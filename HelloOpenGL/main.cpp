@@ -136,8 +136,8 @@ int main(){
 
 	glBindVertexArray(0);
 
-	glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
-	glLineWidth(10);
+//	glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+//	glLineWidth(10);
 	glEnable(GL_MULTISAMPLE);
 
 	float lastTime,curTime;
