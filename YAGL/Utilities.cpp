@@ -9,6 +9,38 @@
 
 namespace gl {
 
+namespace Type {
+
+GLuint type_enum_to_int(type_enum te){
+	if(te==Byte)return GL_BYTE;
+	if(te==UnsignedByte)return GL_UNSIGNED_BYTE;
+	if(te==Short)return GL_SHORT;
+	if(te==UnsignedShort)return GL_UNSIGNED_SHORT;
+	if(te==Int)return GL_INT;
+	if(te==UnsignedInt)return GL_UNSIGNED_INT;
+	if(te==HalfFloat)return GL_HALF_FLOAT;
+	if(te==Float)return GL_FLOAT;
+	if(te==Double)return GL_DOUBLE;
+	if(te==Fixed)return GL_FIXED;
+	return 0;
+}
+
+size_t sizeOfType(type_enum te){
+	if(te==Short)return sizeof(short);
+	if(te==UnsignedShort)return sizeof(unsigned short);
+	if(te==Int)return sizeof(int);
+	if(te==UnsignedInt)return sizeof(unsigned int);
+	if(te==Float)return sizeof(float);
+	if(te==Double)return sizeof(double);
+	return 0;
+}
+
+}
+
+void defaultViewport(Window w){
+	glViewport(0,0,w.width,w.height);
+}
+
 void setClearColor(float r,float g,float b){
 	glClearColor(r,g,b,1);
 }

@@ -32,12 +32,16 @@ void Window::setMinorVersion(int i){
 }
 
 void Window::create(){
+	width=100;
+	height=100;
 	ptr=glfwCreateWindow(100,100,"Default Title", nullptr, nullptr);
 }
 void Window::setTitle(const char*title){
 	glfwSetWindowTitle(ptr, title);
 }
 void Window::setSize(int w,int h){
+	width=w;
+	height=h;
 	glfwSetWindowSize(ptr, w, h);
 }
 

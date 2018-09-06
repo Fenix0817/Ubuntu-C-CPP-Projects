@@ -51,6 +51,8 @@ void Shader::attach(const char*code,ShaderType::shader_type_enum type){
 		glGetShaderInfoLog(s,512,nullptr,log);
 		printf("%s shader error\n%s\n",ShaderType::shader_type_enum_to_str(type),log);
 	}
+
+	glAttachShader(id,s);
 }
 void Shader::link(){
 	glLinkProgram(id);

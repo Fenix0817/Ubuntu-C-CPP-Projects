@@ -27,6 +27,9 @@ public:
 
 	bool boundOnce;
 
+	int width;
+	int height;
+
 	void setMajorVersion(int i);
 	void setMinorVersion(int i);
 
