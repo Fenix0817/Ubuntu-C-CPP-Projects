@@ -67,6 +67,8 @@ public:
 	Type::type_enum type;
 	size_t size;
 
+	int getLength();
+
 	void setTarget(VertexBufferTarget::vertex_buffer_target_enum vbte);
 	void setUsage(VertexBufferUsage::vertex_buffer_usage_enum vbue);
 	void setType(Type::type_enum te);

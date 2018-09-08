@@ -74,6 +74,10 @@ void VertexBuffer::setType(Type::type_enum te){
 	type=te;
 }
 
+int VertexBuffer::getLength(){
+	return size/Type::sizeOfType(type);
+}
+
 void VertexBuffer::create(){
 	glGenBuffers(1,&id);
 }
