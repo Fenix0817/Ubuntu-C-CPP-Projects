@@ -71,6 +71,8 @@
                                     									
                                     <listOptionValue builtIn="false" value="GL"/>
                                     									
+                                    <listOptionValue builtIn="false" value="glm"/>
+                                    									
                                     <listOptionValue builtIn="false" value="X11"/>
                                     									
                                     <listOptionValue builtIn="false" value="Xxf86vm"/>
@@ -247,7 +249,21 @@
     	
     <storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
     	
-    <storageModule moduleId="refreshScope"/>
+    <storageModule moduleId="refreshScope" versionNumber="2">
+        		
+        <configuration configurationName="Debug">
+            			
+            <resource resourceType="PROJECT" workspacePath="/YAGL"/>
+            		
+        </configuration>
+        		
+        <configuration configurationName="Release">
+            			
+            <resource resourceType="PROJECT" workspacePath="/YAGL"/>
+            		
+        </configuration>
+        	
+    </storageModule>
     	
     <storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
     

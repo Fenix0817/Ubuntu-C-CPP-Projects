@@ -35,6 +35,39 @@ Shader::~Shader() {
 	// TODO Auto-generated destructor stub
 }
 
+GLuint Shader::getUniformLocation(string param){
+	return glGetUniformLocation(id,param.c_str());
+}
+void Shader::setFloat(string param,float f){
+	glUniform1f(getUniformLocation(param),f);
+}
+void Shader::setVec2(string param,float x,float y){
+	glUniform2f(getUniformLocation(param),x,y);
+}
+void Shader::setVec3(string param,float x,float y,float z){
+	glUniform3f(getUniformLocation(param),x,y,z);
+}
+void Shader::setVec4(string param,float x,float y,float z,float w){
+	glUniform4f(getUniformLocation(param),x,y,z,w);
+}
+void Shader::setVec2(string param,glm::vec2 v){
+	glUniform2fv(getUniformLocation(param),1,glm::value_ptr(v));
+}
+void Shader::setVec3(string param,glm::vec3 v){
+	glUniform3fv(getUniformLocation(param),1,glm::value_ptr(v));
+}
+void Shader::setVec4(string param,glm::vec4 v){
+	glUniform4fv(getUniformLocation(param),1,glm::value_ptr(v));
+}
+void Shader::setMat2(string param,glm::mat2 m){
+	glUniformMatrix2fv(getUniformLocation(param),1,GL_FALSE,glm::value_ptr(m));
+}
+void Shader::setMat3(string param,glm::mat3 m){
+	glUniformMatrix3fv(getUniformLocation(param),1,GL_FALSE,glm::value_ptr(m));
+}
+void Shader::setMat4(string param,glm::mat4 m){
+	glUniformMatrix4fv(getUniformLocation(param),1,GL_FALSE,glm::value_ptr(m));
+}
 
 void Shader::create(){
 	id=glCreateProgram();
@@ -53,6 +86,9 @@ void Shader::attach(const char*code,ShaderType::shader_type_enum type){
 	}
 
 	glAttachShader(id,s);
+}
+void Shader::attachFile(const char*filename,ShaderType::shader_type_enum type){
+	attach(gl::readFile(filename).c_str(),type);
 }
 void Shader::link(){
 	glLinkProgram(id);

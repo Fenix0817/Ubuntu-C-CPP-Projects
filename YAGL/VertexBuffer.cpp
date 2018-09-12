@@ -90,7 +90,7 @@ void VertexBuffer::setData(size_t length,const void*data){
 }
 void VertexBuffer::addVertexAttrib(int attrib,int size,bool norm,size_t stride,const GLvoid*ptr){
 	glEnableVertexAttribArray(attrib);
-	glVertexAttribPointer(attrib,size,Type::type_enum_to_int(type),norm?GL_FALSE:GL_TRUE,stride,ptr);
+	glVertexAttribPointer(attrib,size,Type::type_enum_to_int(type),norm?GL_FALSE:GL_TRUE,stride*Type::sizeOfType(type),ptr);
 }
 void VertexBuffer::render(){
 	glDrawElements(GL_TRIANGLES,size/Type::sizeOfType(type),Type::type_enum_to_int(type),0);

@@ -88,22 +88,19 @@ switch(error){
 }
 
 int main(){
-
-	printf("1\n");
 	cl_uint result;
 
 	cl_uint platformCount=0;
 
 
 	result=clGetPlatformIDs(0,nullptr,&platformCount);
-
 	if(result!=CL_SUCCESS){
 		printf("%s\n",getErrorString(result));
 		return 1;
 	}
 
+	printf("Platform number: %i\n",platformCount);
 
-	printf("2 %i\n",platformCount);
 	cl_platform_id*platforms=(cl_platform_id*)malloc(platformCount*sizeof(cl_platform_id));
 	clGetPlatformIDs(platformCount,platforms,nullptr);
 	printf("3\n");
@@ -123,10 +120,15 @@ int main(){
 
 			size_t extensionSize;
 			clGetDeviceInfo(device,CL_DEVICE_EXTENSIONS,0,nullptr,&extensionSize);
-
 			char* extensions=(char*)malloc(extensionSize);
 			clGetDeviceInfo(device,CL_DEVICE_EXTENSIONS,extensionSize,extensions,nullptr);
+			printf("Extensions: %s\n",extensions);
 
+			size_t nameSize;
+			clGetDeviceInfo(device,CL_DEVICE_NAME,0,nullptr,&nameSize);
+			char*name=(char*)malloc(nameSize);
+			clGetDeviceInfo(device,CL_DEVICE_NAME,nameSize,name,nullptr);
+			printf("Device name: %s\n",name);
 		}
 	}
 

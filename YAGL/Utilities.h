@@ -13,6 +13,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "Window.h"
+#include <string>
+#include <fstream>
+#include <streambuf>
 
 namespace gl {
 
@@ -40,8 +43,10 @@ size_t sizeOfType(type_enum te);
 void defaultViewport(Window w);
 void setClearColor(float r,float g,float b);
 void setClearColor(float gray);
+void setDepth(bool d);
 void clearScreen();
 float time();
+std::string readFile(const char*filename);
 
 const GLubyte* version();
 const GLubyte* vendor();

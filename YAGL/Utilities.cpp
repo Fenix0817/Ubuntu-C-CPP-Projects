@@ -53,6 +53,15 @@ void clearScreen(){
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 }
 
+void setDepth(bool d){
+	if(d){
+		glDepthFunc(GL_LESS);
+		glEnable(GL_DEPTH_TEST);
+	}else{
+		glDisable(GL_DEPTH_TEST);
+	}
+}
+
 float time(){
 	return glfwGetTime();
 }
@@ -79,6 +88,14 @@ GLuint minorVersion(){
 	int i;
 	glGetIntegerv(GL_MINOR_VERSION,&i);
 	return i;
+}
+
+std::string readFile(const char*filename){
+	std::ifstream t(filename);
+	std::string s((std::istreambuf_iterator<char>(t)),
+	                 std::istreambuf_iterator<char>());
+	printf("code:<%s>\n",s.c_str());
+	return s;
 }
 
 } /* namespace gl */

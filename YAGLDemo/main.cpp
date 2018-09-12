@@ -68,14 +68,14 @@ int main(){
 	vboPos.create();
 	vboPos.bind();
 	vboPos.setData(sizeof(posData),posData);
-	vboPos.addVertexAttrib(0,3,false,3*sizeof(float),(void*)0);
+	vboPos.addVertexAttrib(0,3,false,3,(void*)0);
 	vboPos.unbind();
 
 	gl::VertexBuffer vboCol(gl::VertexBufferTarget::Array,gl::VertexBufferUsage::StaticDraw,gl::Type::Float);
 	vboCol.create();
 	vboCol.bind();
 	vboCol.setData(sizeof(colData),colData);
-	vboCol.addVertexAttrib(1,3,false,3*sizeof(float),(void*)0);
+	vboCol.addVertexAttrib(1,3,false,3,(void*)0);
 	vboCol.unbind();
 
 	gl::VertexBuffer ebo(gl::VertexBufferTarget::ElementArray,gl::VertexBufferUsage::StaticDraw,gl::Type::UnsignedInt);
