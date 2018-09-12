@@ -29,12 +29,8 @@ int main(){
 	window.create();
 	window.setTitle("Simple 3D");
 	window.setSize(300,500);
-	window.bind();//use GLM, add shader uniforms
-	//BIRTHDAY LIST IN HIPCHAT
-	//raymarching, pathtracing, opengl, vulkan, fluid simulation, global illumination books
-	//printouts of Complex Analysis by Simon and LearnOpenGL
-	//Zoe toy
-	//Skittles
+	window.bind();
+	//FIGURE OUT GIT
 
 	printf("Major version ..... %i\n",gl::majorVersion());
 	printf("Minor version ..... %i\n",gl::minorVersion());
