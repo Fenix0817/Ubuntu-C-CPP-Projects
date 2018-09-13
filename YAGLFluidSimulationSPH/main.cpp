@@ -26,18 +26,18 @@ struct particle {
 	float rho,p;
 };
 
-const float SIM_W = 500;
-const float SIM_H = 500;
-const int SIM_WI  = 500;
-const int SIM_HI  = 500;
+const float SIM_W = 1000;
+const float SIM_H = 1000;
+const int SIM_WI  = (int) SIM_W;
+const int SIM_HI  = (int) SIM_H;
 
-const float DISPLAY_SIZE = 5;
+const float DISPLAY_SIZE = 25/2+3;
 
 
 const static vec2 G(0.f, 12000*-9.8f);
 const static float REST_DENS = 1000.f;
 const static float GAS_CONST = 2000.f;
-const static float H = 17.f;
+const static float H = 25.f;
 const static float HSQ = H*H;
 const static float MASS = 65.f;
 const static float VISC = 250.f;
@@ -244,8 +244,22 @@ int main(){
 
 	//TODO: add mouse interactivity to gl::Window and this
 
+	vec2 lastMousePos(0,0);
+	vec2 mousePos(0,0);
+
 	while(window.isOpen()){
 		window.bind();
+
+		lastMousePos=mousePos;
+		mousePos=window.getMouse();
+
+		vec2 diff=mousePos-lastMousePos;
+
+		for(unsigned int i=0;i<list.size();i++){
+			if(glm::length(mousePos-list[i].x)<150){
+				list[i].v+=30.0f*diff;
+			}
+		}
 
 		gl::setClearColor(1);
 		gl::clearScreen();

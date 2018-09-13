@@ -45,6 +45,12 @@ void Window::setSize(int w,int h){
 	glfwSetWindowSize(ptr, w, h);
 }
 
+glm::vec2 Window::getMouse(){
+	double x,y;
+	glfwGetCursorPos(ptr,&x,&y);
+	return glm::vec2(x,height-y);
+}
+
 void Window::bind(){
 	glfwMakeContextCurrent(ptr);
 	if(!boundOnce){

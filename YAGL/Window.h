@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <glm/glm.hpp>
+
 namespace gl {
 
 void init();
@@ -36,6 +38,8 @@ public:
 	void create();
 	void setTitle(const char*title);
 	void setSize(int w,int h);
+
+	glm::vec2 getMouse();
 
 	void bind();
 	void unbind();
