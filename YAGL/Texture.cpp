@@ -54,6 +54,10 @@ GLuint param_value_to_int(param_value pv){
 	if(pv==MirroredRepeat)return GL_MIRRORED_REPEAT;
 	if(pv==Repeat)return GL_REPEAT;
 	if(pv==MirrorClampToEdge)return GL_MIRROR_CLAMP_TO_EDGE;
+	if(pv==LinearMipmapLinear)return GL_LINEAR_MIPMAP_LINEAR;
+	if(pv==LinearMipmapNearest)return GL_LINEAR_MIPMAP_NEAREST;
+	if(pv==NearestMipmapLinear)return GL_NEAREST_MIPMAP_LINEAR;
+	if(pv==NearestMipmapNearest)return GL_NEAREST_MIPMAP_NEAREST;
 	return 0;
 }
 
@@ -91,12 +95,13 @@ void Texture::setParam(TextureParamName::param_name pn,TextureParamValue::param_
 void Texture::setData(int w,int h,TextureData data){
 	width=w;
 	height=h;
-	int num_mipmaps=8;
 	glTexImage2D(TextureTarget::texture_target_enum_to_int(target),0,GL_RGBA,w,h,0,GL_RGBA,GL_UNSIGNED_BYTE,data);
 
+
+//	int num_mipmaps=8;
 	//TODO: Why does this not change anything
-	glTexStorage2D(TextureTarget::texture_target_enum_to_int(target),num_mipmaps,GL_RGBA8,w,h);
-	glTexSubImage2D(TextureTarget::texture_target_enum_to_int(target),0,0,0,w,h,GL_RGBA,GL_UNSIGNED_BYTE,data);
+//	glTexStorage2D(TextureTarget::texture_target_enum_to_int(target),num_mipmaps,GL_RGBA8,w,h);
+//	glTexSubImage2D(TextureTarget::texture_target_enum_to_int(target),0,0,0,w,h,GL_RGBA,GL_UNSIGNED_BYTE,data);
 	glGenerateMipmap(TextureTarget::texture_target_enum_to_int(target));
 }
 

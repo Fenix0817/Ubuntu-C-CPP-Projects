@@ -57,7 +57,11 @@ enum param_value {
 	ClampToBorder,
 	MirroredRepeat,
 	Repeat,
-	MirrorClampToEdge
+	MirrorClampToEdge,
+	LinearMipmapLinear,
+	LinearMipmapNearest,
+	NearestMipmapLinear,
+	NearestMipmapNearest
 };
 
 GLuint param_value_to_int(param_value pv);

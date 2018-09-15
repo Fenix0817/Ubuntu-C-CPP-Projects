@@ -19,6 +19,7 @@
 #include "AtlasPos.h"
 #include "AtlasHD.h"
 #include "AtlasLow.h"
+#include "AtlasNormal.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -175,15 +176,19 @@ int main(){
 	gl::init();
 
 	gl::Window window;
+//	glfwWindowHint(GLFW_SAMPLES,100);
 	window.setMajorVersion(4);
 	window.setMinorVersion(5);
 	window.create();
 	window.setTitle("YAGL Minecraft #1");
 	window.setSize(500,500);
 	window.bind();
+//	glEnable(GL_MULTISAMPLE);
+
 
 //	Atlas* atlas = new AtlasHD();
-	Atlas* atlas = new AtlasLow();
+//	Atlas* atlas = new AtlasLow();
+	Atlas* atlas = new AtlasNormal();
 
 //
 //	std::vector<float> posData{
@@ -241,8 +246,8 @@ int main(){
 	gl::Texture texture=gl::loadTexture(atlas->getFileName());
 
 	texture.bind();
-//	texture.setParam(gl::TextureParamName::MinFilter,gl::TextureParamValue::Linear);
-//	texture.setParam(gl::TextureParamName::MagFilter,gl::TextureParamValue::Linear);
+	texture.setParam(gl::TextureParamName::MinFilter,gl::TextureParamValue::NearestMipmapLinear);
+	texture.setParam(gl::TextureParamName::MagFilter,gl::TextureParamValue::NearestMipmapLinear);
 	texture.unbind();
 
 	window.unbind();
