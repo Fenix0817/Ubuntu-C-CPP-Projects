@@ -91,7 +91,13 @@ void Texture::setParam(TextureParamName::param_name pn,TextureParamValue::param_
 void Texture::setData(int w,int h,TextureData data){
 	width=w;
 	height=h;
+	int num_mipmaps=8;
 	glTexImage2D(TextureTarget::texture_target_enum_to_int(target),0,GL_RGBA,w,h,0,GL_RGBA,GL_UNSIGNED_BYTE,data);
+
+	//TODO: Why does this not change anything
+	glTexStorage2D(TextureTarget::texture_target_enum_to_int(target),num_mipmaps,GL_RGBA8,w,h);
+	glTexSubImage2D(TextureTarget::texture_target_enum_to_int(target),0,0,0,w,h,GL_RGBA,GL_UNSIGNED_BYTE,data);
+	glGenerateMipmap(TextureTarget::texture_target_enum_to_int(target));
 }
 
 void Texture::bindToUnit(int u){
