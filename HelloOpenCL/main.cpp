@@ -99,14 +99,25 @@ int main(){
 		return 1;
 	}
 
-	printf("Platform number: %i\n",platformCount);
-
 	cl_platform_id*platforms=(cl_platform_id*)malloc(platformCount*sizeof(cl_platform_id));
 	clGetPlatformIDs(platformCount,platforms,nullptr);
-	printf("3\n");
-	for(int i=0;i<platformCount;i++){
-		printf("PLATFORM\n");
+
+	for(unsigned int i=0;i<platformCount;i++){
 		cl_platform_id platform=platforms[i];
+
+		printf("Platform\n");
+
+		size_t nameSize;
+		clGetPlatformInfo(platform,CL_PLATFORM_NAME,0,nullptr,&nameSize);
+		char*name=(char*)malloc(nameSize);
+		clGetPlatformInfo(platform,CL_PLATFORM_NAME,nameSize,name,nullptr);
+		printf("Name: %s\n",name);
+
+		size_t vendorSize;
+		clGetPlatformInfo(platform,CL_PLATFORM_VENDOR,0,nullptr,&vendorSize);
+		char*vendor=(char*)malloc(vendorSize);
+		clGetPlatformInfo(platform,CL_PLATFORM_VENDOR,vendorSize,vendor,nullptr);
+		printf("Vendor: %s\n",vendor);
 
 		cl_uint deviceCount=0;
 		clGetDeviceIDs(platform,CL_DEVICE_TYPE_ALL,0,nullptr,&deviceCount);
@@ -114,21 +125,26 @@ int main(){
 		cl_device_id*devices=(cl_device_id*)malloc(deviceCount*sizeof(cl_device_id));
 		clGetDeviceIDs(platform,CL_DEVICE_TYPE_ALL,deviceCount,devices,nullptr);
 
-		for(int j=0;j<deviceCount;j++){
-			printf("DEVICE\n");
+		for(unsigned int j=0;j<deviceCount;j++){
 			cl_device_id device=devices[j];
-
-			size_t extensionSize;
-			clGetDeviceInfo(device,CL_DEVICE_EXTENSIONS,0,nullptr,&extensionSize);
-			char* extensions=(char*)malloc(extensionSize);
-			clGetDeviceInfo(device,CL_DEVICE_EXTENSIONS,extensionSize,extensions,nullptr);
-			printf("Extensions: %s\n",extensions);
 
 			size_t nameSize;
 			clGetDeviceInfo(device,CL_DEVICE_NAME,0,nullptr,&nameSize);
 			char*name=(char*)malloc(nameSize);
 			clGetDeviceInfo(device,CL_DEVICE_NAME,nameSize,name,nullptr);
-			printf("Device name: %s\n",name);
+			printf("\tDevice name: %s\n",name);
+
+			size_t vendorSize;
+			clGetDeviceInfo(device,CL_DEVICE_VENDOR,0,nullptr,&vendorSize);
+			char*vendor=(char*)malloc(vendorSize);
+			clGetDeviceInfo(device,CL_DEVICE_VENDOR,vendorSize,vendor,nullptr);
+			printf("\tDevice vendor: %s\n",vendor);
+
+			size_t extensionSize;
+			clGetDeviceInfo(device,CL_DEVICE_EXTENSIONS,0,nullptr,&extensionSize);
+			char* extensions=(char*)malloc(extensionSize);
+			clGetDeviceInfo(device,CL_DEVICE_EXTENSIONS,extensionSize,extensions,nullptr);
+			printf("\tExtensions: %s\n",extensions);
 		}
 	}
 
