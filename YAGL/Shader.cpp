@@ -38,6 +38,9 @@ Shader::~Shader() {
 GLuint Shader::getUniformLocation(string param){
 	return glGetUniformLocation(id,param.c_str());
 }
+void Shader::setInt(string param,int i){
+	glUniform1i(getUniformLocation(param),i);
+}
 void Shader::setFloat(string param,float f){
 	glUniform1f(getUniformLocation(param),f);
 }

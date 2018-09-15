@@ -58,6 +58,8 @@ public:
 	void setMat3(string param,glm::mat3 m);
 	void setMat4(string param,glm::mat4 m);
 
+	void setInt(string param,int i);
+
 	void bind();
 	void unbind();
 
