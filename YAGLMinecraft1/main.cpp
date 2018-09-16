@@ -21,6 +21,8 @@
 #include "AtlasLow.h"
 #include "AtlasNormal.h"
 
+#include "FastNoise.h"
+
 #include "Camera.h"
 
 #include <glm/glm.hpp>
@@ -30,7 +32,7 @@
 #include <glm/gtx/rotate_vector.hpp>
 
 const int SIZE=16;
-const int HEIGHT=50;
+const int HEIGHT=10;
 
 Block chunk[SIZE][HEIGHT][SIZE];
 
@@ -38,22 +40,30 @@ std::vector<float>posData;
 std::vector<float>uvData;
 std::vector<unsigned int>triData;
 
+FastNoise noise;
+
 void initChunk(){
+	noise.SetNoiseType(FastNoise::Cubic);
+	noise.SetInterp(FastNoise::Hermite);
 	for(int x=0;x<SIZE;x++){
 		for(int z=0;z<SIZE;z++){
 
-			int h=x;
+//			int h=x;
+			int h=(int)(0.5*HEIGHT+HEIGHT*noise.GetSimplex(x*2.0f,z*2.0f));
+			printf("%f\n",h);
 			for(int y=0;y<HEIGHT;y++){
 //				if(y==h)chunk[x][y][z]=blockGrass;
 //				else chunk[x][y][z]=blockEmpty;
-				if(y<h-3)chunk[x][y][z]=blockStone;
+				if(y<h-10)chunk[x][y][z]=blockStone;
 				else if(y<h)chunk[x][y][z]=blockDirt;
 				else if(y==h){
-					if(x<6&&z<6)chunk[x][y][z]=blockSand;
-					else{
-						if(x<12&&z<12)chunk[x][y][z]=blockGrass;
-						else chunk[x][y][z]=blockSnow;
-					}
+					chunk[x][y][z]=blockGrass;
+//					int r=rand()%5;
+//					if(r==0)chunk[x][y][z]=blockGrass;
+//					if(r==1)chunk[x][y][z]=blockDirt;
+//					if(r==2)chunk[x][y][z]=blockStone;
+//					if(r==3)chunk[x][y][z]=blockSand;
+//					if(r==4)chunk[x][y][z]=blockSnow;
 				}
 				else chunk[x][y][z]=blockEmpty;
 			}
@@ -325,6 +335,8 @@ int main(){
 		if(window.isKeyDown('A'))camera.moveLeft();
 		if(window.isKeyDown('D'))camera.moveRight();
 
+		if(window.isKeyDown(' '))camera.camPos.y-=0.1;
+		if(window.isKeyDown(GLFW_KEY_LEFT_SHIFT))camera.camPos.y+=0.1;
 		if(window.isKeyDown(GLFW_KEY_ESCAPE))window.close();
 
 		window.clearInputs();

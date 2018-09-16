@@ -42,7 +42,10 @@ void Camera::updateDirection(glm::vec2 newMouse){
 	rotX+=0.01*dx;
 	rotY+=0.01*dy;
 
-	printf("%f,%f %f,%f %f,%f\n",diff.x,diff.y,rotX,rotY,dx,dy);
+	if(rotX<-PI*0.4)rotX=-PI*0.4;
+	if(rotX> PI*0.4)rotX= PI*0.4;
+
+//	printf("%f,%f %f,%f %f,%f\n",diff.x,diff.y,rotX,rotY,dx,dy);
 
 	camDir=glm::vec3(0,0,1);
 	camDir=glm::rotateX(camDir,rotX);
