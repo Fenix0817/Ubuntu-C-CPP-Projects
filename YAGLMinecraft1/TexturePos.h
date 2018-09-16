@@ -22,6 +22,11 @@ struct TexturePos {
 		_01/=s;
 		_10/=s;
 		_11/=s;
+		float o=0;
+		_00+=glm::vec2( o, o);
+		_01+=glm::vec2( o,-o);
+		_10+=glm::vec2(-o, o);
+		_11+=glm::vec2(-o,-o);
 	}
 };
 

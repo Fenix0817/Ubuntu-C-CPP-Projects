@@ -21,8 +21,13 @@
 #include "AtlasLow.h"
 #include "AtlasNormal.h"
 
+#include "Camera.h"
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/rotate_vector.hpp>
 
 const int SIZE=16;
 const int HEIGHT=50;
@@ -43,7 +48,13 @@ void initChunk(){
 //				else chunk[x][y][z]=blockEmpty;
 				if(y<h-3)chunk[x][y][z]=blockStone;
 				else if(y<h)chunk[x][y][z]=blockDirt;
-				else if(y==h)chunk[x][y][z]=blockGrass;
+				else if(y==h){
+					if(x<6&&z<6)chunk[x][y][z]=blockSand;
+					else{
+						if(x<12&&z<12)chunk[x][y][z]=blockGrass;
+						else chunk[x][y][z]=blockSnow;
+					}
+				}
 				else chunk[x][y][z]=blockEmpty;
 			}
 
@@ -171,7 +182,6 @@ void initMesh(Atlas*atlas){
 }
 
 
-
 int main(){
 	gl::init();
 
@@ -181,7 +191,7 @@ int main(){
 	window.setMinorVersion(5);
 	window.create();
 	window.setTitle("YAGL Minecraft #1");
-	window.setSize(500,500);
+	window.setSize(1000,1000);
 	window.bind();
 //	glEnable(GL_MULTISAMPLE);
 
@@ -252,6 +262,17 @@ int main(){
 
 	window.unbind();
 
+//	glm::vec3 camPos=glm::vec3(-5,5,-5);
+//	glm::vec3 camDir=glm::vec3(1,0,0);
+
+	Camera camera;
+	camera.camPos=glm::vec3(-5,5,-5);
+	camera.camDir=glm::vec3(1,0,0);
+
+	camera.forwardSpeed=0.2;
+	camera.sideSpeed   =0.1;
+	camera.backSpeed   =0.025;
+
 	while(window.isOpen()){
 		window.bind();
 
@@ -265,11 +286,16 @@ int main(){
 		texture.bindToUnit(0);
 		shader.setInt("tex",0);
 
-		glm::mat4 perspective=glm::perspective(80.0f,1.0f,0.01f,100.0f);
-		glm::mat4 view=glm::lookAt(glm::vec3(-5*cos(gl::time()),5,-5),glm::vec3(8,16,8),glm::vec3(0,1,0));
-		glm::mat4 model=glm::mat4(1);
+		camera.fovy=80;
+		camera.windowW=window.width;
+		camera.windowH=window.height;
 
-		shader.setMat4("MVP",perspective*view*model);
+//		glm::mat4 perspective=glm::perspective(80.0f,1.0f*window.width/window.height,0.01f,100.0f);
+//		glm::mat4 view=glm::lookAt(glm::vec3(-5*cos(gl::time()),5,-5),glm::vec3(8,16,8),glm::vec3(0,1,0));
+//		glm::mat4 view=glm::lookAt(camPos,camPos+camDir,glm::vec3(0,1,0));
+//		glm::mat4 model=glm::mat4(1);
+
+		shader.setMat4("MVP",camera.getPerspectiveViewMatrix());
 
 		vao.bind();
 		ebo.bind();
@@ -279,6 +305,30 @@ int main(){
 
 		shader.unbind();
 
+//		camDir=glm::vec3(0,0,1);
+//		camDir=glm::rotateX(camDir,map(window.getMouse().y,0,window.height,-PI,PI));
+//		camDir=glm::rotateY(camDir,map(window.getMouse().x,0,window.width,-PI,PI));
+
+//		glm::vec3 camDirMove=glm::normalize(glm::vec3(camDir.x,0,camDir.z));
+
+//		if(window.isKeyDown('W'))camPos+=0.1f*camDirMove;
+//		if(window.isKeyDown('S'))camPos-=0.1f*camDirMove;
+//		if(window.isKeyDown('A'))camPos-=0.1f*glm::rotateY(camDirMove,glm::radians(90.0f));
+//		if(window.isKeyDown('D'))camPos+=0.1f*glm::rotateY(camDirMove,glm::radians(90.0f));
+
+		camera.updateDirection(window.getMouse());
+		glfwSetCursorPos(window.ptr,window.width/2,window.height/2);
+		camera.mouse=window.getMouse();
+
+		if(window.isKeyDown('W'))camera.moveForward();
+		if(window.isKeyDown('S'))camera.moveBack();
+		if(window.isKeyDown('A'))camera.moveLeft();
+		if(window.isKeyDown('D'))camera.moveRight();
+
+		if(window.isKeyDown(GLFW_KEY_ESCAPE))window.close();
+
+		window.clearInputs();
+		window.updateSize();
 		window.unbind();
 	}
 
