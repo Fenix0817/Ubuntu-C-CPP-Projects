@@ -42,6 +42,10 @@ typedef double FN_DECIMAL;
 typedef float FN_DECIMAL;
 #endif
 
+class FastNoise;
+
+typedef FastNoise* FastNoisePtr;
+
 class FastNoise
 {
 public:

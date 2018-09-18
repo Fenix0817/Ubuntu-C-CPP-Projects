@@ -20,6 +20,9 @@
 #include "AtlasHD.h"
 #include "AtlasLow.h"
 #include "AtlasNormal.h"
+#include "Chunk.h"
+
+#include <utility>
 
 #include "FastNoise.h"
 
@@ -31,166 +34,61 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/rotate_vector.hpp>
 
-const int SIZE=16;
-const int HEIGHT=10;
+bool printError(){
+	GLenum e=glGetError();
+	switch(e){
+	case GL_NO_ERROR: printf("GL_NO_ERROR\n"); return false;
+	case GL_INVALID_ENUM: printf("GL_INVALID_ENUM\n"); return true;
+	case GL_INVALID_VALUE: printf("GL_INVALID_VALUE\n"); return true;
+	case GL_INVALID_OPERATION: printf("GL_INVALID_OPERATION\n"); return true;
+	case GL_INVALID_FRAMEBUFFER_OPERATION: printf("GL_INVALID_FRAMEBUFFER_OPERATION\n"); return true;
+	case GL_OUT_OF_MEMORY: printf("GL_OUT_OF_MEMORY\n"); return true;
+	case GL_STACK_UNDERFLOW: printf("GL_STACK_UNDERFLOW\n"); return true;
+	case GL_STACK_OVERFLOW: printf("GL_STACK_OVERFLOW\n"); return true;
+	}
+	return false;
+}
 
-Block chunk[SIZE][HEIGHT][SIZE];
+std::vector<ChunkPtr>chunks;
 
-std::vector<float>posData;
-std::vector<float>uvData;
-std::vector<unsigned int>triData;
+FastNoisePtr noise;
 
-FastNoise noise;
+AtlasPtr atlas;
 
-void initChunk(){
-	noise.SetNoiseType(FastNoise::Cubic);
-	noise.SetInterp(FastNoise::Hermite);
-	for(int x=0;x<SIZE;x++){
-		for(int z=0;z<SIZE;z++){
-
-//			int h=x;
-			int h=(int)(0.5*HEIGHT+HEIGHT*noise.GetSimplex(x*2.0f,z*2.0f));
-			printf("%f\n",h);
-			for(int y=0;y<HEIGHT;y++){
-//				if(y==h)chunk[x][y][z]=blockGrass;
-//				else chunk[x][y][z]=blockEmpty;
-				if(y<h-10)chunk[x][y][z]=blockStone;
-				else if(y<h)chunk[x][y][z]=blockDirt;
-				else if(y==h){
-					chunk[x][y][z]=blockGrass;
-//					int r=rand()%5;
-//					if(r==0)chunk[x][y][z]=blockGrass;
-//					if(r==1)chunk[x][y][z]=blockDirt;
-//					if(r==2)chunk[x][y][z]=blockStone;
-//					if(r==3)chunk[x][y][z]=blockSand;
-//					if(r==4)chunk[x][y][z]=blockSnow;
-				}
-				else chunk[x][y][z]=blockEmpty;
-			}
-
+ChunkPtr getChunk(int x,int z,bool instantiateChunk){
+	bool foundChunk=false;
+	ChunkPtr c=nullptr;
+	for(int i=0;i<chunks.size()&&!foundChunk;i++){
+		if(chunks[i]->chunkPos.x==x&&chunks[i]->chunkPos.y==z){
+			c=chunks[i];
+			foundChunk=true;
 		}
 	}
-}
-
-void addTriangle(unsigned int a,unsigned int b,unsigned int c){
-	unsigned int i=posData.size()/3;
-	triData.push_back(i+a);
-	triData.push_back(i+b);
-	triData.push_back(i+c);
-}
-
-void addPos(float x,float y,float z){
-	posData.push_back(x);
-	posData.push_back(16-y);
-	posData.push_back(z);
-}
-
-void addUV(float u,float v){
-	uvData.push_back(u);
-	uvData.push_back(v);
-}
-
-void addUV(glm::vec2 v){
-	addUV(v.x,v.y);
-}
-
-void addUV(TexturePos tp,bool flip=false){
-	addUV(tp._00);
-	if(flip){
-		addUV(tp._10);
-		addUV(tp._01);
-	}else{
-		addUV(tp._01);
-		addUV(tp._10);
+	if(!foundChunk){
+		printf("\tCreating data for %i,%i\n",x,z);
+		c=new Chunk();
+		c->chunkPos=glm::ivec2(x,z);
+		c->createChunkData(noise);
+		chunks.push_back(c);
+		printf("\tFinished creating data for %i,%i\n",x,z);
 	}
-	addUV(tp._11);
-}
-
-void addTriangleFace(){
-	addTriangle(0,1,2);
-	addTriangle(1,2,3);
-}
-
-bool isEmpty(int x,int y,int z){
-	if(x<0||y<0||z<0||x>=SIZE||y>=HEIGHT||z>=SIZE)return true;
-	return chunk[x][y][z].empty;
-}
-
-void initMesh(Atlas*atlas){
-	for(int x=0;x<SIZE;x++){
-		for(int y=0;y<HEIGHT;y++){
-			for(int z=0;z<SIZE;z++){
-
-				Block b=chunk[x][y][z];
-
-				if(b.empty)continue;
-
-				TexturePos xmi=atlas->getTexturePos(b.xmi);
-				TexturePos xpl=atlas->getTexturePos(b.xpl);
-				TexturePos ymi=atlas->getTexturePos(b.ymi);
-				TexturePos ypl=atlas->getTexturePos(b.ypl);
-				TexturePos zmi=atlas->getTexturePos(b.zmi);
-				TexturePos zpl=atlas->getTexturePos(b.zpl);
-
-				if(isEmpty(x-1,y,z)){//xmi
-					addTriangleFace();
-					addPos(x,y,z);
-					addPos(x,y+1,z);
-					addPos(x,y,z+1);
-					addPos(x,y+1,z+1);
-					addUV(xmi);
-				}
-
-				if(isEmpty(x+1,y,z)){//xpl
-					addTriangleFace();
-					addPos(x+1,y,z);
-					addPos(x+1,y+1,z);
-					addPos(x+1,y,z+1);
-					addPos(x+1,y+1,z+1);
-					addUV(xpl);
-				}
-
-				if(isEmpty(x,y-1,z)){//ymi
-					addTriangleFace();
-					addPos(x,y,z);
-					addPos(x+1,y,z);
-					addPos(x,y,z+1);
-					addPos(x+1,y,z+1);
-					addUV(ymi);
-				}
-
-				if(isEmpty(x,y+1,z)){//ypl
-					addTriangleFace();
-					addPos(x,y+1,z);
-					addPos(x+1,y+1,z);
-					addPos(x,y+1,z+1);
-					addPos(x+1,y+1,z+1);
-					addUV(ypl);
-				}
-
-				if(isEmpty(x,y,z-1)){//zmi
-					addTriangleFace();
-					addPos(x,y,z);
-					addPos(x,y+1,z);
-					addPos(x+1,y,z);
-					addPos(x+1,y+1,z);
-					addUV(zmi);
-				}
-
-				if(isEmpty(x,y,z+1)){//zpl
-					addTriangleFace();
-					addPos(x,y,z+1);
-					addPos(x,y+1,z+1);
-					addPos(x+1,y,z+1);
-					addPos(x+1,y+1,z+1);
-					addUV(zpl);
-				}
-
-			}
-		}
+	if(instantiateChunk&&!c->instantiated){
+		printf("\nInstantiating %i,%i\n",x,z);
+		c->instantiated=true;
+		ChunkPtr xmi=getChunk(x-1,z,false);
+		ChunkPtr xpl=getChunk(x+1,z,false);
+		ChunkPtr zmi=getChunk(x,z-1,false);
+		ChunkPtr zpl=getChunk(x,z+1,false);
+		c->cXMI=xmi;
+		c->cXPL=xpl;
+		c->cZMI=zmi;
+		c->cZPL=zpl;
+		c->prepareMesh(atlas);
+		c->prepareGL();
+		printf("Finished instantiating %i,%i:  %i,%i,%i,%i\n",x,z,c->vao.id,c->vboPos.id,c->vboUV.id,c->ebo.id);
 	}
+	return c;
 }
-
 
 int main(){
 	gl::init();
@@ -205,57 +103,53 @@ int main(){
 	window.bind();
 //	glEnable(GL_MULTISAMPLE);
 
+	atlas=new AtlasNormal();
 
-//	Atlas* atlas = new AtlasHD();
-//	Atlas* atlas = new AtlasLow();
-	Atlas* atlas = new AtlasNormal();
+	noise=new FastNoise();
+	noise->SetInterp(FastNoise::Hermite);
+	noise->SetCellularReturnType(FastNoise::Distance);
+	noise->SetCellularDistanceFunction(FastNoise::Euclidean);
+
+//	for(int x=0;x<5;x++){
+//		for(int z=0;z<5;z++){
+//			getChunk(x,z,true);
+//		}
+//	}
+
+	int size=0;
+	int realSize=0;
+	for(int i=0;i<chunks.size();i++){
+		if(chunks[i]->instantiated)realSize++;
+		size++;
+		printf("Chunk pos %i: %i,%i\n",i,chunks[i]->chunkPos.x,chunks[i]->chunkPos.y);
+	}
+	printf("%i,%i\n",size,realSize);
+
+	for(int x=-10;x<=10;x++){
+		for(int z=-10;z<=10;z++){
+			for(int i=0;i<chunks.size();i++){
+				if(chunks[i]->chunkPos==glm::ivec2(x,z))printf("has chunk %i,%i\n",x,z);
+			}
+		}
+	}
 
 //
-//	std::vector<float> posData{
-//		0,0,0,
-//		1,0,0,
-//		0,1,0,
-//		1,1,0
-//	};
-//	std::vector<float> uvData={
-//		0,0,
-//		1,0,
-//		0,1,
-//		1,1
-//	};
-//	std::vector<unsigned int> triData={
-//			0,1,2,
-//			1,2,3
-//	};
-
-	initChunk();
-	initMesh(atlas);
-
-	gl::VertexArray vao;
-	vao.create();
-	vao.bind();
-
-	gl::VertexBuffer vboPos(gl::VertexBufferTarget::Array,gl::VertexBufferUsage::StaticDraw,gl::Type::Float);
-	vboPos.create();
-	vboPos.bind();
-	vboPos.setData(sizeof(float)*posData.size(),posData.data());
-	vboPos.addVertexAttrib(0,3,false,3,0);
-	vboPos.unbind();
-
-	gl::VertexBuffer vboUV(gl::VertexBufferTarget::Array,gl::VertexBufferUsage::StaticDraw,gl::Type::Float);
-	vboUV.create();
-	vboUV.bind();
-	vboUV.setData(sizeof(float)*uvData.size(),uvData.data());
-	vboUV.addVertexAttrib(1,2,false,2,0);
-	vboUV.unbind();
-
-	gl::VertexBuffer ebo(gl::VertexBufferTarget::ElementArray,gl::VertexBufferUsage::StaticDraw,gl::Type::UnsignedInt);
-	ebo.create();
-	ebo.bind();
-	ebo.setData(sizeof(unsigned int)*triData.size(),triData.data());
-	ebo.unbind();
-
-	vao.unbind();
+//	Chunk* chunk=new Chunk();
+//	printf("Init\n");
+//	chunk->createChunkData(noise);
+//	printf("Gen\n");
+//	Chunk* xmi=emptyChunk();
+//	Chunk* xpl=emptyChunk();
+//	Chunk* zmi=emptyChunk();
+//	Chunk* zpl=emptyChunk();
+//	chunk->cXMI=xmi;
+//	chunk->cXPL=xpl;
+//	chunk->cZMI=zmi;
+//	chunk->cZPL=zpl;
+//	chunk->prepareMesh(atlas);
+//	printf("Mesh created\n");
+//	chunk->prepareGL();
+//	printf("GL created\n");
 
 	gl::Shader shader;
 	shader.create();
@@ -267,13 +161,14 @@ int main(){
 
 	texture.bind();
 	texture.setParam(gl::TextureParamName::MinFilter,gl::TextureParamValue::NearestMipmapLinear);
+
+	printError();
 	texture.setParam(gl::TextureParamName::MagFilter,gl::TextureParamValue::NearestMipmapLinear);
+	printError();
+
 	texture.unbind();
 
 	window.unbind();
-
-//	glm::vec3 camPos=glm::vec3(-5,5,-5);
-//	glm::vec3 camDir=glm::vec3(1,0,0);
 
 	Camera camera;
 	camera.camPos=glm::vec3(-5,5,-5);
@@ -300,31 +195,34 @@ int main(){
 		camera.windowW=window.width;
 		camera.windowH=window.height;
 
-//		glm::mat4 perspective=glm::perspective(80.0f,1.0f*window.width/window.height,0.01f,100.0f);
-//		glm::mat4 view=glm::lookAt(glm::vec3(-5*cos(gl::time()),5,-5),glm::vec3(8,16,8),glm::vec3(0,1,0));
-//		glm::mat4 view=glm::lookAt(camPos,camPos+camDir,glm::vec3(0,1,0));
-//		glm::mat4 model=glm::mat4(1);
-
 		shader.setMat4("MVP",camera.getPerspectiveViewMatrix());
-
-		vao.bind();
-		ebo.bind();
-		ebo.render();
-		ebo.unbind();
-		vao.unbind();
+//		shader.setMat4("MVP",camera.getPerspectiveViewMatrix()*chunk->getModelMatrix());
+//
+//		chunk->render();
+		for(int i=0;i<chunks.size();i++){
+			ChunkPtr c=chunks[i];
+			if(c->instantiated){
+				shader.setMat4("MVP",camera.getPerspectiveViewMatrix()*c->getModelMatrix());
+				c->render();
+			}
+		}
 
 		shader.unbind();
 
-//		camDir=glm::vec3(0,0,1);
-//		camDir=glm::rotateX(camDir,map(window.getMouse().y,0,window.height,-PI,PI));
-//		camDir=glm::rotateY(camDir,map(window.getMouse().x,0,window.width,-PI,PI));
+		int chunkX=(int)(camera.camPos.x/CHUNK_SIZE);
+		int chunkZ=(int)(camera.camPos.z/CHUNK_SIZE);
 
-//		glm::vec3 camDirMove=glm::normalize(glm::vec3(camDir.x,0,camDir.z));
+		for(int x=-3;x<=3;x++){
+			for(int z=-3;z<=3;z++){
+				getChunk(x+chunkX,z+chunkZ,true);
+			}
+		}
 
-//		if(window.isKeyDown('W'))camPos+=0.1f*camDirMove;
-//		if(window.isKeyDown('S'))camPos-=0.1f*camDirMove;
-//		if(window.isKeyDown('A'))camPos-=0.1f*glm::rotateY(camDirMove,glm::radians(90.0f));
-//		if(window.isKeyDown('D'))camPos+=0.1f*glm::rotateY(camDirMove,glm::radians(90.0f));
+		//TODO:
+		// (1) Implement side-by-side chunk meshing
+		// (2) AtlasFogleman: https://github.com/fogleman/Craft/blob/master/textures/texture.png
+		// (3) Queue of chunks to add, 1 to 2 per frame
+		// (4) Queue of chunks to remove, 1 to 2 per frame
 
 		camera.updateDirection(window.getMouse());
 		glfwSetCursorPos(window.ptr,window.width/2,window.height/2);
@@ -337,7 +235,8 @@ int main(){
 
 		if(window.isKeyDown(' '))camera.camPos.y-=0.1;
 		if(window.isKeyDown(GLFW_KEY_LEFT_SHIFT))camera.camPos.y+=0.1;
-		if(window.isKeyDown(GLFW_KEY_ESCAPE))window.close();
+		if(window.isKeyDown(GLFW_KEY_ESCAPE)||window.isKeyDown('/'))window.close();
+		// ABOVE - '/' is a exit key because touchbar sometimes doesn't work
 
 		window.clearInputs();
 		window.updateSize();

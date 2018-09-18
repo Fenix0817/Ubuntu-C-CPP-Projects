@@ -12,6 +12,10 @@
 #include "TexturePos.h"
 #include <string>
 
+class Atlas;
+
+typedef Atlas* AtlasPtr;
+
 class Atlas {
 public:
 	Atlas();
