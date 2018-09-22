@@ -212,8 +212,8 @@ int main(){
 		int chunkX=(int)(camera.camPos.x/CHUNK_SIZE);
 		int chunkZ=(int)(camera.camPos.z/CHUNK_SIZE);
 
-		for(int x=-3;x<=3;x++){
-			for(int z=-3;z<=3;z++){
+		for(int x=-2;x<=2;x++){
+			for(int z=-2;z<=2;z++){
 				getChunk(x+chunkX,z+chunkZ,true);
 			}
 		}

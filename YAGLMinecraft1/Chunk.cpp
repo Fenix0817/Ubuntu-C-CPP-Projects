@@ -73,14 +73,14 @@ void Chunk::addTriangleFace(){
 
 bool Chunk::isEmpty(int x,int y,int z){
 	if(
-			x<0||x>=CHUNK_SIZE||
-			y<0||y>=CHUNK_HEIGHT||
-			z<0||z>=CHUNK_SIZE
+//			x<0||x>=CHUNK_SIZE||
+			y<0||y>=CHUNK_HEIGHT
+//			||z<0||z>=CHUNK_SIZE
 			)return true;
-//	if(x<0)return cXMI->isEmptyReal(16+x,y,z);
-//	if(x>=CHUNK_SIZE)return cXPL->isEmptyReal(-16+x,y,z);
-//	if(z<0)return cZMI->isEmptyReal(x,y,16+z);
-//	if(z>=CHUNK_SIZE)return cZPL->isEmptyReal(x,y,-16+z);
+	if(x<0)return cXMI->isEmptyReal(x+CHUNK_SIZE,y,z);
+	if(x>=CHUNK_SIZE)return cXPL->isEmptyReal(x-CHUNK_SIZE,y,z);
+	if(z<0)return cZMI->isEmptyReal(x,y,z+CHUNK_SIZE);
+	if(z>=CHUNK_SIZE)return cZPL->isEmptyReal(x,y,z-CHUNK_SIZE);
 //	if(y<0||y>=CHUNK_HEIGHT)return true;
 	return isEmptyReal(x,y,z);
 }
@@ -95,7 +95,10 @@ void Chunk::createChunkData(FastNoise*fn){
 
 //			int h=x;
 			float zoom=1;
-			float fh=CHUNK_HEIGHT/2+10*fn->GetSimplex( zoom*(chunkPos.x*CHUNK_SIZE+x),zoom*(chunkPos.y*CHUNK_SIZE+z));
+			fn->SetFractalOctaves(10);
+			fn->SetFractalLacunarity(2);
+			fn->SetFractalType(FastNoise::FBM);
+			float fh=CHUNK_HEIGHT/2+30*fn->GetSimplexFractal( zoom*(chunkPos.x*CHUNK_SIZE+x),zoom*(chunkPos.y*CHUNK_SIZE+z));
 			int h=(int)fh;
 //			int h=chunkPos.x*chunkPos.y;
 			for(int y=0;y<CHUNK_HEIGHT;y++){
@@ -199,7 +202,7 @@ void Chunk::prepareMesh(Atlas*atlas){
 			}
 		}
 	}
-	printf("%i,%i,%i\n",posData.size(),uvData.size(),triData.size());
+//	printf("%i,%i,%i\n",posData.size(),uvData.size(),triData.size());
 }
 
 void Chunk::prepareGL(){
