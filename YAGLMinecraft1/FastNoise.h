@@ -46,6 +46,38 @@ class FastNoise;
 
 typedef FastNoise* FastNoisePtr;
 
+#define NoiseTypeValue FastNoise::Value
+#define NoiseTypeValueFractal FastNoise::ValueFractal
+#define NoiseTypePerlin FastNoise::Perlin
+#define NoiseTypePerlinFractal FastNoise::PerlinFractal
+#define NoiseTypeSimplex FastNoise::Simplex
+#define NoiseTypeSimplexFractal FastNoise::SimplexFractal
+#define NoiseTypeCellular FastNoise::Cellular
+#define NoiseTypeWhiteNoise FastNoise::WhiteNoise
+#define NoiseTypeCubic FastNoise::Cubic
+#define NoiseTypeCubicFractal FastNoise::CubicFractal
+
+#define InterpLinear FastNoise::Linear
+#define InterpHermite FastNoise::Hermite
+#define InterpQuintic FastNoise::Quintic
+
+#define FractalTypeFBM FastNoise::FBM
+#define FractalTypeBillow FastNoise::Billow
+#define FractalTypeRigidMulti FastNoise::RigidMulti
+
+#define CellularDistanceFunctionEuclidean FastNoise::Euclidean
+#define CellularDistanceFunctionManhattan FastNoise::Manhattan
+#define CellularDistanceFunctionNatural FastNoise::Natural
+
+#define CellularReturnTypeCellValue FastNoise::CellValue
+#define CellularReturnTypeNoiseLookup FastNoise::NoiseLookup
+#define CellularReturnTypeDistance FastNoise::Distance
+#define CellularReturnTypeDistance2 FastNoise::Distance2
+#define CellularReturnTypeDistance2Add FastNoise::Distance2Add
+#define CellularReturnTypeDistance2Sub FastNoise::Distance2Sub
+#define CellularReturnTypeDistance2Mul FastNoise::Distance2Mul
+#define CellularReturnTypeDistance2Div FastNoise::Distance2Div
+
 class FastNoise
 {
 public:

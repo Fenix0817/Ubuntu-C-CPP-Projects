@@ -23,7 +23,7 @@
 
 #include <vector>
 
-const int CHUNK_SIZE=10;
+const int CHUNK_SIZE=16;
 const int CHUNK_HEIGHT=50;
 
 class Chunk;

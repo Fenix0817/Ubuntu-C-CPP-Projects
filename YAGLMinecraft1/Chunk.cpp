@@ -97,8 +97,8 @@ void Chunk::createChunkData(FastNoise*fn){
 			float zoom=1;
 			fn->SetFractalOctaves(10);
 			fn->SetFractalLacunarity(2);
-			fn->SetFractalType(FastNoise::FBM);
-			float fh=CHUNK_HEIGHT/2+30*fn->GetSimplexFractal( zoom*(chunkPos.x*CHUNK_SIZE+x),zoom*(chunkPos.y*CHUNK_SIZE+z));
+			fn->SetFractalType(FractalTypeFBM);
+			float fh=CHUNK_HEIGHT/2+20*fn->GetSimplexFractal( zoom*(chunkPos.x*CHUNK_SIZE+x),zoom*(chunkPos.y*CHUNK_SIZE+z));
 			int h=(int)fh;
 //			int h=chunkPos.x*chunkPos.y;
 			for(int y=0;y<CHUNK_HEIGHT;y++){

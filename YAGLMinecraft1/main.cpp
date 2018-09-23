@@ -20,6 +20,7 @@
 #include "AtlasHD.h"
 #include "AtlasLow.h"
 #include "AtlasNormal.h"
+#include "AtlasFogleman.h"
 #include "Chunk.h"
 
 #include <utility>
@@ -33,6 +34,8 @@
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/rotate_vector.hpp>
+
+#define max(a,b) (a<b?b:a)
 
 bool printError(){
 	GLenum e=glGetError();
@@ -54,6 +57,14 @@ std::vector<ChunkPtr>chunks;
 FastNoisePtr noise;
 
 AtlasPtr atlas;
+
+std::vector<glm::ivec2> chunksToAdd;
+std::vector<glm::ivec2> chunksToRemove;
+
+bool contains_ivec2(std::vector<glm::ivec2> list,glm::ivec2 v){
+	for(int i=0;i<list.size();i++)if(list[i]==v)return true;
+	return false;
+}
 
 ChunkPtr getChunk(int x,int z,bool instantiateChunk){
 	bool foundChunk=false;
@@ -90,6 +101,14 @@ ChunkPtr getChunk(int x,int z,bool instantiateChunk){
 	return c;
 }
 
+void eraseChunk(int x,int z){
+	for(int i=0;i<chunks.size();i++){
+		if(chunks[i]->chunkPos==glm::ivec2(x,z)){
+			chunks[i]->instantiated=false;
+		}
+	}
+}
+
 int main(){
 	gl::init();
 
@@ -101,20 +120,12 @@ int main(){
 	window.setTitle("YAGL Minecraft #1");
 	window.setSize(1000,1000);
 	window.bind();
-//	glEnable(GL_MULTISAMPLE);
 
-	atlas=new AtlasNormal();
+//	atlas=new AtlasNormal();
+//	atlas=new AtlasHD();
+	atlas=new AtlasFogleman();
 
 	noise=new FastNoise();
-	noise->SetInterp(FastNoise::Hermite);
-	noise->SetCellularReturnType(FastNoise::Distance);
-	noise->SetCellularDistanceFunction(FastNoise::Euclidean);
-
-//	for(int x=0;x<5;x++){
-//		for(int z=0;z<5;z++){
-//			getChunk(x,z,true);
-//		}
-//	}
 
 	int size=0;
 	int realSize=0;
@@ -132,24 +143,6 @@ int main(){
 			}
 		}
 	}
-
-//
-//	Chunk* chunk=new Chunk();
-//	printf("Init\n");
-//	chunk->createChunkData(noise);
-//	printf("Gen\n");
-//	Chunk* xmi=emptyChunk();
-//	Chunk* xpl=emptyChunk();
-//	Chunk* zmi=emptyChunk();
-//	Chunk* zpl=emptyChunk();
-//	chunk->cXMI=xmi;
-//	chunk->cXPL=xpl;
-//	chunk->cZMI=zmi;
-//	chunk->cZPL=zpl;
-//	chunk->prepareMesh(atlas);
-//	printf("Mesh created\n");
-//	chunk->prepareGL();
-//	printf("GL created\n");
 
 	gl::Shader shader;
 	shader.create();
@@ -176,10 +169,20 @@ int main(){
 
 	camera.forwardSpeed=0.2;
 	camera.sideSpeed   =0.1;
-	camera.backSpeed   =0.025;
+	camera.backSpeed   =2.025;
+
+	float prevTime=0;
+	float time=0;
+
+	int frames=0;
 
 	while(window.isOpen()){
+		frames++;
 		window.bind();
+
+		prevTime=time;
+		time=gl::time();
+		printf("SPF: %f, FPS: %f\n",time-prevTime,1/(time-prevTime));
 
 		gl::defaultViewport(window);
 		gl::setDepth(true);
@@ -195,11 +198,11 @@ int main(){
 		camera.windowW=window.width;
 		camera.windowH=window.height;
 
-		shader.setMat4("MVP",camera.getPerspectiveViewMatrix());
+//		shader.setMat4("MVP",camera.getPerspectiveViewMatrix());
 //		shader.setMat4("MVP",camera.getPerspectiveViewMatrix()*chunk->getModelMatrix());
 //
 //		chunk->render();
-		for(int i=0;i<chunks.size();i++){
+		for(unsigned int i=0;i<chunks.size();i++){
 			ChunkPtr c=chunks[i];
 			if(c->instantiated){
 				shader.setMat4("MVP",camera.getPerspectiveViewMatrix()*c->getModelMatrix());
@@ -212,10 +215,31 @@ int main(){
 		int chunkX=(int)(camera.camPos.x/CHUNK_SIZE);
 		int chunkZ=(int)(camera.camPos.z/CHUNK_SIZE);
 
-		for(int x=-2;x<=2;x++){
-			for(int z=-2;z<=2;z++){
-				getChunk(x+chunkX,z+chunkZ,true);
+		int o=10;
+		for(int x=-o;x<=o;x++){
+			for(int z=-o;z<=o;z++){
+				if(!contains_ivec2(chunksToAdd,glm::ivec2(x+chunkX,z+chunkZ))){
+					chunksToAdd.push_back(glm::ivec2(x+chunkX,z+chunkZ));
+				}
+//				getChunk(x+chunkX,z+chunkZ,true);
 			}
+		}
+		for(int i=0;i<5;i++){
+		if(frames%1==0&&chunksToAdd.size()>0){
+			glm::ivec2 chunkToAdd=chunksToAdd[0];
+			getChunk(chunkToAdd.x,chunkToAdd.y,true);
+			chunksToAdd.erase(chunksToAdd.begin());
+		}}
+		for(int i=0;i<5;i++){
+		if(frames%1==0&&chunksToRemove.size()>0){
+			glm::ivec2 chunkToRem=chunksToRemove[0];
+			eraseChunk(chunkToRem.x,chunkToRem.y);
+			chunksToRemove.erase(chunksToRemove.begin());
+		}}
+
+		for(int i=0;i<chunks.size();i++){
+			float d=max(abs(chunks[i]->chunkPos.x-chunkX),abs(chunks[i]->chunkPos.y-chunkZ));
+			if(d>o+2&&!contains_ivec2(chunksToRemove,chunks[i]->chunkPos))chunksToRemove.push_back(chunks[i]->chunkPos);
 		}
 
 		//TODO:
@@ -233,10 +257,10 @@ int main(){
 		if(window.isKeyDown('A'))camera.moveLeft();
 		if(window.isKeyDown('D'))camera.moveRight();
 
-		if(window.isKeyDown(' '))camera.camPos.y-=0.1;
-		if(window.isKeyDown(GLFW_KEY_LEFT_SHIFT))camera.camPos.y+=0.1;
+		if(window.isKeyDown(' '))camera.camPos.y-=0.5;
+		if(window.isKeyDown(GLFW_KEY_LEFT_SHIFT))camera.camPos.y+=0.5;
 		if(window.isKeyDown(GLFW_KEY_ESCAPE)||window.isKeyDown('/'))window.close();
-		// ABOVE - '/' is a exit key because touchbar sometimes doesn't work
+		// ABOVE - '/' is a exit key because touchbar ESCAPE sometimes doesn't work
 
 		window.clearInputs();
 		window.updateSize();
