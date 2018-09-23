@@ -6,6 +6,7 @@
  */
 
 #include <CL/cl.h>
+#include <CL/cl.hpp>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -92,7 +93,7 @@ int main(){
 
 	cl_uint platformCount=0;
 
-
+	//cl.h
 	result=clGetPlatformIDs(0,nullptr,&platformCount);
 	if(result!=CL_SUCCESS){
 		printf("%s\n",getErrorString(result));
@@ -145,6 +146,44 @@ int main(){
 			char* extensions=(char*)malloc(extensionSize);
 			clGetDeviceInfo(device,CL_DEVICE_EXTENSIONS,extensionSize,extensions,nullptr);
 			printf("\tExtensions: %s\n",extensions);
+		}
+	}
+
+	printf("\n\n*************************************************\n\n");
+
+	//CL.HPP
+	{
+		std::vector<cl::Platform> platforms;
+		cl::Platform::get(&platforms);
+
+		for(unsigned int i=0;i<platforms.size();i++){
+			cl::Platform platform=platforms[i];
+			printf("Name .... %s\n",platform.getInfo<CL_PLATFORM_NAME>().c_str());
+			printf("Version . %s\n",platform.getInfo<CL_PLATFORM_VERSION>().c_str());
+			printf("Vendor .. %s\n",platform.getInfo<CL_PLATFORM_VENDOR>().c_str());
+
+			std::vector<cl::Device> devices;
+			platform.getDevices(CL_DEVICE_TYPE_ALL,&devices);
+
+			for(unsigned int j=0;j<devices.size();j++){
+				cl::Device device=devices[j];
+
+				printf("\tName .... %s\n",device.getInfo<CL_DEVICE_NAME>().c_str());
+				printf("\tVersion . %s\n",device.getInfo<CL_DEVICE_VERSION>().c_str());
+				printf("\tVendor .. %s\n",device.getInfo<CL_DEVICE_VENDOR>().c_str());
+
+				int type=device.getInfo<CL_DEVICE_TYPE>();
+				printf("\tType .... ");
+				switch(type){
+				case CL_DEVICE_TYPE_GPU: printf("GPU"); break;
+				case CL_DEVICE_TYPE_CPU: printf("CPU"); break;
+				case CL_DEVICE_TYPE_ACCELERATOR: printf("Accelerator"); break;
+				case CL_DEVICE_TYPE_CUSTOM: printf("Custom"); break;
+				}
+				printf("\n");
+
+			}
+
 		}
 	}
 
