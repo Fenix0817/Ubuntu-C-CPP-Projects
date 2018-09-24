@@ -66,6 +66,7 @@ public:
 	gl::VertexBuffer ebo;
 
 	bool instantiated=false;
+	bool meshCreated=false;
 
 	void createChunkData(FastNoise*fn);
 	void prepareMesh(Atlas*atlas);

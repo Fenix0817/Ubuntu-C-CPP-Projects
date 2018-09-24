@@ -83,9 +83,12 @@ ChunkPtr getChunk(int x,int z,bool instantiateChunk){
 		chunks.push_back(c);
 		printf("\tFinished creating data for %i,%i\n",x,z);
 	}
-	if(instantiateChunk&&!c->instantiated){
-		printf("\nInstantiating %i,%i\n",x,z);
+	if(instantiateChunk){
 		c->instantiated=true;
+	}
+	if(instantiateChunk&&!c->meshCreated){
+		printf("\nInstantiating %i,%i\n",x,z);
+		c->meshCreated=true;
 		ChunkPtr xmi=getChunk(x-1,z,false);
 		ChunkPtr xpl=getChunk(x+1,z,false);
 		ChunkPtr zmi=getChunk(x,z-1,false);
@@ -127,23 +130,6 @@ int main(){
 
 	noise=new FastNoise();
 
-	int size=0;
-	int realSize=0;
-	for(int i=0;i<chunks.size();i++){
-		if(chunks[i]->instantiated)realSize++;
-		size++;
-		printf("Chunk pos %i: %i,%i\n",i,chunks[i]->chunkPos.x,chunks[i]->chunkPos.y);
-	}
-	printf("%i,%i\n",size,realSize);
-
-	for(int x=-10;x<=10;x++){
-		for(int z=-10;z<=10;z++){
-			for(int i=0;i<chunks.size();i++){
-				if(chunks[i]->chunkPos==glm::ivec2(x,z))printf("has chunk %i,%i\n",x,z);
-			}
-		}
-	}
-
 	gl::Shader shader;
 	shader.create();
 	shader.attachFile("Shaders/shader.vert",gl::ShaderType::Vertex);
@@ -167,9 +153,9 @@ int main(){
 	camera.camPos=glm::vec3(-5,5,-5);
 	camera.camDir=glm::vec3(1,0,0);
 
-	camera.forwardSpeed=0.2;
-	camera.sideSpeed   =0.1;
-	camera.backSpeed   =2.025;
+	camera.forwardSpeed=2;
+	camera.sideSpeed   =2;
+	camera.backSpeed   =2;
 
 	float prevTime=0;
 	float time=0;
