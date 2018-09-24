@@ -22,6 +22,7 @@
 #include "AtlasNormal.h"
 #include "AtlasFogleman.h"
 #include "Chunk.h"
+#include "ChunkManager.h"
 
 #include <utility>
 
@@ -35,7 +36,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/rotate_vector.hpp>
 
-#define max(a,b) (a<b?b:a)
+//#define DEBUG_FPS
+//#define DEBUG_CHUNKMANAGER
 
 bool printError(){
 	GLenum e=glGetError();
@@ -52,65 +54,9 @@ bool printError(){
 	return false;
 }
 
-std::vector<ChunkPtr>chunks;
-
 FastNoisePtr noise;
 
 AtlasPtr atlas;
-
-std::vector<glm::ivec2> chunksToAdd;
-std::vector<glm::ivec2> chunksToRemove;
-
-bool contains_ivec2(std::vector<glm::ivec2> list,glm::ivec2 v){
-	for(int i=0;i<list.size();i++)if(list[i]==v)return true;
-	return false;
-}
-
-ChunkPtr getChunk(int x,int z,bool instantiateChunk){
-	bool foundChunk=false;
-	ChunkPtr c=nullptr;
-	for(int i=0;i<chunks.size()&&!foundChunk;i++){
-		if(chunks[i]->chunkPos.x==x&&chunks[i]->chunkPos.y==z){
-			c=chunks[i];
-			foundChunk=true;
-		}
-	}
-	if(!foundChunk){
-		printf("\tCreating data for %i,%i\n",x,z);
-		c=new Chunk();
-		c->chunkPos=glm::ivec2(x,z);
-		c->createChunkData(noise);
-		chunks.push_back(c);
-		printf("\tFinished creating data for %i,%i\n",x,z);
-	}
-	if(instantiateChunk){
-		c->instantiated=true;
-	}
-	if(instantiateChunk&&!c->meshCreated){
-		printf("\nInstantiating %i,%i\n",x,z);
-		c->meshCreated=true;
-		ChunkPtr xmi=getChunk(x-1,z,false);
-		ChunkPtr xpl=getChunk(x+1,z,false);
-		ChunkPtr zmi=getChunk(x,z-1,false);
-		ChunkPtr zpl=getChunk(x,z+1,false);
-		c->cXMI=xmi;
-		c->cXPL=xpl;
-		c->cZMI=zmi;
-		c->cZPL=zpl;
-		c->prepareMesh(atlas);
-		c->prepareGL();
-		printf("Finished instantiating %i,%i:  %i,%i,%i,%i\n",x,z,c->vao.id,c->vboPos.id,c->vboUV.id,c->ebo.id);
-	}
-	return c;
-}
-
-void eraseChunk(int x,int z){
-	for(int i=0;i<chunks.size();i++){
-		if(chunks[i]->chunkPos==glm::ivec2(x,z)){
-			chunks[i]->instantiated=false;
-		}
-	}
-}
 
 int main(){
 	gl::init();
@@ -129,6 +75,10 @@ int main(){
 	atlas=new AtlasFogleman();
 
 	noise=new FastNoise();
+
+	ChunkManager chunkManager;
+	chunkManager.noise=noise;
+	chunkManager.atlas=atlas;
 
 	gl::Shader shader;
 	shader.create();
@@ -162,20 +112,28 @@ int main(){
 
 	int frames=0;
 
+	float fogR=0;
+	float fogG=0;
+	float fogB=0;
+
 	while(window.isOpen()){
 		frames++;
 		window.bind();
 
 		prevTime=time;
 		time=gl::time();
+
+#ifdef DEBUG_FPS
 		printf("SPF: %f, FPS: %f\n",time-prevTime,1/(time-prevTime));
+#endif
 
 		gl::defaultViewport(window);
 		gl::setDepth(true);
-		gl::setClearColor(1);
+		gl::setClearColor(fogR,fogG,fogB);
 		gl::clearScreen();
 
 		shader.bind();
+		shader.setVec4("fogColor", fogR,fogG,fogB,1);
 
 		texture.bindToUnit(0);
 		shader.setInt("tex",0);
@@ -184,55 +142,11 @@ int main(){
 		camera.windowW=window.width;
 		camera.windowH=window.height;
 
-//		shader.setMat4("MVP",camera.getPerspectiveViewMatrix());
-//		shader.setMat4("MVP",camera.getPerspectiveViewMatrix()*chunk->getModelMatrix());
-//
-//		chunk->render();
-		for(unsigned int i=0;i<chunks.size();i++){
-			ChunkPtr c=chunks[i];
-			if(c->instantiated){
-				shader.setMat4("MVP",camera.getPerspectiveViewMatrix()*c->getModelMatrix());
-				c->render();
-			}
-		}
+		chunkManager.render(shader,camera.getPerspectiveViewMatrix());
 
 		shader.unbind();
 
-		int chunkX=(int)(camera.camPos.x/CHUNK_SIZE);
-		int chunkZ=(int)(camera.camPos.z/CHUNK_SIZE);
-
-		int o=10;
-		for(int x=-o;x<=o;x++){
-			for(int z=-o;z<=o;z++){
-				if(!contains_ivec2(chunksToAdd,glm::ivec2(x+chunkX,z+chunkZ))){
-					chunksToAdd.push_back(glm::ivec2(x+chunkX,z+chunkZ));
-				}
-//				getChunk(x+chunkX,z+chunkZ,true);
-			}
-		}
-		for(int i=0;i<5;i++){
-		if(frames%1==0&&chunksToAdd.size()>0){
-			glm::ivec2 chunkToAdd=chunksToAdd[0];
-			getChunk(chunkToAdd.x,chunkToAdd.y,true);
-			chunksToAdd.erase(chunksToAdd.begin());
-		}}
-		for(int i=0;i<5;i++){
-		if(frames%1==0&&chunksToRemove.size()>0){
-			glm::ivec2 chunkToRem=chunksToRemove[0];
-			eraseChunk(chunkToRem.x,chunkToRem.y);
-			chunksToRemove.erase(chunksToRemove.begin());
-		}}
-
-		for(int i=0;i<chunks.size();i++){
-			float d=max(abs(chunks[i]->chunkPos.x-chunkX),abs(chunks[i]->chunkPos.y-chunkZ));
-			if(d>o+2&&!contains_ivec2(chunksToRemove,chunks[i]->chunkPos))chunksToRemove.push_back(chunks[i]->chunkPos);
-		}
-
-		//TODO:
-		// (1) Implement side-by-side chunk meshing
-		// (2) AtlasFogleman: https://github.com/fogleman/Craft/blob/master/textures/texture.png
-		// (3) Queue of chunks to add, 1 to 2 per frame
-		// (4) Queue of chunks to remove, 1 to 2 per frame
+		chunkManager.update(frames,glm::ivec2((int)(camera.camPos.x/CHUNK_SIZE),(int)(camera.camPos.z/CHUNK_SIZE)));
 
 		camera.updateDirection(window.getMouse());
 		glfwSetCursorPos(window.ptr,window.width/2,window.height/2);

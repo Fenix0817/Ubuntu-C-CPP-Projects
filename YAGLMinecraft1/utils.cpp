@@ -7,6 +7,10 @@
 
 #include "utils.h"
 
+float max(float a,float b){
+	if(a>b)return a;
+	return b;
+}
 
 float lerp(float t,float a,float b){
 	return (b-a)*t+a;

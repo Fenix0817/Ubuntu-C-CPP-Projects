@@ -10,7 +10,9 @@
 
 #include <stdio.h>
 #include <glm/glm.hpp>
+#include <math.h>
 
+float max(float a,float b);
 float lerp(float t,float a,float b);
 float norm(float t,float a,float b);
 float map(float t,float s1,float e1,float s2,float e2);

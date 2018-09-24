@@ -89,7 +89,7 @@ bool Chunk::isEmptyReal(int x,int y,int z){
 	return blockData[x][y][z].empty;
 }
 
-void Chunk::createChunkData(FastNoise*fn){
+void Chunk::createChunkData(FastNoisePtr fn){
 	for(int x=0;x<CHUNK_SIZE;x++){
 		for(int z=0;z<CHUNK_SIZE;z++){
 
