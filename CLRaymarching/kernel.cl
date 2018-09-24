@@ -17,6 +17,8 @@ typedef struct {
 #define TWO_PI 6.28318530718
 #define HALF_PI 1.57079632679
 
+#define deg2rad(d) (d*PI/180)
+
 float2 rotate2(float2 v,float theta){
 	float c=cos(theta);
 	float s=sin(theta);
@@ -74,16 +76,17 @@ float sdBox(float3 p,float3 b){
 	return min(max(d.x,max(d.y,d.z)),0)+length(max3(d,(float3)(0,0,0)));
 }
 
-#define scale 1.3
+#define scale 2
 #define CX 2
-#define CY 4.8
-#define CZ 0
+#define CY 1
+#define CZ 1
 
 void transform1(float x,float y,float z,float*ox,float*oy,float*oz){
 	float3 p=(float3)(x,y,z);
 	
 	//p=rotateY(p,1.0);
-	//p=rotateZ(p,-1.0);
+	p=rotateZ(p,-1.0);
+	//p=rotateY(p,deg2rad(25));
 	
 	*ox=p.x;
 	*oy=p.y;
@@ -184,7 +187,7 @@ kernel void createImage(int IMG_W, int IMG_H, global float* rComp, global float*
 	float3 lightPos=(float3)(-12,6.7,-6);
 	float3 reflected=reflect(normalize(end-pos),normal);
 	float phong=clamp(dot(normalize(lightPos-end),normal),0,1)*0.9+1*pow(clamp(dot(reflected,normalize(lightPos-end)),      0,1),200);
-
+	phong=phong*0.5+0.5;
 	//float3 col=(float3)(uv.x,uv.y,0);
 	float3 col=phong*(0.5+0.5*normal);
 	
