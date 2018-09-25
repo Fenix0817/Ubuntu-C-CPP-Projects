@@ -63,7 +63,7 @@ glm::vec3 Camera::getRightMovement(){
 }
 
 glm::mat4 Camera::getPerspectiveMatrix(){
-	return glm::perspective(fovy,1.0f*windowW/windowH,0.01f,1000.0f);
+	return glm::perspective(-glm::radians(fovy),1.0f*windowW/windowH,0.01f,1000.0f);
 }
 glm::mat4 Camera::getViewMatrix(){
 	return glm::lookAt(camPos,camPos+camDir,glm::vec3(0,1,0));

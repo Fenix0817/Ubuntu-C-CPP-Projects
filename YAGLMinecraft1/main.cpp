@@ -58,7 +58,12 @@ FastNoisePtr noise;
 
 AtlasPtr atlas;
 
+ChunkManager chunkManager;
+
 int main(){
+	//TODO:
+	// - Block editing: press ' ' to remove blocks near player
+	// - After above, encapsulate game logic
 	gl::init();
 
 	gl::Window window;
@@ -76,7 +81,6 @@ int main(){
 
 	noise=new FastNoise();
 
-	ChunkManager chunkManager;
 	chunkManager.noise=noise;
 	chunkManager.atlas=atlas;
 
@@ -100,21 +104,21 @@ int main(){
 	window.unbind();
 
 	Camera camera;
-	camera.camPos=glm::vec3(-5,5,-5);
+	camera.camPos=glm::vec3(20,-40,20);
 	camera.camDir=glm::vec3(1,0,0);
 
-	camera.forwardSpeed=2;
-	camera.sideSpeed   =2;
-	camera.backSpeed   =2;
+	camera.forwardSpeed=0.1;
+	camera.sideSpeed   =0.1;
+	camera.backSpeed   =0.1;
 
 	float prevTime=0;
 	float time=0;
 
 	int frames=0;
 
-	float fogR=0;
-	float fogG=0;
-	float fogB=0;
+	float fogR=0.7;
+	float fogG=0.7;
+	float fogB=0.7;
 
 	while(window.isOpen()){
 		frames++;
@@ -148,9 +152,12 @@ int main(){
 
 		chunkManager.update(frames,glm::ivec2((int)(camera.camPos.x/CHUNK_SIZE),(int)(camera.camPos.z/CHUNK_SIZE)));
 
-		camera.updateDirection(window.getMouse());
-		glfwSetCursorPos(window.ptr,window.width/2,window.height/2);
-		camera.mouse=window.getMouse();
+		glm::vec2 mouse=window.getMouse();
+		camera.updateDirection(mouse);
+		if(mouse.x<0||mouse.y<0||mouse.x>window.width||mouse.y>window.height)
+				glfwSetCursorPos(window.ptr,window.width/2,window.height/2);
+		mouse=window.getMouse();
+		camera.mouse=mouse;
 
 		if(window.isKeyDown('W'))camera.moveForward();
 		if(window.isKeyDown('S'))camera.moveBack();
