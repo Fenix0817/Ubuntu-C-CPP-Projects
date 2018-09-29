@@ -61,11 +61,13 @@ public:
 	VertexBuffer(VertexBufferTarget::vertex_buffer_target_enum vbte,VertexBufferUsage::vertex_buffer_usage_enum vbue,Type::type_enum te);
 	virtual ~VertexBuffer();
 
-	GLuint id;
+	GLuint id=-1;
 	VertexBufferTarget::vertex_buffer_target_enum target;
 	VertexBufferUsage::vertex_buffer_usage_enum usage;
 	Type::type_enum type;
 	size_t size;
+
+	bool isCreated();
 
 	int getLength();
 
@@ -79,6 +81,8 @@ public:
 	void addVertexAttrib(int attrib,int size,bool norm,size_t stride,const GLvoid*ptr);
 	void render();
 	void unbind();
+
+	void del();
 
 };
 

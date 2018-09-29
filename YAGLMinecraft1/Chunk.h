@@ -30,6 +30,9 @@ class Chunk;
 
 typedef Chunk* ChunkPtr;
 
+glm::ivec2 getChunkCoord(glm::ivec2 worldXZ);
+glm::ivec2 getPosInChunk(glm::ivec2 worldXZ);
+
 class Chunk {
 private:
 	std::vector<float>posData;
@@ -51,7 +54,7 @@ public:
 
 	Chunk(int x,int z);
 
-	glm::vec2i chunkPos;
+	glm::ivec2 chunkPos;
 
 	Chunk *cXMI;
 	Chunk *cXPL;

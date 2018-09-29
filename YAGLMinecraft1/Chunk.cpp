@@ -7,6 +7,19 @@
 
 #include "Chunk.h"
 
+glm::ivec2 getChunkCoord(glm::ivec2 worldXZ){
+	glm::ivec2 offset=getPosInChunk(worldXZ);
+	worldXZ-=offset;
+	return worldXZ/CHUNK_SIZE;
+}
+glm::ivec2 getPosInChunk(glm::ivec2 worldXZ){
+	while(worldXZ.x<0)worldXZ.x+=CHUNK_SIZE;
+	while(worldXZ.y<0)worldXZ.y+=CHUNK_SIZE;
+	while(worldXZ.x>=CHUNK_SIZE)worldXZ.x-=CHUNK_SIZE;
+	while(worldXZ.y>=CHUNK_SIZE)worldXZ.y-=CHUNK_SIZE;
+	return worldXZ;
+}
+
 Chunk::Chunk() {
 	// TODO Auto-generated constructor stub
 }
@@ -17,7 +30,7 @@ Chunk::~Chunk() {
 
 
 Chunk::Chunk(int x,int z){
-	chunkPos=glm::vec2i(x,z);
+	chunkPos=glm::ivec2(x,z);
 }
 
 Chunk* emptyChunk(){
@@ -206,6 +219,11 @@ void Chunk::prepareMesh(Atlas*atlas){
 }
 
 void Chunk::prepareGL(){
+	if(vao.isCreated())vao.del();
+	if(vboPos.isCreated())vboPos.del();
+	if(vboUV.isCreated())vboUV.del();
+	if(ebo.isCreated())ebo.del();
+
 	vao.create();
 	vao.bind();
 

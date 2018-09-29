@@ -22,7 +22,7 @@ const float PI=3.14159265359;
 
 namespace glm {
 
-typedef glm::vec<2,int,glm::qualifier::defaultp> vec2i;
+//typedef glm::vec<2,int,glm::qualifier::defaultp> vec2i;
 
 }
 

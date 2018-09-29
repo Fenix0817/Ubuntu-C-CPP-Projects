@@ -35,6 +35,10 @@ Shader::~Shader() {
 	// TODO Auto-generated destructor stub
 }
 
+bool Shader::isCreated(){
+	return id!=-1;
+}
+
 GLuint Shader::getUniformLocation(string param){
 	return glGetUniformLocation(id,param.c_str());
 }
@@ -102,6 +106,11 @@ void Shader::bind(){
 }
 void Shader::unbind(){
 	glUseProgram(0);
+}
+
+void Shader::del(){
+	glDeleteProgram(id);
+	id=-1;
 }
 
 } /* namespace gl */

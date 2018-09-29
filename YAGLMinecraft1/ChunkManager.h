@@ -14,6 +14,8 @@
 #include "utils.h"
 #include "Shader.h"
 
+bool contains_ivec2(std::vector<glm::ivec2>list,glm::ivec2 v);
+
 class ChunkManager {
 public:
 	ChunkManager();
@@ -30,10 +32,12 @@ public:
 	void render(gl::Shader shader,glm::mat4 vp);
 	void update(int frames,glm::ivec2 chunkPos);
 
+	void setBlock(int x,int y,int z,Block b);
+	void remeshChunk(int x,int z);
+
 private:
 	void eraseChunk(int x,int z);
 	ChunkPtr getChunk(int x,int z,bool instantiate);
-	bool contains_ivec2(std::vector<glm::ivec2>list,glm::ivec2 v);
 
 };
 

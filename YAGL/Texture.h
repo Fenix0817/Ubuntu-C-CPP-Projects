@@ -76,9 +76,11 @@ public:
 	Texture(TextureTarget::texture_target_enum tte);
 	virtual ~Texture();
 
-	GLuint id;
+	GLuint id=-1;
 	int width;
 	int height;
+
+	bool isCreated();
 
 	TextureTarget::texture_target_enum target;
 
@@ -90,8 +92,7 @@ public:
 	void setData(int w,int h,TextureData data);
 	void bindToUnit(int u);
 
-	//shader interopability
-
+	void del();
 
 };
 

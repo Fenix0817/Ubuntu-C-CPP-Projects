@@ -33,6 +33,7 @@ public:
 
 	void clamp();
 
+	void setPixel(int x,int y,float f);
 	void setPixel(int x,int y,float r,float g,float b);
 
 	void setR(int x,int y,float r);

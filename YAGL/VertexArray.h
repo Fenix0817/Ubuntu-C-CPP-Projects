@@ -18,11 +18,15 @@ public:
 	VertexArray();
 	virtual ~VertexArray();
 
-	GLuint id;
+	GLuint id=-1;
+
+	bool isCreated();
 
 	void create();
 	void bind();
 	void unbind();
+
+	void del();
 };
 
 } /* namespace gl */

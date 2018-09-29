@@ -72,6 +72,10 @@ Texture::~Texture() {
 	// TODO Auto-generated destructor stub
 }
 
+bool Texture::isCreated(){
+	return id!=-1;
+}
+
 void Texture::setTarget(TextureTarget::texture_target_enum tte){
 	target=tte;
 }
@@ -136,6 +140,11 @@ Texture loadTexture(std::string fn){
 	stbi_set_flip_vertically_on_load(true);
 	img=stbi_load(fn.c_str(),&w,&h,&channels,4);
 	return createTexture(w,h,img);
+}
+
+void Texture::del(){
+	glDeleteTextures(1,&id);
+	id=-1;
 }
 
 } /* namespace gl */

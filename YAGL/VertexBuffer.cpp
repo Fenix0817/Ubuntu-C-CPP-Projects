@@ -64,6 +64,10 @@ VertexBuffer::~VertexBuffer() {
 	// TODO Auto-generated destructor stub
 }
 
+bool VertexBuffer::isCreated(){
+	return id!=-1;
+}
+
 void VertexBuffer::setTarget(VertexBufferTarget::vertex_buffer_target_enum vbte){
 	target=vbte;
 }
@@ -97,6 +101,11 @@ void VertexBuffer::render(){
 }
 void VertexBuffer::unbind(){
 	glBindBuffer(VertexBufferTarget::vertex_buffer_target_enum_to_int(target),0);
+}
+
+void VertexBuffer::del(){
+	glDeleteBuffers(1,&id);
+	id=-1;
 }
 
 

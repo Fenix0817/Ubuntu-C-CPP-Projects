@@ -39,7 +39,9 @@ public:
 	Shader();
 	virtual ~Shader();
 
-	GLuint id;
+	GLuint id=-1;
+
+	bool isCreated();
 
 	void create();
 	void attach(const char*code,ShaderType::shader_type_enum type);
@@ -62,6 +64,8 @@ public:
 
 	void bind();
 	void unbind();
+
+	void del();
 
 };
 

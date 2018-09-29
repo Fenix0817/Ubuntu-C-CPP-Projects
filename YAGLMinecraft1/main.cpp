@@ -104,7 +104,7 @@ int main(){
 	window.unbind();
 
 	Camera camera;
-	camera.camPos=glm::vec3(20,-40,20);
+	camera.camPos=glm::vec3(CHUNK_SIZE/2,-40,CHUNK_SIZE/2);
 	camera.camDir=glm::vec3(1,0,0);
 
 	camera.forwardSpeed=0.1;
@@ -150,7 +150,8 @@ int main(){
 
 		shader.unbind();
 
-		chunkManager.update(frames,glm::ivec2((int)(camera.camPos.x/CHUNK_SIZE),(int)(camera.camPos.z/CHUNK_SIZE)));
+		glm::vec2 chunkPos=getChunkCoord(glm::ivec2((int)camera.camPos.x,(int)camera.camPos.z));
+		chunkManager.update(frames,chunkPos);
 
 		glm::vec2 mouse=window.getMouse();
 		camera.updateDirection(mouse);
@@ -168,6 +169,31 @@ int main(){
 		if(window.isKeyDown(GLFW_KEY_LEFT_SHIFT))camera.camPos.y+=0.5;
 		if(window.isKeyDown(GLFW_KEY_ESCAPE)||window.isKeyDown('/'))window.close();
 		// ABOVE - '/' is a exit key because touchbar ESCAPE sometimes doesn't work
+
+//		if(window.isKeyDown('C')){
+		if(true){
+			int posX=(int)camera.camPos.x;
+			int posY=-(int)camera.camPos.y;
+			int posZ=(int)camera.camPos.z;
+			int a=2;//Why is this only kind of working?
+			printf("start %f\n",camera.camPos.y);
+			std::vector<glm::ivec2>changes;
+			for(int x=-a;x<=a;x++){
+				for(int y=-a;y<=a;y++){
+					for(int z=-a;z<=a;z++){
+						printf("%i %i %i\n",x,y+(int)camera.camPos.z,z);
+						glm::ivec2 worldXZ=glm::ivec2(x+posX,z+posZ);
+						glm::ivec2 chunkCoord=getChunkCoord(worldXZ);
+						if(!contains_ivec2(changes,chunkCoord))changes.push_back(chunkCoord);
+						chunkManager.setBlock(x+posX,y+posY,z+posZ,blockEmpty);
+					}
+				}
+			}
+			for(int i=0;i<changes.size();i++){
+				printf("\t%i\n",i);
+				chunkManager.remeshChunk(changes[i].x,changes[i].y);
+			}
+		}
 
 		window.clearInputs();
 		window.updateSize();

@@ -16,7 +16,7 @@ ChunkManager::~ChunkManager() {
 	// TODO Auto-generated destructor stub
 }
 
-bool ChunkManager::contains_ivec2(std::vector<glm::ivec2> list,glm::ivec2 v){
+bool contains_ivec2(std::vector<glm::ivec2> list,glm::ivec2 v){
 	for(int i=0;i<list.size();i++)if(list[i]==v)return true;
 	return false;
 }
@@ -73,6 +73,28 @@ void ChunkManager::eraseChunk(int x,int z){
 			chunks[i]->instantiated=false;
 		}
 	}
+}
+
+void ChunkManager::setBlock(int x,int y,int z,Block b){
+	glm::ivec2 xz(x,z);
+	glm::ivec2 chunkCoord=getChunkCoord(xz);
+	glm::ivec2 pos=getPosInChunk(xz);
+	ChunkPtr chunk=getChunk(chunkCoord.x,chunkCoord.y,false);
+	chunk->blockData[pos.x][y][pos.y]=b;
+}
+
+void ChunkManager::remeshChunk(int x,int z){
+	ChunkPtr chunk=getChunk(x,z,false);
+	ChunkPtr xmi=getChunk(x-1,z,false);
+	ChunkPtr xpl=getChunk(x+1,z,false);
+	ChunkPtr zmi=getChunk(x,z-1,false);
+	ChunkPtr zpl=getChunk(x,z+1,false);
+	chunk->cXMI=xmi;
+	chunk->cXPL=xpl;
+	chunk->cZMI=zmi;
+	chunk->cZPL=zpl;
+	chunk->prepareMesh(atlas);
+	chunk->prepareGL();
 }
 
 

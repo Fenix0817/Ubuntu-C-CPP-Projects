@@ -51,6 +51,10 @@ void ppm::setPixel(int x,int y,float r,float g,float b){
 	setB(x,y,b);
 }
 
+void ppm::setPixel(int x,int y,float f){
+	setPixel(x,y,f,f,f);
+}
+
 void ppm::setR(int x,int y,float r){
 	rComp[getInd(x,y)]=r;
 }
