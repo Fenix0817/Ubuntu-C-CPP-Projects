@@ -12,6 +12,11 @@ Sphere::Sphere() {
 
 }
 
+Sphere::Sphere(float r,Vector3 c){
+	rad=r;
+	center=c;
+}
+
 Sphere::~Sphere() {
 	// TODO Auto-generated destructor stub
 }

@@ -34,3 +34,7 @@ float dotVector(Vector3 a,Vector3 b){
 Vector3 normalizeVector(Vector3 v){
 	return glm::normalize(v);
 }
+
+Vector3 crossVector(Vector3 a,Vector3 b){
+	return glm::cross(a,b);
+}
