@@ -17,6 +17,12 @@ Sphere::Sphere(float r,Vector3 c){
 	center=c;
 }
 
+Sphere::Sphere(Material*mat,float r,Vector3 c){
+	material=mat;
+	rad=r;
+	center=c;
+}
+
 Sphere::~Sphere() {
 	// TODO Auto-generated destructor stub
 }

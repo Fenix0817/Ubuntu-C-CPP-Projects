@@ -14,6 +14,7 @@ class Sphere : public Object {
 public:
 	Sphere();
 	Sphere(float r,Vector3 c);
+	Sphere(Material*mat,float r,Vector3 c);
 	virtual ~Sphere();
 
 	Vector3 center;

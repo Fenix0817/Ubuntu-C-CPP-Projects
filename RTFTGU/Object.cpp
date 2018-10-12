@@ -12,6 +12,10 @@ Object::Object() {
 
 }
 
+Object::Object(Material*m) {
+	material=m;
+}
+
 Object::~Object() {
 	// TODO Auto-generated destructor stub
 }

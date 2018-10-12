@@ -14,6 +14,7 @@ class Plane : public Object {
 public:
 	Plane();
 	Plane(Vector3 p,Vector3 n);
+	Plane(Material*mat,Vector3 p,Vector3 n);
 	virtual ~Plane();
 
 	Vector3 point;

@@ -16,9 +16,12 @@
 class Object {
 public:
 	Object();
+	Object(Material*m);
 	virtual ~Object();
 
 	virtual ShadeInfo hit(Ray ray)=0;
+
+	Material* material;
 
 };
 

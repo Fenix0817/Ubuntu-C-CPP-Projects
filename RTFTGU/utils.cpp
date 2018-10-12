@@ -11,6 +11,10 @@ float randomFloat(){
 	return (1.0f*(rand()%RANDOM_ACCURACY))/RANDOM_ACCURACY;
 }
 
+Vector3 reflectVector(Vector3 i, Vector3 n){
+	return i-2*dotVector(n,i)*n;
+}
+
 bool solvableQuadratic(float a,float b,float c){
 	return b*b-4*a*c>=0;
 }

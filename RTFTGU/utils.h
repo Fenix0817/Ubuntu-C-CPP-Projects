@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <vector>
+#include <cmath>
 
 #define RANDOM_ACCURACY RAND_MAX
 
@@ -25,14 +26,21 @@ typedef glm::vec3 Vector3;
 typedef glm::vec3 RGBColor;
 typedef glm::vec3 Normal;
 
+#define PI 3.14159265359f
+#define ONE_OVER_PI 0.31830988618f
+
 const Vector3 X_AXIS=Vector3(1,0,0);
 const Vector3 Y_AXIS=Vector3(0,1,0);
 const Vector3 Z_AXIS=Vector3(0,0,1);
 
 #define min(a,b) (a<b?a:b)
 #define max(a,b) (a>b?a:b)
+#define clampFloat(t,mi,ma) min(max(t,mi),ma)
+#define clampColor(t) clampFloat(t,0,1)
 
 float randomFloat();
+
+Vector3 reflectVector(Vector3 i, Vector3 n);
 
 bool solvableQuadratic(float a,float b,float c);
 

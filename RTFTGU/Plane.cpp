@@ -14,7 +14,13 @@ Plane::Plane() {
 
 Plane::Plane(Vector3 p,Vector3 n){
 	point=p;
-	normal=n;
+	normal=normalizeVector(n);
+}
+
+Plane::Plane(Material*mat,Vector3 p,Vector3 n){
+	material=mat;
+	point=p;
+	normal=normalizeVector(n);
 }
 
 Plane::~Plane() {
