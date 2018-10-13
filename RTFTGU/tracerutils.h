@@ -11,7 +11,9 @@
 #include "ShadeInfo.h"
 #include "Object.h"
 #include <vector>
+#include "World.h"
 
-ShadeInfo intersect(std::vector<Object*>&list, Ray&ray);
+ShadeInfo intersect(World*world, Ray&ray);
+bool shadowIntersect(World*world,Ray&ray);
 
 #endif /* TRACERUTILS_H_ */

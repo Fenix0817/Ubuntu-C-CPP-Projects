@@ -22,14 +22,14 @@ Matte::~Matte() {
 
 RGBColor Matte::shade(ShadeInfo&si){
 	Vector3 wo=-si.ray->dir;
-	RGBColor col=ambient->rho(si,wo)*si.ambient->getColor(si);
-	for(int i=0;i<si.lights.size();i++){
-		Vector3 wi=si.lights[i]->getDirection(si);
+	RGBColor col=ambient->rho(si,wo)*si.world->ambientLight->getColor(si);
+	for(int i=0;i<si.world->lights.size();i++){
+		Vector3 wi=si.world->lights[i]->getDirection(si);
 		float dot=dotVector(wi,si.normal);
 		if(dot>0){
 //			printf("hi %f  %f,%f,%f %f,%f,%f",dot,dir.x,dir.y,dir.z,si.lights[i]->getColor(si).x,si.lights[i]->getColor(si).y,si.lights[i]->getColor(si).z);
 //			printf(" %f,%f,%f\n",(si.lights[i]->getColor(si)*dot).x,(si.lights[i]->getColor(si)*dot).y,(si.lights[i]->getColor(si)*dot).z);
-			col+=diffuse->f(si,wo,wi)*si.lights[i]->getColor(si)*dot;
+			col+=diffuse->f(si,wo,wi)*si.world->lights[i]->getColor(si)*dot;
 		}
 	}
 	return col;

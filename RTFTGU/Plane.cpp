@@ -38,3 +38,7 @@ ShadeInfo Plane::hit(Ray ray){
 	}
 	return si;
 }
+
+bool Plane::shadowHit(Ray&ray){
+	return dotVector(point-ray.pos,normal)/dotVector(ray.dir,normal)>0.0001;
+}

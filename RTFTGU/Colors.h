@@ -17,6 +17,9 @@ const RGBColor black = RGBColor(0);
 const RGBColor red = RGBColor(1,0,0);
 const RGBColor green = RGBColor(0,1,0);
 const RGBColor blue = RGBColor(0,0,1);
+const RGBColor yellow = RGBColor(1,1,0);
+const RGBColor purple = RGBColor(1,0,1);
+const RGBColor cyan = RGBColor(0,1,1);
 
 //TODO: HSB functions
 

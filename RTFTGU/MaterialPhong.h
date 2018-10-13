@@ -14,6 +14,7 @@
 #include "BRDFLambertian.h"
 #include "BRDFGlossySpecular.h"
 #include "Ray.h"
+#include "World.h"
 
 class MaterialPhong : public Material {
 public:

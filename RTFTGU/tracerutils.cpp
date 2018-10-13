@@ -7,10 +7,10 @@
 
 #include "tracerutils.h"
 
-ShadeInfo intersect(std::vector<Object*>&list, Ray&ray){
+ShadeInfo intersect(World*world, Ray&ray){
 	ShadeInfo si;
 	si.hit=false;
-	for(Object*obj:list){
+	for(Object*obj:world->objects){
 		ShadeInfo nsi=obj->hit(ray);
 		nsi.object=obj;
 		if(nsi.hit){
@@ -21,4 +21,11 @@ ShadeInfo intersect(std::vector<Object*>&list, Ray&ray){
 		}
 	}
 	return si;
+}
+
+bool shadowIntersect(World*world,Ray&ray){
+	for(Object*obj:world->objects){
+		if(obj->shadowHit(ray))return true;
+	}
+	return false;
 }

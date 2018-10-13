@@ -21,6 +21,8 @@ public:
 	Normal normal;
 
 	ShadeInfo hit(Ray ray);
+	bool shadowHit(Ray&ray);
+
 };
 
 #endif /* PLANE_H_ */

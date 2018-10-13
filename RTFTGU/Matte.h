@@ -13,6 +13,7 @@
 #include "BRDF.h"
 #include "BRDFLambertian.h"
 #include "Ray.h"
+#include "World.h"
 
 class Matte : public Material {
 public:

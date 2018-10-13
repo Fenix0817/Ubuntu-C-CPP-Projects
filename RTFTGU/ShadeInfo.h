@@ -14,16 +14,15 @@ class Material;
 class Light;
 class Ray;
 class Object;
+class World;
 
 struct ShadeInfo {
 	Normal normal;
 	float t;
 	bool hit;
 	Ray*ray;
-	Material*mat;
 	Vector3 hitPoint;
-	std::vector<Light*>lights;
-	Light*ambient;
+	World*world;
 	Object*object;
 };
 

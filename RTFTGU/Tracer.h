@@ -10,11 +10,14 @@
 
 #include "utils.h"
 #include "Ray.h"
+#include "World.h"
 
 class Tracer {
 public:
 	Tracer();
 	virtual ~Tracer();
+
+	World*world;
 
 	virtual void create() = 0;
 	virtual RGBColor traceRay(Ray&ray) = 0;

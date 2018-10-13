@@ -21,6 +21,7 @@ public:
 	float rad;
 
 	ShadeInfo hit(Ray ray);
+	bool shadowHit(Ray&ray);
 };
 
 #endif /* SPHERE_H_ */

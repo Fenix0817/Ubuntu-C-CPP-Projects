@@ -21,16 +21,12 @@
 	#include "LightAmbient.h"
 	#include "LightDirectional.h"
 	#include "LightPoint.h"
+#include "World.h"
 
 class TracerSimple : public Tracer {
 public:
 	TracerSimple();
 	virtual ~TracerSimple();
-
-	std::vector<Object*>world;
-	std::vector<Light*>lights;
-
-	Light*ambient;
 
 	void create();
 	RGBColor traceRay(Ray&ray);

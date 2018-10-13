@@ -26,6 +26,8 @@ typedef glm::vec3 Vector3;
 typedef glm::vec3 RGBColor;
 typedef glm::vec3 Normal;
 
+#define HALF_PI 1.57079632679
+#define TWO_PI 6.28318530718
 #define PI 3.14159265359f
 #define ONE_OVER_PI 0.31830988618f
 
