@@ -81,6 +81,7 @@ void ppm::save(std::string fn){
 		}
 		file<<"\n";
 	}
+	file.close();
 }
 
 void ppm::dealloc(){
