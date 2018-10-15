@@ -23,6 +23,9 @@
 #include "LightAmbient.h"
 #include "LightDirectional.h"
 #include "LightPoint.h"
+#include <omp.h>
+#include <chrono>
+using namespace std::chrono;
 
 const Vector3 camPos=Vector3(3,2,1);
 const Vector3 lookAt=Vector3(0,0,0);
@@ -32,6 +35,13 @@ const int W=1000;
 const int H=1000;
 
 Tracer*tracer;
+
+long curTime(){
+	milliseconds ms = duration_cast< milliseconds >(
+		system_clock::now().time_since_epoch()
+	);
+	return ms.count();
+}
 
 void init(){
 //	world.objects.push_back(new ObjectSphere(Vector3(0,0,0),1));
@@ -98,12 +108,19 @@ int main(){
 
 	printf("Memory allocated\n");
 
+	long start,end;
+	start=curTime();
+#pragma omp parallel for
 	for(int x=0;x<W;x++){
+#pragma omp parallel for
 		for(int y=0;y<H;y++){
 			Vector3 color=getColor(Vector2(x,y)/Vector2(W,H));
 			img.setPixel(x,y,color.x,color.y,color.z);
 		}
 	}
+	end=curTime();
+	printf("Time: %lu\n",end-start);
+	//Around 830msms to 220ms for 1000x1000 simple pathtraced
 
 	printf("Computed\n");
 
