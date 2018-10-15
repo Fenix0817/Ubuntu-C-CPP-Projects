@@ -11,8 +11,8 @@
 #include "Light.h"
 #include "Ray.h"
 #include "tracerutils.h"
-
-#define samples 400
+#include "Sampler.h"
+#include "SamplerRandom.h"
 
 class LightAmbientOcclusion : public Light {
 public:
@@ -28,6 +28,8 @@ public:
 
 	float intensity;
 	RGBColor color;
+
+	Sampler* sampler;
 
 private:
 	Vector3 u;

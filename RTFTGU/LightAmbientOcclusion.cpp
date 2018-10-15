@@ -19,13 +19,17 @@ LightAmbientOcclusion::LightAmbientOcclusion(float i,RGBColor c,float m){
 	intensity=i;
 	color=c;
 	minAmount=m;
+	sampler=new SamplerRandom(10000);
+	sampler->generateSamples();
+	sampler->mapSamplesToHemisphere();
 }
 
 Vector3 LightAmbientOcclusion::getDirection(ShadeInfo&si){
-	float theta=TWO_PI*randomFloat();
-	float phi=PI*randomFloat();
+//	float theta=TWO_PI*randomFloat();
+//	float phi=PI*randomFloat();
 //	Vector3 sampled=normalizeVector(Vector3(randomFloat(),randomFloat(),randomFloat())*2.0f-1.0f);
-	Vector3 sampled=Vector3(sin(theta)*cos(phi),sin(theta)*sin(phi),cos(theta));
+//	Vector3 sampled=Vector3(sin(theta)*cos(phi),sin(theta)*sin(phi),cos(theta));
+	Vector3 sampled=sampler->sampleHemisphere();
 	return  normalizeVector(sampled.x*u+sampled.y*v+sampled.z*w);
 //	return sampled;
 //	return normalizeVector(si.hitPoint-Vector3(3));

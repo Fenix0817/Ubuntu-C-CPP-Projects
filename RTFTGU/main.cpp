@@ -16,6 +16,7 @@
 #include "World.h"
 #include "LightAmbientOcclusion.h"
 #include "MaterialUnshaded.h"
+#include "Sampler.h"
 
 //Raytracing From The Ground Up
 //ISBN: 978-1-56881-272-4
@@ -99,7 +100,7 @@ int main(){
 
 	tracer->world=world;
 
-	int n=500;
+	int n=300;
 	for(int x=0;x<w;x++){
 		for(int y=0;y<h;y++){
 			RGBColor color;
