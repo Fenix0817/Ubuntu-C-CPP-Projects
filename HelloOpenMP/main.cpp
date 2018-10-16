@@ -5,6 +5,20 @@
  *      Author: jack
  */
 
+#include <stdio.h>
+
+//Basic omp demo
+/*
+int main(){
+#pragma omp parallel for
+	for(int i=0;i<10;i++){
+		printf("%i\n",i);
+	}
+	return 0;
+}
+*/
+//Use the following program if you want to do a mandelbrot time-comparison
+
 #include <math.h>
 #include "ppm.h"
 #include <chrono>
@@ -104,3 +118,4 @@ int main(){
 
 	return 0;
 }
+
