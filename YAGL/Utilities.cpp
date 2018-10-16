@@ -94,7 +94,7 @@ std::string readFile(const char*filename){
 	std::ifstream t(filename);
 	std::string s((std::istreambuf_iterator<char>(t)),
 	                 std::istreambuf_iterator<char>());
-	printf("code:<%s>\n",s.c_str());
+//	printf("code:<%s>\n",s.c_str());
 	return s;
 }
 

@@ -14,6 +14,7 @@ namespace ShaderType {
 int shader_type_enum_to_int(shader_type_enum ste){
 	if(ste==Vertex)return GL_VERTEX_SHADER;
 	if(ste==Fragment)return GL_FRAGMENT_SHADER;
+	if(ste==Geometry)return GL_GEOMETRY_SHADER;
 	return 0;
 }
 
@@ -21,6 +22,7 @@ int shader_type_enum_to_int(shader_type_enum ste){
 const char* shader_type_enum_to_str(shader_type_enum ste){
 	if(ste==Vertex)return "Vertex";
 	if(ste==Fragment)return "Fragment";
+	if(ste==Geometry)return "Geometry";
 	return 0;
 }
 

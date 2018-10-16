@@ -26,7 +26,8 @@ namespace ShaderType {
 
 	enum shader_type_enum {
 		Vertex,
-		Fragment
+		Fragment,
+		Geometry
 	};
 
 	int shader_type_enum_to_int(shader_type_enum ste);
