@@ -31,13 +31,12 @@ const float SIM_H = 1000;
 const int SIM_WI  = (int) SIM_W;
 const int SIM_HI  = (int) SIM_H;
 
-const float DISPLAY_SIZE = 25/2+3;
 
 
 const static vec2 G(0.f, 12000*-9.8f);
 const static float REST_DENS = 1000.f;
 const static float GAS_CONST = 2000.f;
-const static float H = 25.f;
+const static float H = 20.f;
 const static float HSQ = H*H;
 const static float MASS = 65.f;
 const static float VISC = 250.f;
@@ -50,13 +49,39 @@ const static float VISC_LAP = 45.f/(M_PI*pow(H, 6.f));
 const static float BOUND_SIZE = H;
 const static float BOUND_DAMPING = -0.5f;
 
+const float DISPLAY_SIZE = H/2;
+
 vector<particle>list;
 vector<float>posData;
 vector<float>colData;
 vector<unsigned int>triData;
 
+void addParticle(float x,float y){
+	int i=list.size();
+	printf("(%f,%f)\n",x,y);
+	list.push_back(particle(x,y));
+
+	posData.push_back(x - DISPLAY_SIZE);posData.push_back(y - DISPLAY_SIZE);
+	posData.push_back(x + DISPLAY_SIZE);posData.push_back(y - DISPLAY_SIZE);
+	posData.push_back(x - DISPLAY_SIZE);posData.push_back(y + DISPLAY_SIZE);
+	posData.push_back(x + DISPLAY_SIZE);posData.push_back(y + DISPLAY_SIZE);
+
+	triData.push_back(i*4+0);
+	triData.push_back(i*4+1);
+	triData.push_back(i*4+2);
+	triData.push_back(i*4+1);
+	triData.push_back(i*4+2);
+	triData.push_back(i*4+3);
+
+//		colData.insert(colData.end(), {1,0,0,  0,1,0,  0,0,1,  1,1,0});
+	colData.push_back(1);colData.push_back(0);colData.push_back(0);
+	colData.push_back(0);colData.push_back(1);colData.push_back(0);
+	colData.push_back(0);colData.push_back(0);colData.push_back(1);
+	colData.push_back(1);colData.push_back(1);colData.push_back(0);
+}
 void initSimulation(){
-	for(int i=0;i<500;i++){
+	/*
+	for(int i=0;i<700;i++){
 		float x=rand()%200-100+SIM_WI/2;
 		float y=rand()%200-100+SIM_HI/2;
 		printf("(%f,%f)\n",x,y);
@@ -80,14 +105,22 @@ void initSimulation(){
 		colData.push_back(0);colData.push_back(0);colData.push_back(1);
 		colData.push_back(1);colData.push_back(1);colData.push_back(0);
 	}
+	*/
+	for(int x=30;x<=600;x+=H){
+		for(int y=100;y<=700;y+=H){
+			addParticle(x+rand()%4-2,y);
+		}
+	}
 
 }
 
 void stepSimulation(){
 
 	//density and pressure
+#pragma omp parallel for
 	for(unsigned int i=0;i<list.size();i++){
 		list[i].rho=0;
+#pragma omp parallel for
 		for(unsigned int j=0;j<list.size();j++){
 			vec2 rij=list[j].x-list[i].x;
 			float r2=rij.x*rij.x+rij.y*rij.y;
@@ -99,9 +132,11 @@ void stepSimulation(){
 	}
 
 	//forces
+#pragma omp parallel for
 	for(unsigned int i=0;i<list.size();i++){
 		vec2 fpress(0,0);
 		vec2 fvisc(0,0);
+#pragma omp parallel for
 		for(unsigned int j=0;j<list.size();j++){
 			if(i==j)continue;
 			vec2 rij=list[j].x-list[i].x;
@@ -115,6 +150,7 @@ void stepSimulation(){
 	}
 
 	//integration
+#pragma omp parallel for
 	for(unsigned int i=0;i<list.size();i++){
 		list[i].v+=DT*list[i].f/list[i].rho;
 		list[i].x+=DT*list[i].v;
@@ -219,7 +255,7 @@ int main(){
 	vboPos.addVertexAttrib(0,2,false,2,0);
 	vboPos.unbind();
 
-	gl::VertexBuffer vboCol(gl::VertexBufferTarget::Array,gl::VertexBufferUsage::StaticDraw,gl::Type::Float);
+	gl::VertexBuffer vboCol(gl::VertexBufferTarget::Array,gl::VertexBufferUsage::DynamicDraw,gl::Type::Float);
 //	vboCol.setTarget(gl::VertexBufferTarget::Array);
 //	vboCol.setUsage(gl::VertexBufferUsage::StaticDraw);
 //	vboCol.setType(gl::Type::Float);
@@ -229,7 +265,7 @@ int main(){
 	vboCol.addVertexAttrib(1,3,false,3,0);
 	vboCol.unbind();
 
-	gl::VertexBuffer ebo(gl::VertexBufferTarget::ElementArray,gl::VertexBufferUsage::StaticDraw,gl::Type::UnsignedInt);
+	gl::VertexBuffer ebo(gl::VertexBufferTarget::ElementArray,gl::VertexBufferUsage::DynamicDraw,gl::Type::UnsignedInt);
 //	ebo.setTarget(gl::VertexBufferTarget::ElementArray);
 //	ebo.setUsage(gl::VertexBufferUsage::StaticDraw);
 //	ebo.setType(gl::Type::UnsignedInt);
@@ -247,7 +283,9 @@ int main(){
 	vec2 lastMousePos(0,0);
 	vec2 mousePos(0,0);
 
+	int frames=0;
 	while(window.isOpen()){
+		frames++;
 		window.bind();
 
 		lastMousePos=mousePos;
@@ -257,7 +295,7 @@ int main(){
 
 		for(unsigned int i=0;i<list.size();i++){
 			if(glm::length(mousePos-list[i].x)<150){
-				list[i].v+=30.0f*diff;
+				list[i].v+=70.0f*diff;
 			}
 		}
 
