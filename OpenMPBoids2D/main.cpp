@@ -11,6 +11,8 @@
 #include "Shader.h"
 #include "VertexArray.h"
 #include "VertexBuffer.h"
+#include <glm/glm.hpp>
+#include "Boid.h"
 
 int main(){
 #pragma omp parallel for
@@ -24,7 +26,7 @@ int main(){
 	window.setMinorVersion(1);
 	window.create();
 	window.setTitle("Boids and OpenMP");
-	window.setSize(500,500);
+	window.setSize(1000,1000);
 
 	window.bind();
 
@@ -35,7 +37,7 @@ int main(){
 	shader.attachFile("Shaders/shader.geom",gl::ShaderType::Geometry);
 	shader.link();
 
-	int n=20;
+	int n=1000;
 	float pos[n*2];
 	for(int i=0;i<n;i++){
 		pos[i*2+0]=2*((float)rand())/((float)RAND_MAX)-1;
@@ -49,8 +51,29 @@ int main(){
 	}
 	float size[n];
 	for(int i=0;i<n;i++){
-		size[i]=0.05+0.1*((float)rand())/((float)RAND_MAX);
+//		size[i]=0.05+0.1*((float)rand())/((float)RAND_MAX);
+		size[i]=0.01;
 	}
+	float dir[n*2];
+	for(int i=0;i<n;i++){
+		dir[i*2+0]=0;
+		dir[i*2+1]=0;
+	}
+
+	Params*params=new Params();
+	params->dt=1;
+	params->centerOfMassAttraction=0.0025;
+	params->centerOfVelAttraction=0.2;
+	params->velDamping=0.75;
+	params->seperation=20;
+	params->sepDist=0.04;
+	params->viewDist=0.2;
+
+	Boid boids[n];
+	for(int i=0;i<n;i++){
+		boids[i].params=params;
+	}
+
 
 	gl::VertexArray vao;
 	vao.create();
@@ -86,6 +109,16 @@ int main(){
 	vboSize.setData(sizeof(size),size);
 	vboSize.unbind();
 
+	gl::VertexBuffer vboDir;
+	vboDir.setTarget(gl::VertexBufferTarget::Array);
+	vboDir.setUsage(gl::VertexBufferUsage::StaticDraw);
+	vboDir.setType(gl::Type::Float);
+	vboDir.create();
+	vboDir.bind();
+	vboDir.addVertexAttrib(3,2,false,2,(const GLvoid*)0);
+	vboDir.setData(sizeof(dir),dir);
+	vboDir.unbind();
+
 	vao.unbind();
 
 	printf("vao=%i, vboPos=%i, shader=%i\n",vao.id,vboPos.id,shader.id);
@@ -93,15 +126,39 @@ int main(){
 	while(window.isOpen()){
 		window.bind();
 
-		gl::setClearColor(.5+.5*cos(gl::time()));
+		gl::setClearColor(0);
 		gl::clearScreen();
 		gl::defaultViewport(window);
 
 		shader.bind();
 		vao.bind();
+
+		vboPos.bind();
+		float*ptrPos=(float*)glMapBuffer(GL_ARRAY_BUFFER,GL_WRITE_ONLY);
+		for(int i=0;i<n;i++){
+			ptrPos[i*2+0]=boids[i].pos.x;
+			ptrPos[i*2+1]=boids[i].pos.y;
+		}
+		glUnmapBuffer(GL_ARRAY_BUFFER);
+		vboPos.unbind();
+
+		vboDir.bind();
+		float*ptrDir=(float*)glMapBuffer(GL_ARRAY_BUFFER,GL_WRITE_ONLY);
+		for(int i=0;i<n;i++){
+			ptrDir[i*2+0]=boids[i].vel.x;
+			ptrDir[i*2+1]=boids[i].vel.y;
+		}
+		glUnmapBuffer(GL_ARRAY_BUFFER);
+		vboDir.unbind();
+
 		glDrawArrays(GL_POINTS,0,n);
 		vao.unbind();
 		shader.unbind();
+
+#pragma omp parallel for
+		for(int i=0;i<n;i++){
+			boids[i].update(boids,n,i);
+		}
 
 		window.unbind();
 	}
