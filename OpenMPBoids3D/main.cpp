@@ -193,15 +193,15 @@ int main(){
 		shaderBoids.unbind();
 
 
-		shaderBounds.bind();
-		shaderBounds.setMat4("perspective",perspective);
-		shaderBounds.setMat4("view",view);
-		vaoBounds.bind();
-		eboBounds.bind();
-		eboBounds.render();
-		eboBounds.unbind();
-		vaoBounds.unbind();
-		shaderBounds.unbind();
+//		shaderBounds.bind();
+//		shaderBounds.setMat4("perspective",perspective);
+//		shaderBounds.setMat4("view",view);
+//		vaoBounds.bind();
+//		eboBounds.bind();
+//		eboBounds.render();
+//		eboBounds.unbind();
+//		vaoBounds.unbind();
+//		shaderBounds.unbind();
 
 #ifdef USE_OMP
 #pragma omp parallel for
