@@ -12,25 +12,12 @@
 #include <stdio.h>
 #include <stddef.h>
 
-struct Params {
-	Params(){dt=0;centerOfMassAttraction=0;seperation=0;velDamping=0;centerOfVelAttraction=0;sepDist=0;viewDist=0;}
-	float dt;
-	float centerOfMassAttraction;
-	float centerOfVelAttraction;
-	float seperation;
-	float velDamping;
-	float viewDist;
-	float sepDist;
-};
-
 class Boid;
 
 class Boid {
 public:
 	Boid();
 	virtual ~Boid();
-
-	Params*params;
 
 	glm::vec2 pos;
 	glm::vec2 vel;

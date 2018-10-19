@@ -11,10 +11,9 @@
 
 Boid::Boid() {
 	// TODO Auto-generated constructor stub
-	pos=2.0f*glm::vec2(((float)rand())/((float)RAND_MAX),((float)rand())/((float)RAND_MAX))-1.0f;
+	pos=1.6f*glm::vec2(((float)rand())/((float)RAND_MAX),((float)rand())/((float)RAND_MAX))-0.8f;
 	vel=glm::vec2(0,0);
 	acc=glm::vec2(0,0);
-	params=nullptr;
 }
 
 Boid::~Boid() {
@@ -22,55 +21,60 @@ Boid::~Boid() {
 }
 
 void Boid::update(Boid*boids,int n,int selfI){
-	glm::vec2 centerOfMass(0,0);
-	int com_n=0;
+	float viewDist=0.1;
+	float maxVel=0.005;
+	float sepDist=0.025;
+	float bounds=0.8;
+	float bDamp=20;
 
+	glm::vec2 com(0,0);
+	int com_n=0;
 #pragma omp parallel for
 	for(int i=0;i<n;i++){
 		if(i==selfI)continue;
-		if(glm::length(boids[i].pos-pos)>params->viewDist)continue;
-		if(glm::length(boids[i].pos-pos)<params->sepDist*2)continue;
+		if(glm::length(boids[i].pos-pos)>viewDist)continue;
 		com_n++;
-		centerOfMass+=boids[i].pos;
+		com+=boids[i].pos-pos;
 	}
-	if(com_n!=0)centerOfMass/=com_n;
+	if(com_n!=0)com/=com_n;
+
+	glm::vec2 rule1=(com)*0.001f;
 
 	glm::vec2 sep(0,0);
-
+	int sep_n=0;
 #pragma omp parallel for
 	for(int i=0;i<n;i++){
 		if(i==selfI)continue;
-		if(glm::length(boids[i].pos-pos)<params->sepDist){
-			sep+=boids[i].pos-pos;
-		}
+		if(glm::length(boids[i].pos-pos)>sepDist)continue;
+		sep_n++;
+		sep+=pos-boids[i].pos;
 	}
-	sep/=n-1;
+	if(sep_n!=0)sep/=sep_n;
 
-	glm::vec2 centerOfVel(0,0);
+	glm::vec2 rule2=sep*0.05f;
+
+	glm::vec2 cov(0,0);
 	int cov_n=0;
-
 #pragma omp parallel for
 	for(int i=0;i<n;i++){
 		if(i==selfI)continue;
-		if(glm::length(boids[i].pos-pos)>params->viewDist)continue;
-		if(glm::length(boids[i].pos-pos)<params->sepDist*2)continue;
+		if(glm::length(boids[i].pos-pos)>viewDist)continue;
 		cov_n++;
-		centerOfVel+=boids[i].vel;
+		cov+=boids[i].vel;
 	}
-	if(cov_n!=0)centerOfVel/=cov_n;
+	if(cov_n!=0)cov/=cov_n;
 
-	acc=glm::vec2(0,0);
+	glm::vec2 rule3=cov*0.05f;
 
-	acc+=(centerOfMass-pos)*params->centerOfMassAttraction;
-	acc-=sep*params->seperation;
-	acc+=centerOfVel*params->centerOfVelAttraction;
+	vel+=rule1;
+	vel+=rule2;
+	vel+=rule3;
+	if(glm::length(vel)>maxVel)vel=maxVel*glm::normalize(vel);
+	pos+=vel;
 
-	vel+=acc*params->dt;
-	vel*=params->velDamping;
-	pos+=vel*params->dt;
-
-	if(pos.x<-.8)vel.x=abs(vel.x);
-	if(pos.y<-.8)vel.y=abs(vel.y);
-	if(pos.x> .8)vel.x=-abs(vel.x);
-	if(pos.y> .8)vel.y=-abs(vel.y);
+	//add boundary conditions
+	if(pos.x<-bounds)vel.x= abs(vel.x)*bDamp;
+	if(pos.y<-bounds)vel.y= abs(vel.y)*bDamp;
+	if(pos.x> bounds)vel.x=-abs(vel.x)*bDamp;
+	if(pos.y> bounds)vel.y=-abs(vel.y)*bDamp;
 }

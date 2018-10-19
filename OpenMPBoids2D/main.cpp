@@ -13,6 +13,7 @@
 #include "VertexBuffer.h"
 #include <glm/glm.hpp>
 #include "Boid.h"
+#include <omp.h>
 
 int main(){
 #pragma omp parallel for
@@ -32,12 +33,12 @@ int main(){
 
 	gl::Shader shader;
 	shader.create();
-	shader.attachFile("Shaders/shader.vert",gl::ShaderType::Vertex);
-	shader.attachFile("Shaders/shader.frag",gl::ShaderType::Fragment);
-	shader.attachFile("Shaders/shader.geom",gl::ShaderType::Geometry);
+	shader.attachFile("Shaders/boid.vert",gl::ShaderType::Vertex);
+	shader.attachFile("Shaders/boid.frag",gl::ShaderType::Fragment);
+	shader.attachFile("Shaders/boid.geom",gl::ShaderType::Geometry);
 	shader.link();
 
-	int n=1000;
+	int n=600;
 	float pos[n*2];
 	for(int i=0;i<n;i++){
 		pos[i*2+0]=2*((float)rand())/((float)RAND_MAX)-1;
@@ -52,7 +53,7 @@ int main(){
 	float size[n];
 	for(int i=0;i<n;i++){
 //		size[i]=0.05+0.1*((float)rand())/((float)RAND_MAX);
-		size[i]=0.01;
+		size[i]=0.03;
 	}
 	float dir[n*2];
 	for(int i=0;i<n;i++){
@@ -60,20 +61,7 @@ int main(){
 		dir[i*2+1]=0;
 	}
 
-	Params*params=new Params();
-	params->dt=1;
-	params->centerOfMassAttraction=0.0025;
-	params->centerOfVelAttraction=0.2;
-	params->velDamping=0.75;
-	params->seperation=20;
-	params->sepDist=0.04;
-	params->viewDist=0.2;
-
 	Boid boids[n];
-	for(int i=0;i<n;i++){
-		boids[i].params=params;
-	}
-
 
 	gl::VertexArray vao;
 	vao.create();
@@ -126,7 +114,7 @@ int main(){
 	while(window.isOpen()){
 		window.bind();
 
-		gl::setClearColor(0);
+		gl::setClearColor(1);
 		gl::clearScreen();
 		gl::defaultViewport(window);
 
