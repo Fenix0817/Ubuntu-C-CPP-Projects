@@ -36,6 +36,27 @@ void YAGL_keypress(GLFWwindow*glfwPtr,int key,int scancode,int actions,int mods)
 	}
 }
 
+void YAGL_mouseclick(GLFWwindow*glfwPtr,int button,int action,int mods){
+	Window*obj=(Window*)glfwGetWindowUserPointer(glfwPtr);
+	if(button==GLFW_MOUSE_BUTTON_LEFT){
+		if(action==GLFW_PRESS){
+			obj->mouseLeftJustPressed=true;
+			obj->mouseLeftPressed=true;
+		}else if(action==GLFW_RELEASE){
+			obj->mouseLeftJustReleased=true;
+			obj->mouseLeftPressed=false;
+		}
+	}else if(button==GLFW_MOUSE_BUTTON_RIGHT){
+		if(action==GLFW_PRESS){
+			obj->mouseRightJustPressed=true;
+			obj->mouseRightPressed=true;
+		}else if(action==GLFW_RELEASE){
+			obj->mouseRightJustReleased=true;
+			obj->mouseRightPressed=false;
+		}
+	}
+}
+
 void init(){
 	glfwInit();
 }
@@ -58,16 +79,13 @@ void Window::setMinorVersion(int i){
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,i);
 }
 
-void doit(GLFWwindow*ptr,int a,int b,int c,int d){
-
-}
-
 void Window::create(){
 	width=100;
 	height=100;
 	ptr=glfwCreateWindow(100,100,"Default Title", nullptr, nullptr);
 	glfwSetWindowUserPointer(ptr,this);
 	glfwSetKeyCallback(ptr,YAGL_keypress);
+	glfwSetMouseButtonCallback(ptr,YAGL_mouseclick);
 }
 void Window::setTitle(const char*title){
 	glfwSetWindowTitle(ptr, title);
@@ -115,6 +133,10 @@ bool Window::wasJustReleased(char c){
 void Window::clearInputs(){
 	justPressed.clear();
 	justReleased.clear();
+	mouseLeftJustPressed=false;
+	mouseLeftJustReleased=false;
+	mouseRightJustPressed=false;
+	mouseRightJustReleased=false;
 }
 
 void Window::updateSize(){

@@ -32,7 +32,7 @@ void init();
 void end();
 
 void YAGL_keypress(GLFWwindow*glfwPtr,int key,int scancode,int actions,int mods);
-
+void YAGL_mouseclick(GLFWwindow*glfwPtr,int button,int action,int mods);
 
 class Window {
 public:
@@ -58,6 +58,14 @@ public:
 	std::vector<char> keys;
 	std::vector<char> justPressed;
 	std::vector<char> justReleased;
+
+	bool mouseLeftJustPressed=false;
+	bool mouseLeftJustReleased=false;
+	bool mouseRightJustPressed=false;
+	bool mouseRightJustReleased=false;
+
+	bool mouseLeftPressed=false;
+	bool mouseRightPressed=false;
 
 	bool isKeyDown(char c);
 	bool wasJustPressed(char c);
