@@ -73,7 +73,6 @@ void init(){
 	Light*ambient=new LightAmbient(.2,Colors::white);
 	world->setAmbient(ambient);
 
-
 	tracer=new TracerSimple(world);
 	//Implement lights
 }

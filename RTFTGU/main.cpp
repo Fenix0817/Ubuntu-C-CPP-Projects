@@ -100,7 +100,7 @@ int main(){
 
 	tracer->world=world;
 
-	int n=300;
+	int n=30;
 	for(int x=0;x<w;x++){
 		for(int y=0;y<h;y++){
 			RGBColor color;
