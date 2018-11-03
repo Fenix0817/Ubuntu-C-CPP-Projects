@@ -40,11 +40,3 @@ ShadeInfo ObjectSphere::hit(Ray ray){
 	si.normal=normalizeVector(ray.pos+t*ray.dir-center);
 	return si;
 }
-
-bool ObjectSphere::shadowHit(Ray ray){
-	float a=squareLength(ray.dir);
-	float b=2*dotVectors(ray.pos-center,ray.dir);
-	float c=squareLength(ray.pos-center)-radius*radius;
-	if(!solvableQuadratic(a,b,c))return false;
-	return true;
-}

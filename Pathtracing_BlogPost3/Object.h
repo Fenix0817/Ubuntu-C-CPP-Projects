@@ -20,7 +20,6 @@ public:
 	virtual ~Object();
 
 	virtual ShadeInfo hit(Ray ray)=0;
-	virtual bool shadowHit(Ray ray)=0;
 
 	Material*material;
 

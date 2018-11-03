@@ -32,11 +32,4 @@ inline ShadeInfo intersectWorld(World*w,Ray r){
 	return si;
 }
 
-inline bool intersectShadowWorld(World*w,Ray r){
-	for(Object*o:w->objects){
-		if(o->shadowHit(r))return true;
-	}
-	return false;
-}
-
 #endif /* TRACERUTILS_H_ */

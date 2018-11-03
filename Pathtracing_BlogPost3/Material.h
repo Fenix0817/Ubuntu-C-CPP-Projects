@@ -18,6 +18,9 @@ public:
 	virtual ~Material();
 
 	virtual RGBColor shade(ShadeInfo&si)=0;
+	virtual RGBColor giShade(ShadeInfo&si){
+		return shade(si);
+	}
 };
 
 #endif /* MATERIAL_H_ */

@@ -22,7 +22,6 @@ public:
 	ObjectSphere(Vector3 c,float r);
 
 	ShadeInfo hit(Ray ray);
-	bool shadowHit(Ray ray);
 };
 
 #endif /* OBJECTSPHERE_H_ */

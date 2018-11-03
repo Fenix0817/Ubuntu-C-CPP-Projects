@@ -17,8 +17,11 @@
 #include "ObjectAABB.h"
 #include "Tracer.h"
 #include "TracerSimple.h"
+#include "TracerGI.h"
 #include "Material.h"
 #include "MaterialMatte.h"
+#include "MaterialEmmisive.h"
+#include "MaterialReflective.h"
 #include "Light.h"
 #include "LightAmbient.h"
 #include "LightDirectional.h"
@@ -27,9 +30,9 @@
 #include <chrono>
 using namespace std::chrono;
 
-const Vector3 camPos=Vector3(2,0,0);
-const Vector3 lookAt=Vector3(0,0,0);
-const float zoom=1;
+Vector3 camPos=Vector3(1,0,0);
+Vector3 lookAt=Vector3(0,0,0);
+float zoom=1;
 
 const int W=1000;
 const int H=1000;
@@ -43,14 +46,14 @@ long curTime(){
 	return ms.count();
 }
 
-void init(){
-//	world.objects.push_back(new ObjectSphere(Vector3(0,0,0),1));
-//	world.objects.push_back(new ObjectPlane(Vector3(0,0,0),Vector3(0,1,0)));
-//	world.objects.push_back(new ObjectDisk(Vector3(0,1.2,-2),Vector3(0.5,0.8,1),1));
-//	world.objects.push_back(new ObjectAABB(Vector3(-1,0,-1),Vector3(0.5,1.5,0)));
-//	world.objects.push_back(new ObjectPlane(Vector3(-1,0,0),Vector3(1,0,0)));
-//	world.objects.push_back(new ObjectPlane(Vector3(0,0,-3),Vector3(0,0,1)));
+World*buildCornellBox(){
+	camPos=Vector3(-.8,0,.9);//1,0,0
+	lookAt=Vector3(1,0,0);
+	zoom=1;
+
 	World*world=new World();
+	world->setBackground(Colors::white);
+//	world->setDepth(10);
 
 	MaterialMatte*matteWhite=new MaterialMatte();
 	matteWhite->setAmbient(1,Colors::white);
@@ -68,6 +71,8 @@ void init(){
 	matteOrange->setAmbient(1,Colors::white);
 	matteOrange->setDiffuse(1,Colors::orange);
 
+	MaterialEmmisive*matteLight=new MaterialEmmisive(30,Colors::white);
+
 	Object*backWall=new ObjectPlane(Vector3(-1,0,0),Vector3(1,0,0));
 	backWall->setMaterial(matteWhite);
 	world->addObject(backWall);
@@ -77,7 +82,7 @@ void init(){
 	world->addObject(leftWall);
 
 	Object*rightWall=new ObjectPlane(Vector3(0,0,1),Vector3(0,0,-1));
-	rightWall->setMaterial(matteGreen);
+	rightWall->setMaterial(matteWhite);
 	world->addObject(rightWall);
 
 	Object*ceiling=new ObjectPlane(Vector3(0,1,0),Vector3(0,-1,0));
@@ -88,17 +93,100 @@ void init(){
 	floor->setMaterial(matteWhite);
 	world->addObject(floor);
 
-	Object*box1=new ObjectAABB(Vector3(-.7,-1,-.6),Vector3(-.1,0,-.1));
-	box1->setMaterial(matteOrange);
+	Object*behindWall=new ObjectPlane(Vector3(3,0,0),Vector3(-1,0,0));
+	behindWall->setMaterial(matteWhite);
+	world->addObject(behindWall);
+
+	Object*box1=new ObjectAABB(Vector3(-.8,-1,-.1),Vector3(0.3,1,0));
+	box1->setMaterial(matteWhite);
 	world->addObject(box1);
 
-	Light*ambient=new LightAmbient(0	,Colors::white);
+	Object*lightSphere=new ObjectSphere(Vector3(-.4,0,0.3),.2);
+	lightSphere->setMaterial(matteLight);
+	world->addObject(lightSphere);
+
+	Light*ambient=new LightAmbient(0,Colors::white);
 	world->setAmbient(ambient);
 
-	Light*light=new LightPoint(3,Colors::white,Vector3(0.3,0,0));
-	world->addLight(light);
+	return world;
+}
 
-	tracer=new TracerSimple(world);
+World*buildBoxPlaneLight(){
+	camPos=Vector3(-3,4,-4);
+	lookAt=Vector3(0,0,0);
+	zoom=1;
+
+	World*world=new World();
+	world->setBackground(Colors::black);
+//	world->setDepth(10);
+
+	MaterialMatte*matteWhite=new MaterialMatte();
+	matteWhite->setAmbient(1,Colors::white);
+	matteWhite->setDiffuse(1,Colors::white);
+
+	MaterialMatte*matteRed=new MaterialMatte();
+	matteRed->setAmbient(1,Colors::white);
+	matteRed->setDiffuse(1,Colors::red);
+
+	MaterialMatte*matteGreen=new MaterialMatte();
+	matteGreen->setAmbient(1,Colors::white);
+	matteGreen->setDiffuse(1,Colors::green);
+
+	MaterialEmmisive*matteLight=new MaterialEmmisive(30,Colors::white-Colors::red*0.2f);
+
+	MaterialReflective*matteReflective=new MaterialReflective();
+	matteReflective->setReflective(1,Colors::white);
+	matteReflective->setAmbient(1,Colors::white);
+
+	Object*floor=new ObjectPlane(Vector3(0,0,0),Vector3(0,1,0));
+	floor->setMaterial(matteWhite);
+	world->addObject(floor);
+
+	Object*top=new ObjectPlane(Vector3(0,4.1,0),Vector3(0,-1,0));
+	top->setMaterial(matteWhite);
+	world->addObject(top);
+
+//	Object*box1=new ObjectAABB(Vector3(0,0,0),Vector3(1.5,1.5,1.5));
+//	box1->setMaterial(matteRed);
+//	world->addObject(box1);
+
+	Object*sphere1=new ObjectSphere(Vector3(1.5,0,0),1);
+	sphere1->setMaterial(matteReflective);
+	world->addObject(sphere1);
+
+	Object*box2=new ObjectAABB(Vector3(3,0,0),Vector3(8.5,1.5,3.5));
+	box2->setMaterial(matteReflective);
+	world->addObject(box2);
+
+	Object*sphere2=new ObjectSphere(Vector3(1,1,1),1);
+	sphere2->setMaterial(matteGreen);
+	world->addObject(sphere2);
+
+	Object*light=new ObjectSphere(Vector3(0,0.5,0),1);
+	light->setMaterial(matteLight);
+	world->addObject(light);
+
+	Light*ambient=new LightAmbient(0,Colors::black);
+	world->setAmbient(ambient);
+
+	return world;
+}
+
+void init(){
+//	World*world=buildCornellBox();
+	World*world=buildBoxPlaneLight();
+	world->setDepth(30);
+
+	tracer=new TracerGI(world);
+
+	world->tracer=tracer;
+}
+
+RGBColor mapColor(RGBColor color){
+	if(color.x>1||color.y>1||color.z>1){
+		color/=max(color.x,max(color.y,color.z));
+	}
+	return color;
 }
 
 Vector3 getColor(Vector2 uv){
@@ -116,6 +204,7 @@ Vector3 getColor(Vector2 uv){
 	Vector3 c=camPos+f*zoom;
 	Vector3 i=c+uv.x*r+uv.y*u;
 	ray.dir=normalizeVector(i-camPos);
+
 
 	return tracer->getColor(ray);
 }
@@ -141,18 +230,28 @@ int main(){
 	//TODO: 	- std::vector<Object*>objects;
 	//TODO:		- std::vector<ObjectLight*>lights;
 
+	const int numSamples=10000;
+
+	int num=0;
+	const int total=W*H;
+
 	long start,end;
 	start=curTime();
 #pragma omp parallel for
 	for(int x=0;x<W;x++){
 #pragma omp parallel for
 		for(int y=0;y<H;y++){
-			Vector3 color=getColor(Vector2(x,y)/Vector2(W,H));
-			if(color.x>1||color.y>1||color.z>1){
-				color/=max(color.x,max(color.y,color.z));
+			RGBColor color=Colors::black;
+#pragma omp parallel for
+			for(int i=0;i<numSamples;i++){
+				color+=getColor(Vector2(x+randomFloat(),y+randomFloat())/Vector2(W,H));
 			}
+			color/=numSamples;
+			color=mapColor(color);
 			img.setPixel(x,y,color.x,color.y,color.z);
+			num++;
 		}
+		printf("%i / %i\n",num,total);
 	}
 	end=curTime();
 	printf("Time: %lu\n",end-start);
@@ -162,7 +261,7 @@ int main(){
 	printf("Computed\n");
 
 	img.clamp();
-	img.save("pathtracing-01.ppm");
+	img.save("pathtracing-05.ppm");
 	img.dealloc();
 
 	printf("Saved\n");

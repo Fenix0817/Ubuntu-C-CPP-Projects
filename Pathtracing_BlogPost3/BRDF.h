@@ -17,7 +17,7 @@ public:
 	virtual ~BRDF();
 
 	virtual RGBColor f(ShadeInfo&si,Vector3&wi,Vector3&wo)=0;
-	virtual RGBColor sampleF(ShadeInfo&si,Vector3&wi,Vector3&wo)=0;
+	virtual RGBColor sampleF(ShadeInfo&si,Vector3&wi,Vector3&wo,float&pdf)=0;
 	virtual RGBColor rho(ShadeInfo&si,Vector3&wo)=0;
 };
 

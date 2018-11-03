@@ -33,8 +33,3 @@ ShadeInfo ObjectPlane::hit(Ray ray){
 	}
 	return si;
 }
-
-bool ObjectPlane::shadowHit(Ray ray){
-	if(dotVectors(ray.dir,normal)==0)return false;
-	return dotVectors(pos-ray.pos,normal)/dotVectors(ray.dir,normal)>0.0001;
-}

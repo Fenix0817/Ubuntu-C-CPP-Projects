@@ -68,9 +68,9 @@ ShadeInfo ObjectAABB::hit(Ray ray){
 
 	t=tmin;
 
-	if(t<0){
+	if(t<0.001){
 		t=tmax;
-		if(t<0)return si;
+		if(t<0.001)return si;
 	}
 
 	si.t=t;
@@ -86,8 +86,4 @@ ShadeInfo ObjectAABB::hit(Ray ray){
 	si.hit=true;
 
 	return si;
-}
-
-bool ObjectAABB::shadowHit(Ray r){
-	return hit(r).hit;
 }

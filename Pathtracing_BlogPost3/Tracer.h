@@ -17,6 +17,9 @@ public:
 	virtual ~Tracer();
 
 	virtual RGBColor getColor(Ray ray)=0;
+	virtual RGBColor getColor(Ray ray,int depth){
+		return Colors::black;
+	}
 };
 
 #endif /* TRACER_H_ */

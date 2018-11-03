@@ -22,7 +22,6 @@ public:
 	ObjectAABB(Vector3 min,Vector3 max);
 
 	ShadeInfo hit(Ray ray);
-	bool shadowHit(Ray r);
 };
 
 #endif /* OBJECTAABB_H_ */

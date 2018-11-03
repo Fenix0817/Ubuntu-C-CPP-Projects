@@ -21,7 +21,6 @@ public:
 	ObjectPlane(Vector3 p,Vector3 n);
 
 	ShadeInfo hit(Ray ray);
-	bool shadowHit(Ray ray);
 };
 
 #endif /* OBJECTPLANE_H_ */

@@ -22,12 +22,6 @@ public:
 
 	Vector3 getDirection(ShadeInfo&si);
 	RGBColor getColor(ShadeInfo&si);
-	inline bool castsShadows(){
-		return false;
-	}
-	inline bool inShadow(Ray&ray,ShadeInfo&si){
-		return false;
-	}
 };
 
 #endif /* LIGHTAMBIENT_H_ */

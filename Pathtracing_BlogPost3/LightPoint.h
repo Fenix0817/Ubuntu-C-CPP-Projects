@@ -21,15 +21,6 @@ public:
 	Vector3 getDirection(ShadeInfo&si);
 	RGBColor getColor(ShadeInfo&si);
 
-	inline bool castsShadows(){
-		return false;
-	}
-	inline bool inShadow(Ray&ray,ShadeInfo&si){
-		Vector3 hitPoint=si.ray.pos+si.ray.dir*si.t;
-		Vector3 dir=normalizeVector(hitPoint-pos);
-		return intersectShadowWorld(si.world,Ray(hitPoint,dir));
-	}
-
 	float intensity;
 	RGBColor color;
 	Vector3 pos;

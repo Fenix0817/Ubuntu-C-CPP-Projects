@@ -48,11 +48,14 @@ void Sampler::mapSamplesToSphere(){
 }
 
 void Sampler::mapSamplesToHemisphere(){
+	float e=0;
 	samplesHemisphere.clear();
 	for(int i=0;i<samples.size();i++){
-		float theta=TWO_PI*samples[i].x;
-		float phi=PI*samples[i].y;
-		samplesHemisphere.push_back(Vector3(sin(theta)*cos(phi),sin(theta)*sin(phi),cos(theta)));
+		float cosPhi=cos(2*PI*samples[i].x);
+		float sinPhi=sin(2*PI*samples[i].x);
+		float cosTheta=pow((1-samples[i].y),1/(e+1));
+		float sinTheta=sqrt(1-cosTheta*cosTheta);
+		samplesHemisphere.push_back(Vector3(sinTheta*cosPhi,sinTheta*sinPhi,cosTheta));
 	}
 }
 
@@ -61,7 +64,10 @@ Vector3 Sampler::sampleSphere(){
 	return samplesSphere[indexSphere%numSamples];
 }
 Vector3 Sampler::sampleHemisphere(){
-	indexHemisphere+=rand()%jump;
-	return samplesHemisphere[indexHemisphere%numSamples];
+	float theta=TWO_PI*randomFloat();
+	float phi=TWO_PI*randomFloat();
+	return Vector3(sin(theta)*cos(phi),sin(theta)*sin(phi),cos(theta));
+//	indexHemisphere+=rand()%jump;
+//	return samplesHemisphere[indexHemisphere%numSamples];
 }
 

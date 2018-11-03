@@ -13,6 +13,7 @@
 
 class World;
 class Object;
+class Tracer;
 
 struct ShadeInfo {
 	Ray ray;
@@ -21,6 +22,7 @@ struct ShadeInfo {
 	Vector3 normal;
 	World*world;
 	Object*object;
+	int depth;
 };
 
 #endif /* SHADEINFO_H_ */

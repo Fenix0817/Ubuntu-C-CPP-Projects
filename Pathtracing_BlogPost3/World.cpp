@@ -27,3 +27,11 @@ void World::addLight(Light*l){
 void World::setAmbient(Light*a){
 	ambient=a;
 }
+
+void World::setDepth(int d){
+	maxDepth=d;
+}
+
+void World::setBackground(RGBColor bg){
+	bgColor=bg;
+}

@@ -18,8 +18,6 @@ public:
 
 	virtual Vector3 getDirection(ShadeInfo&si)=0;
 	virtual RGBColor getColor(ShadeInfo&si)=0;
-	virtual bool castsShadows()=0;
-	virtual bool inShadow(Ray&ray,ShadeInfo&si)=0;
 };
 
 #endif /* LIGHT_H_ */

@@ -13,6 +13,7 @@
 #include "BRDFLambertian.h"
 #include "ShadeInfo.h"
 #include "World.h"
+#include "Tracer.h"
 
 class MaterialMatte : public Material {
 public:
@@ -20,6 +21,7 @@ public:
 	virtual ~MaterialMatte();
 
 	RGBColor shade(ShadeInfo&si);
+	RGBColor giShade(ShadeInfo&si);
 
 	BRDFLambertian*ambient;
 	BRDFLambertian*diffuse;

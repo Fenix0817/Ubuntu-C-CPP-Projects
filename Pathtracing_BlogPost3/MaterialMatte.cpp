@@ -11,10 +11,10 @@ MaterialMatte::MaterialMatte() {
 	// TODO Auto-generated constructor stub
 	ambient=new BRDFLambertian();
 	diffuse=new BRDFLambertian();
-	ambient->kd=0;
-	ambient->cd=Colors::black;
-	diffuse->kd=0;
-	diffuse->cd=Colors::black;
+	ambient->intensity=0;
+	ambient->color=Colors::black;
+	diffuse->intensity=0;
+	diffuse->color=Colors::black;
 }
 
 MaterialMatte::~MaterialMatte() {
@@ -28,26 +28,29 @@ RGBColor MaterialMatte::shade(ShadeInfo&si){
 		Vector3 wi=light->getDirection(si);
 		float dot=dotVectors(wi,si.normal);
 		if(dot>0){
-			bool inShadow=false;
-			if(light->castsShadows()){
-				Vector3 hitPoint=si.ray.pos+si.ray.dir*si.t;
-				Ray shadowRay(hitPoint,wi);
-				if(light->inShadow(shadowRay,si))inShadow=true;
-			}
-			if(!inShadow){
-				col+=diffuse->f(si,wo,wi)*light->getColor(si)*dot;
-			}
+			col+=diffuse->f(si,wo,wi)*light->getColor(si)*dot;
 		}
 	}
 	return col;
 }
 
+RGBColor MaterialMatte::giShade(ShadeInfo&si){
+	Vector3 wi;
+	Vector3 wo=-si.ray.dir;
+	float pdf;
+	RGBColor f=diffuse->sampleF(si,wi,wo,pdf);
+	float ndotwi=dotVectors(si.normal,wi);
+	Vector3 hitPoint=si.ray.pos+si.ray.dir*si.t;
+	Ray reflectedRay(hitPoint,wi);
+	return f*si.world->tracer->getColor(reflectedRay,si.depth+1)*ndotwi/pdf;
+}
+
 void MaterialMatte::setAmbient(float i,RGBColor c){
-	ambient->kd=i;
-	ambient->cd=c;
+	ambient->intensity=i;
+	ambient->color=c;
 }
 
 void MaterialMatte::setDiffuse(float i,RGBColor c){
-	diffuse->kd=i;
-	diffuse->cd=c;
+	diffuse->intensity=i;
+	diffuse->color=c;
 }
