@@ -67,21 +67,32 @@ void ppm::setB(int x,int y,float b){
 
 void ppm::save(std::string fn){
 	std::ofstream file;
-	file.open(fn.c_str());
+	file.exceptions(std::ofstream::failbit|std::ofstream::badbit);
+	try{
+		file.open(fn.c_str());
 
-	file<<"P3\n";
-	file<<w<<" "<<h<<"\n";
-	file<<PPM_PRECISION<<"\n";
-	for(int y=h-1;y>=0;y--){
-		for(int x=0;x<w;x++){
-			int r=(int)(getR(x,y)*PPM_PRECISION);
-			int g=(int)(getG(x,y)*PPM_PRECISION);
-			int b=(int)(getB(x,y)*PPM_PRECISION);
-			file<<r<<" "<<g<<" "<<b<<" ";
+		file<<"P3\n";
+		file<<w<<" "<<h<<"\n";
+		file<<PPM_PRECISION<<"\n";
+		for(int y=h-1;y>=0;y--){
+			for(int x=0;x<w;x++){
+				int r=(int)(getR(x,y)*PPM_PRECISION);
+				int g=(int)(getG(x,y)*PPM_PRECISION);
+				int b=(int)(getB(x,y)*PPM_PRECISION);
+				if(r<0)r=0;
+				if(g<0)g=0;
+				if(b<0)b=0;
+				if(r>=PPM_PRECISION)r=PPM_PRECISION-1;
+				if(g>=PPM_PRECISION)g=PPM_PRECISION-1;
+				if(b>=PPM_PRECISION)b=PPM_PRECISION-1;
+				file<<r<<" "<<g<<" "<<b<<" ";
+			}
+			file<<"\n";
 		}
-		file<<"\n";
+		file.close();
+	}catch(std::ofstream::failure ex){
+		printf("Error writing file %s\n",fn.c_str());
 	}
-	file.close();
 }
 
 void ppm::dealloc(){
