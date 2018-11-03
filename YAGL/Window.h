@@ -71,6 +71,8 @@ public:
 	bool wasJustPressed(char c);
 	bool wasJustReleased(char c);
 
+	void setMouse(double x,double y);
+
 	void clearInputs();
 	void updateSize();
 

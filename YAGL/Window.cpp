@@ -139,6 +139,10 @@ void Window::clearInputs(){
 	mouseRightJustReleased=false;
 }
 
+void Window::setMouse(double x,double y){
+	glfwSetCursorPos(ptr,x,y);
+}
+
 void Window::updateSize(){
 	glfwGetWindowSize(ptr,&width,&height);
 }

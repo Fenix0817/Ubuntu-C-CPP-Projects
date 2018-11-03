@@ -45,36 +45,69 @@ GLuint Shader::getUniformLocation(string param){
 	return glGetUniformLocation(id,param.c_str());
 }
 void Shader::setInt(string param,int i){
+#ifdef GL_SHADER_DEBUG_setInt
+	printf("gl::Shader setInt %s = %i\n",param.c_str(),i);
+#endif
 	glUniform1i(getUniformLocation(param),i);
 }
 void Shader::setFloat(string param,float f){
+#ifdef GL_SHADER_DEBUG_setFloat
+	printf("gl::Shader setFloat %s = %f\n",param.c_str(),f);
+#endif
 	glUniform1f(getUniformLocation(param),f);
 }
 void Shader::setVec2(string param,float x,float y){
+#ifdef GL_SHADER_DEBUG_setVec2
+	printf("gl::Shader setVec2 %s = (%f, %f)\n",param.c_str(),x,y);
+#endif
 	glUniform2f(getUniformLocation(param),x,y);
 }
 void Shader::setVec3(string param,float x,float y,float z){
+#ifdef GL_SHADER_DEBUG_setVec3
+	printf("gl::Shader setVec3 %s = (%f, %f, %f)\n",param.c_str(),x,y,z);
+#endif
 	glUniform3f(getUniformLocation(param),x,y,z);
 }
 void Shader::setVec4(string param,float x,float y,float z,float w){
+#ifdef GL_SHADER_DEBUG_setVec4
+	printf("gl::Shader setVec4 %s = (%f, %f, %f, %f)\n",param.c_str(),x,y,z,w);
+#endif
 	glUniform4f(getUniformLocation(param),x,y,z,w);
 }
 void Shader::setVec2(string param,glm::vec2 v){
+#ifdef GL_SHADER_DEBUG_setVec2
+	printf("gl::Shader setVec2 %s = (%f, %f)\n",param.c_str(),v.x,v.y);
+#endif
 	glUniform2fv(getUniformLocation(param),1,glm::value_ptr(v));
 }
 void Shader::setVec3(string param,glm::vec3 v){
+#ifdef GL_SHADER_DEBUG_setVec3
+	printf("gl::Shader setVec3 %s = (%f, %f, %f)\n",param.c_str(),v.x,v.y,v.z);
+#endif
 	glUniform3fv(getUniformLocation(param),1,glm::value_ptr(v));
 }
 void Shader::setVec4(string param,glm::vec4 v){
+#ifdef GL_SHADER_DEBUG_setVec4
+	printf("gl::Shader setVec4 %s = (%f, %f, %f, %f)\n",param.c_str(),v.x,v.y,v.z,v.w);
+#endif
 	glUniform4fv(getUniformLocation(param),1,glm::value_ptr(v));
 }
 void Shader::setMat2(string param,glm::mat2 m){
+#ifdef GL_SHADER_DEBUG_setMat2
+	printf("gl::Shader setMat2 %s\n",param.c_str());
+#endif
 	glUniformMatrix2fv(getUniformLocation(param),1,GL_FALSE,glm::value_ptr(m));
 }
 void Shader::setMat3(string param,glm::mat3 m){
+#ifdef GL_SHADER_DEBUG_setMat3
+	printf("gl::Shader setMat3 %s\n",param.c_str());
+#endif
 	glUniformMatrix3fv(getUniformLocation(param),1,GL_FALSE,glm::value_ptr(m));
 }
 void Shader::setMat4(string param,glm::mat4 m){
+#ifdef GL_SHADER_DEBUG_setMat4
+	printf("gl::Shader setMat4 %s\n",param.c_str());
+#endif
 	glUniformMatrix4fv(getUniformLocation(param),1,GL_FALSE,glm::value_ptr(m));
 }
 
