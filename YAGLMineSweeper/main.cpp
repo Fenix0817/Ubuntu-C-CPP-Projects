@@ -14,15 +14,16 @@
 #include "Game.h"
 
 int main(){
-	int w=16;
-	int h=16;
-	int num=40;
+	int w=100;
+	int h=100;
+	int num=800;
+	int size=10;
 
 	gl::init();
 
 	gl::Window window;
 	window.create();
-	window.setSize(w*50,h*50);
+	window.setSize(w*size,h*size);
 	window.setTitle("Minesweeper");
 
 	window.bind();
