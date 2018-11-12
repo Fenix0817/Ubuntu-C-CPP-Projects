@@ -34,11 +34,13 @@ Vector3 camPos=Vector3(1,0,0);
 Vector3 lookAt=Vector3(0,0,0);
 float zoom=1;
 
-const int W=1000;
-const int H=1000;
+const int W=300;
+const int H=300;
 
 Tracer*tracer;
-
+Object*sizedBox(Vector3 a,Vector3 b){
+	return new ObjectAABB(a,a+b);
+}
 long curTime(){
 	milliseconds ms = duration_cast< milliseconds >(
 		system_clock::now().time_since_epoch()
@@ -47,8 +49,8 @@ long curTime(){
 }
 
 World*buildCornellBox(){
-	camPos=Vector3(-.8,0,.9);//1,0,0
-	lookAt=Vector3(1,0,0);
+	camPos=Vector3(1,0,0);//1,0,0
+	lookAt=Vector3(0,0,0);
 	zoom=1;
 
 	World*world=new World();
@@ -71,14 +73,14 @@ World*buildCornellBox(){
 	matteOrange->setAmbient(1,Colors::white);
 	matteOrange->setDiffuse(1,Colors::orange);
 
-	MaterialEmmisive*matteLight=new MaterialEmmisive(30,Colors::white);
+	MaterialEmmisive*emmisive=new MaterialEmmisive(2,Colors::white);
 
 	Object*backWall=new ObjectPlane(Vector3(-1,0,0),Vector3(1,0,0));
-	backWall->setMaterial(matteWhite);
+	backWall->setMaterial(matteOrange);
 	world->addObject(backWall);
 
 	Object*leftWall=new ObjectPlane(Vector3(0,0,-1),Vector3(0,0,1));
-	leftWall->setMaterial(matteRed);
+	leftWall->setMaterial(matteWhite);
 	world->addObject(leftWall);
 
 	Object*rightWall=new ObjectPlane(Vector3(0,0,1),Vector3(0,0,-1));
@@ -93,16 +95,16 @@ World*buildCornellBox(){
 	floor->setMaterial(matteWhite);
 	world->addObject(floor);
 
-	Object*behindWall=new ObjectPlane(Vector3(3,0,0),Vector3(-1,0,0));
-	behindWall->setMaterial(matteWhite);
-	world->addObject(behindWall);
+//	Object*behindWall=new ObjectPlane(Vector3(1.1,0,0),Vector3(-1,0,0));
+//	behindWall->setMaterial(matteWhite);
+//	world->addObject(behindWall);
 
-	Object*box1=new ObjectAABB(Vector3(-.8,-1,-.1),Vector3(0.3,1,0));
-	box1->setMaterial(matteWhite);
+	Object*box1=sizedBox(Vector3(-1,.2,.2),Vector3(1,.4,.4));
+	box1->setMaterial(matteGreen);
 	world->addObject(box1);
 
-	Object*lightSphere=new ObjectSphere(Vector3(-.4,0,0.3),.2);
-	lightSphere->setMaterial(matteLight);
+	Object*lightSphere=new ObjectSphere(Vector3(-.7,0,0),.2);
+	lightSphere->setMaterial(emmisive);
 	world->addObject(lightSphere);
 
 	Light*ambient=new LightAmbient(0,Colors::white);
@@ -120,52 +122,82 @@ World*buildBoxPlaneLight(){
 	world->setBackground(Colors::black);
 //	world->setDepth(10);
 
-	MaterialMatte*matteWhite=new MaterialMatte();
-	matteWhite->setAmbient(1,Colors::white);
-	matteWhite->setDiffuse(1,Colors::white);
+	MaterialMatte*white=new MaterialMatte();
+	white->setAmbient(1,Colors::white);
+	white->setDiffuse(1,Colors::white);
 
-	MaterialMatte*matteRed=new MaterialMatte();
-	matteRed->setAmbient(1,Colors::white);
-	matteRed->setDiffuse(1,Colors::red);
+	MaterialMatte*red=new MaterialMatte();
+	red->setAmbient(1,Colors::white);
+	red->setDiffuse(1,Colors::red);
 
-	MaterialMatte*matteGreen=new MaterialMatte();
-	matteGreen->setAmbient(1,Colors::white);
-	matteGreen->setDiffuse(1,Colors::green);
+	MaterialMatte*green=new MaterialMatte();
+	green->setAmbient(1,Colors::white);
+	green->setDiffuse(1,Colors::green);
 
-	MaterialEmmisive*matteLight=new MaterialEmmisive(30,Colors::white-Colors::red*0.2f);
+	MaterialEmmisive*emmisive=new MaterialEmmisive(90,Colors::white-Colors::red*0.2f);
 
-	MaterialReflective*matteReflective=new MaterialReflective();
-	matteReflective->setReflective(1,Colors::white);
-	matteReflective->setAmbient(1,Colors::white);
+	MaterialReflective*reflective=new MaterialReflective();
+	reflective->setReflective(1,Colors::white);
+	reflective->setAmbient(1,Colors::white);
 
-	Object*floor=new ObjectPlane(Vector3(0,0,0),Vector3(0,1,0));
-	floor->setMaterial(matteWhite);
-	world->addObject(floor);
 
-	Object*top=new ObjectPlane(Vector3(0,4.1,0),Vector3(0,-1,0));
-	top->setMaterial(matteWhite);
-	world->addObject(top);
-
-//	Object*box1=new ObjectAABB(Vector3(0,0,0),Vector3(1.5,1.5,1.5));
-//	box1->setMaterial(matteRed);
-//	world->addObject(box1);
-
-	Object*sphere1=new ObjectSphere(Vector3(1.5,0,0),1);
-	sphere1->setMaterial(matteReflective);
-	world->addObject(sphere1);
-
-	Object*box2=new ObjectAABB(Vector3(3,0,0),Vector3(8.5,1.5,3.5));
-	box2->setMaterial(matteReflective);
-	world->addObject(box2);
-
-	Object*sphere2=new ObjectSphere(Vector3(1,1,1),1);
-	sphere2->setMaterial(matteGreen);
-	world->addObject(sphere2);
-
-	Object*light=new ObjectSphere(Vector3(0,0.5,0),1);
-	light->setMaterial(matteLight);
+	Object*light=new ObjectSphere(Vector3(0,1,0),1);
+	light->setMaterial(emmisive);
 	world->addObject(light);
 
+
+	Object*ground=new ObjectPlane(Vector3(0,0,0),Vector3(0,1,0));
+	ground->setMaterial(white);
+	world->addObject(ground);
+
+	Object*box=sizedBox(Vector3(2,0,2),Vector3(2,5,2));
+	box->setMaterial(red);
+	world->addObject(box);
+
+
+	Light*ambient=new LightAmbient(0,Colors::black);
+	world->setAmbient(ambient);
+
+	return world;
+}
+
+World*buildSunAndBox(){
+	World*world=new World();
+
+	camPos=Vector3(60,30,60);
+	lookAt=Vector3(0,0,0);
+	zoom=1;
+
+	//Materials
+	Material*emmisive=new MaterialEmmisive(50,Colors::yellow);
+
+	MaterialMatte*white=new MaterialMatte();
+	white->setAmbient(0,Colors::black);
+	white->setDiffuse(1,Colors::white);
+
+	MaterialMatte*red=new MaterialMatte();
+	red->setAmbient(0,Colors::black);
+	red->setDiffuse(1,Colors::red);
+
+	//Objects
+	Object*ground=new ObjectPlane(Vector3(0,0,0),Vector3(0,1,0));
+	ground->setMaterial(white);
+	world->addObject(ground);
+
+	float s=10;
+	float h=70;
+	float o=40;
+//	Object*box1=new ObjectAABB(Vector3(o-s,0,-s),Vector3(o+s,h,s));
+	Object*box1=new ObjectSphere(Vector3(30,30,0),40);
+	box1->setMaterial(white);
+	world->addObject(box1);
+
+	//Lights
+	Object*light=new ObjectDisk(Vector3(0,1,0),Vector3(1,0,0),50);
+	light->setMaterial(emmisive);
+	world->addObject(light);
+
+	//Stuff that doesn't matter:
 	Light*ambient=new LightAmbient(0,Colors::black);
 	world->setAmbient(ambient);
 
@@ -174,8 +206,9 @@ World*buildBoxPlaneLight(){
 
 void init(){
 //	World*world=buildCornellBox();
-	World*world=buildBoxPlaneLight();
-	world->setDepth(30);
+//	World*world=buildBoxPlaneLight();
+	World*world=buildSunAndBox();
+	world->setDepth(10);
 
 	tracer=new TracerGI(world);
 
@@ -230,7 +263,8 @@ int main(){
 	//TODO: 	- std::vector<Object*>objects;
 	//TODO:		- std::vector<ObjectLight*>lights;
 
-	const int numSamples=10000;
+	const int numSamples=500;
+	const float numSamplesf=numSamples;
 
 	int num=0;
 	const int total=W*H;
@@ -244,9 +278,8 @@ int main(){
 			RGBColor color=Colors::black;
 #pragma omp parallel for
 			for(int i=0;i<numSamples;i++){
-				color+=getColor(Vector2(x+randomFloat(),y+randomFloat())/Vector2(W,H));
+				color+=getColor(Vector2(x+randomFloat(),y+randomFloat())/Vector2(W,H))/numSamplesf;
 			}
-			color/=numSamples;
 			color=mapColor(color);
 			img.setPixel(x,y,color.x,color.y,color.z);
 			num++;
@@ -261,7 +294,7 @@ int main(){
 	printf("Computed\n");
 
 	img.clamp();
-	img.save("pathtracing-05.ppm");
+	img.save("pathtracing-08.ppm");
 	img.dealloc();
 
 	printf("Saved\n");

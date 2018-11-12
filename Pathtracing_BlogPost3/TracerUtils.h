@@ -22,6 +22,7 @@ inline ShadeInfo closestShadeInfo(ShadeInfo a,ShadeInfo b){
 inline ShadeInfo intersectWorld(World*w,Ray r){
 	ShadeInfo si;
 	si.hit=false;
+//#pragma omp parallel for
 	for(Object*obj:w->objects){
 		ShadeInfo nsi=obj->hit(r);
 		nsi.object=obj;
