@@ -1,7 +1,7 @@
 #version 450 core
 
 layout (points) in;
-layout (triangle_strip, max_vertices=24) out;
+layout (triangle_strip, max_vertices=100) out;
 
 in VertexOut {
 	vec3 pos;
