@@ -81,7 +81,7 @@
                                     									
                                     <listOptionValue builtIn="false" value="/usr/lib/x86_64-linux-gnu/glib-2.0/include"/>
                                     									
-                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/GUI}&quot;"/>
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/gtk.hpp}&quot;"/>
                                     								
                                 </option>
                                 								
@@ -189,9 +189,9 @@
                     					
                     <sourceEntries>
                         						
-                        <entry excluding="GUI" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+                        <entry excluding="gtk.hpp|GUI" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
                         						
-                        <entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="GUI"/>
+                        <entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="gtk.hpp"/>
                         					
                     </sourceEntries>
                     				

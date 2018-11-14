@@ -1,0 +1,14 @@
+<ui_document>
+
+<ui name="my_ui">
+
+<box orientation="vertical" spacing="10">
+	<label>Label 1</label>
+	<button><label>Button 1</label></button>
+	<label>Label 2</label>
+	<button><label>Button 2</label></button>
+</box>
+
+</ui>
+
+</ui_document>

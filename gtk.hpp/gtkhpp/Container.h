@@ -10,17 +10,20 @@
 
 #include "Widget.h"
 
-namespace gui {
+namespace gtk {
 
 class Container : public Widget {
 public:
 	Container();
 	virtual ~Container();
 
-	void add(Widget w);
-	void remove(Widget w);
+	void create();
+	void add(Widget*w);
+	void remove(Widget*w);
+
+//	std::vector<Widget>comps;
 };
 
-} /* namespace gui */
+} /* namespace gtk */
 
 #endif /* CONTAINER_H_ */

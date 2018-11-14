@@ -11,7 +11,7 @@
 #include "gtk_include.h"
 #include "Container.h"
 
-namespace gui {
+namespace gtk {
 
 class Window : public Container {
 public:
@@ -29,6 +29,6 @@ public:
 	int getHeight();
 };
 
-} /* namespace gui */
+} /* namespace gtk */
 
 #endif /* WINDOW_H_ */

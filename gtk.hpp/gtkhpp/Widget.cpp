@@ -5,9 +5,9 @@
  *      Author: jack
  */
 
-#include "Widget.h"
+#include "../gtkhpp/Widget.h"
 
-namespace gui {
+namespace gtk {
 
 Widget::Widget() {
 	// TODO Auto-generated constructor stub
@@ -22,4 +22,4 @@ void Widget::showAll(){
 	gtk_widget_show_all(widget);
 }
 
-} /* namespace gui */
+} /* namespace gtk */

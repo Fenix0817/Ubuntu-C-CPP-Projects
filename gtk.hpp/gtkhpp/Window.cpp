@@ -5,9 +5,9 @@
  *      Author: jack
  */
 
-#include "Window.h"
+#include "../gtkhpp/Window.h"
 
-namespace gui {
+namespace gtk {
 
 Window::Window() {
 	// TODO Auto-generated constructor stub
@@ -46,4 +46,4 @@ int Window::getHeight(){
 	return h;
 }
 
-} /* namespace gui */
+} /* namespace gtk */

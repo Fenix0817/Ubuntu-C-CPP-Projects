@@ -10,7 +10,7 @@
 
 #include "gtk_include.h"
 
-namespace gui {
+namespace gtk {
 
 class Widget {
 public:
@@ -22,6 +22,6 @@ public:
 	void showAll();
 };
 
-} /* namespace gui */
+} /* namespace gtk */
 
 #endif /* WIDGET_H_ */

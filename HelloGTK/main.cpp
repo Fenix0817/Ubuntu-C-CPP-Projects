@@ -5,50 +5,45 @@
  *      Author: jack
  */
 
-#include <gui/gui.h>
+#include <gtkhpp/gtk.hpp>
 
 int main(int argc, char *argv[]) {
 
-//	gtk_init(&argc,&argv);
-//
-//	GtkWidget*window=gtk_window_new(GTK_WINDOW_TOPLEVEL);
-//	gtk_window_set_position(GTK_WINDOW(window),GTK_WIN_POS_CENTER);
-//	gtk_window_set_default_size(GTK_WINDOW(window),500,500);
-//	gtk_window_set_title(GTK_WINDOW(window),"Hello GTK");
+	gtk::init(argc,argv);
 
-	gui::init(argc,argv);
+	gtk::Window*window=new gtk::Window();
+	window->create(GTK_WINDOW_TOPLEVEL);
+	window->setPosition(GTK_WIN_POS_CENTER);
+	window->setSize(500,500);
+	window->setTitle("Hello GTK");
 
-	gui::Window window;
-	window.create(GTK_WINDOW_TOPLEVEL);
-	window.setPosition(GTK_WIN_POS_CENTER);
-	window.setSize(500,500);
-	window.setTitle("Hello GTK");
+	gtk::Box*box=new gtk::Box();
+	box->create(GTK_ORIENTATION_VERTICAL,100);
 
-	GtkWidget*table=gtk_table_new(4,4,TRUE);
-	gtk_table_set_row_spacings(GTK_TABLE(table),2);
-	gtk_table_set_col_spacings(GTK_TABLE(table),2);
+	gtk::Label*label=new gtk::Label();
+	label->create();
+	label->setText("Label");
+	box->add(label);
 
-	for(int x=0;x<4;x++){
-		for(int y=0;y<4;y++){
-			GtkWidget*btn=gtk_button_new_with_label("Button");
-			gtk_table_attach_defaults(GTK_TABLE(table),btn,x,x+1,y,y+1);
-		}
-	}
+	gtk::ButtonBox*btnBox=new gtk::ButtonBox();
+	btnBox->create(GTK_ORIENTATION_VERTICAL);
+	gtk::Button*btn=new gtk::Button();
+	btn->create();
+	btn->addLabel("Button");
+	btnBox->add(btn);
+	box->add(btnBox);
 
-	gui::Widget tableWidget;
-	tableWidget.widget=table;
+//	window->add(box);
 
-//	gtk_container_add(GTK_CONTAINER(window.widget),table);
-	window.add(tableWidget);
+	gtk::xml::UI*ui=new gtk::xml::UI();
+	ui->loadUI("ui.xml","my_ui");
+	window->add(ui);
 
+	window->enableQuitOnExit();
 
-//	g_signal_connect(G_OBJECT(window.window),"destroy",G_CALLBACK(gtk_main_quit),NULL);
-	window.enableQuitOnExit();
+	window->showAll();
 
-//	gtk_widget_show_all(window);
-	window.showAll();
-
-	gtk_main();
+	gtk::startMain();
 
 
 	return 0;

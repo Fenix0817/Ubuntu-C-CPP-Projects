@@ -5,9 +5,9 @@
  *      Author: jack
  */
 
-#include "Utils.h"
+#include "../gtkhpp/Utils.h"
 
-namespace gui {
+namespace gtk {
 
 void init(int argc,char**argv){
 	gtk_init(&argc,&argv);
@@ -17,4 +17,4 @@ void startMain(){
 	gtk_main();
 }
 
-} /* namespace gui */
+} /* namespace gtk */

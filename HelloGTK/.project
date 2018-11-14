@@ -26,9 +26,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>GUI</name>
+			<name>gtk.hpp</name>
 			<type>2</type>
-			<location>/home/jack/Documents/eclipse-workspace-cpp/GUI</location>
+			<location>/home/jack/Documents/eclipse-workspace-cpp/gtk.hpp</location>
 		</link>
 	</linkedResources>
 </projectDescription>

@@ -10,12 +10,12 @@
 
 #include "gtk_include.h"
 
-namespace gui {
+namespace gtk {
 
 void init(int argc,char**argv);
 
 void startMain();
 
-} /* namespace gui */
+} /* namespace gtk */
 
 #endif /* UTILS_H_ */
