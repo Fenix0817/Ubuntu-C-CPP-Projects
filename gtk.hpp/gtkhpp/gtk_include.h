@@ -14,6 +14,7 @@
 #include <gtk/gtkbutton.h>
 #include <gtk/gtklabel.h>
 #include <gtk/gtkbox.h>
+#include <gtk/gtkgrid.h>
 #include <gtk/gtkenums.h>
 
 #include "tinyxml2.h"

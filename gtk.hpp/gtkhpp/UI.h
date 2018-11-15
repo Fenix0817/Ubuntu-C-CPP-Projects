@@ -12,10 +12,12 @@
 #include "Label.h"
 #include "Box.h"
 #include "Button.h"
+#include "Grid.h"
 
 namespace gtk {
 namespace xml {
 
+void addChildrenGrid(Grid*to,tinyxml2::XMLNode*node);
 void addChildren(Container*to,tinyxml2::XMLNode*node);
 Widget* createWidgetFromXML(tinyxml2::XMLNode*elem);
 

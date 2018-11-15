@@ -28,6 +28,25 @@ void addChildren(Container*to,tinyxml2::XMLNode*node){
 		printf("Next sibling\n");
 	}
 }
+
+void addChildrenGrid(Grid*to,tinyxml2::XMLNode*node){
+	using namespace tinyxml2;
+	printf("Adding children\n");
+	XMLElement*elem=node->ToElement();
+	XMLNode*n=elem->FirstChild();
+	if(n==NULL)return;
+	printf("First child gotten\n");
+	elem=n->ToElement();
+	while(elem!=NULL){
+		printf("Elem\n");
+		to->add(createWidgetFromXML(elem),elem->IntAttribute("gridx"),elem->IntAttribute("gridy"),elem->IntAttribute("gridw"),elem->IntAttribute("gridh"));
+		printf("Elem added\n");
+		XMLNode*newNode=elem->NextSibling();
+		if(newNode==NULL)return;
+		elem=newNode->ToElement();
+		printf("Next sibling\n");
+	}
+}
 Widget* createWidgetFromXML(tinyxml2::XMLNode*n){
 	printf("Creating widget\n");
 	using namespace tinyxml2;
@@ -59,6 +78,21 @@ Widget* createWidgetFromXML(tinyxml2::XMLNode*n){
 		btn->create();
 		addChildren(btn,n);
 		return btn;
+	}
+	if(elemName=="button-with-label"){
+		Button*btn=new Button();
+		btn->create();
+		Label*lbl=new Label();
+		lbl->create();
+		lbl->setText(std::string(elem->GetText()));
+		btn->add(lbl);
+		return btn;
+	}
+	if(elemName=="grid"){
+		Grid*grid=new Grid();
+		grid->create();
+		addChildrenGrid(grid,n);
+		return grid;
 	}
 //	return NULL;
 	return nullptr;
