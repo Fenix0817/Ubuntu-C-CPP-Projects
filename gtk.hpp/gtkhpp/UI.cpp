@@ -66,6 +66,11 @@ Widget* createWidgetFromXML(tinyxml2::XMLNode*n){
 		int spacing(elem->IntAttribute("spacing"));
 		GtkOrientation o=GTK_ORIENTATION_HORIZONTAL;
 		if(orientation=="vertical")o=GTK_ORIENTATION_VERTICAL;
+		else if(orientation=="horizontal")o=GTK_ORIENTATION_HORIZONTAL;
+		else{
+			printf("Cannot recognize orientation %s for box element.\n",orientation.c_str());
+			exit(EXIT_FAILURE);
+		}
 		Box*bx=new Box();
 		bx->create(o,spacing);
 		printf("Adding children to box\n");

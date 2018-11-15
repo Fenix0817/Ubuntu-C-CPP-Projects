@@ -15,6 +15,7 @@
 #include "Button.h"
 #include "Box.h"
 #include "ButtonBox.h"
+#include "Conversions.h"
 
 #include "UI.h"
 

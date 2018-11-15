@@ -8,6 +8,8 @@
 #ifndef GTK_INCLUDE_H_
 #define GTK_INCLUDE_H_
 
+//Disabled parts of GTK are not used here
+#define GTK_DISABLE_DEPRECATED
 #include <gtk/gtk.h>
 #include <gtk/gtkmain.h>
 #include <gtk/gtkwindow.h>

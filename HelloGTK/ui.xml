@@ -10,15 +10,21 @@
 	<box orientation="horizontal" spacing="10">
 		<label>Label 3</label>
 		<button><label>Button 3</label></button>
+	</box>
+	<box orientation="horizontal" spacing="10">
 		<label>Label 4</label>
 		<button><label>Button 4</label></button>
-		<button-with-label>Labeled button</button-with-label>
 	</box>
+	<button-with-label>Labeled button</button-with-label>
 	<grid>
-		<button-with-label gridx="0" gridy="0" gridw="1" gridh="1">0,0, 1,1</button-with-label>
-		<button-with-label gridx="1" gridy="0" gridw="1" gridh="1">1,0, 1,1</button-with-label>
-		<button-with-label gridx="0" gridy="1" gridw="1" gridh="1">0,1, 1,1</button-with-label>
-		<button-with-label gridx="1" gridy="1" gridw="1" gridh="1">1,1, 1,1</button-with-label>
+		<button-with-label gridx="0" gridy="0" gridw="1" gridh="1">0,0,   1,1</button-with-label>
+		<button-with-label gridx="1" gridy="0" gridw="1" gridh="1">1,0,   1,1</button-with-label>
+		<button-with-label gridx="0" gridy="1" gridw="1" gridh="1">0,1,   1,1</button-with-label>
+		<button-with-label gridx="1" gridy="1" gridw="1" gridh="1">1,1,   1,1</button-with-label>
+		<button-with-label gridx="2" gridy="0" gridw="1" gridh="1">2,0,   1,1</button-with-label>
+		<button-with-label gridx="2" gridy="1" gridw="1" gridh="1">2,1,   1,1</button-with-label>
+		<button-with-label gridx="0" gridy="2" gridw="2" gridh="1">0,2,   2,1</button-with-label>
+		<button-with-label gridx="2" gridy="2" gridw="1" gridh="1">2,2,   1,1</button-with-label>
 	</grid>
 </box>
 

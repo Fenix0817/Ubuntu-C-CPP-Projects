@@ -29,4 +29,8 @@ void Button::addLabel(std::string s){
 	add(w);
 }
 
+void Button::addClickListener(ButtonClickCallback callback,gpointer userData){
+	g_signal_connect(widget,"clicked",G_CALLBACK(callback),userData);
+}
+
 } /* namespace gtk */

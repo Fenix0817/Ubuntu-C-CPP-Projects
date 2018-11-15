@@ -21,6 +21,11 @@ void addChildrenGrid(Grid*to,tinyxml2::XMLNode*node);
 void addChildren(Container*to,tinyxml2::XMLNode*node);
 Widget* createWidgetFromXML(tinyxml2::XMLNode*elem);
 
+struct UIElement {
+	std::string id;
+	Widget*widget;
+};
+
 class UI : public Container {
 public:
 	UI();

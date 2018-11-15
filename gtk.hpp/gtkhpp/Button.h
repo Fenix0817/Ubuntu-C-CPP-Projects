@@ -13,6 +13,8 @@
 
 namespace gtk {
 
+typedef void (*ButtonClickCallback)(GtkButton*button,gpointer userData);
+
 class Button : public Container {
 public:
 	Button();
@@ -20,6 +22,7 @@ public:
 
 	void create();
 	void addLabel(std::string s);
+	void addClickListener(ButtonClickCallback callback,gpointer userData);
 };
 
 } /* namespace gtk */
