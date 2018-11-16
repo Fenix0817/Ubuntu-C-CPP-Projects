@@ -10,7 +10,7 @@
 namespace gtk {
 namespace xml {
 
-void addChildren(Container*to,tinyxml2::XMLNode*node){
+void addChildren(Container*to,tinyxml2::XMLNode*node,UI*ui){
 	using namespace tinyxml2;
 	printf("Adding children\n");
 	XMLElement*elem=node->ToElement();
@@ -20,7 +20,9 @@ void addChildren(Container*to,tinyxml2::XMLNode*node){
 	elem=n->ToElement();
 	while(elem!=NULL){
 		printf("Elem\n");
-		to->add(createWidgetFromXML(elem));
+		Widget*w=createWidgetFromXML(elem,ui);
+		to->add(w);
+		if(elem->Attribute("name")!=0)ui->addNamedElement(w,std::string(elem->Attribute("name")));
 		printf("Elem added\n");
 		XMLNode*newNode=elem->NextSibling();
 		if(newNode==NULL)return;
@@ -29,7 +31,7 @@ void addChildren(Container*to,tinyxml2::XMLNode*node){
 	}
 }
 
-void addChildrenGrid(Grid*to,tinyxml2::XMLNode*node){
+void addChildrenGrid(Grid*to,tinyxml2::XMLNode*node,UI*ui){
 	using namespace tinyxml2;
 	printf("Adding children\n");
 	XMLElement*elem=node->ToElement();
@@ -39,7 +41,9 @@ void addChildrenGrid(Grid*to,tinyxml2::XMLNode*node){
 	elem=n->ToElement();
 	while(elem!=NULL){
 		printf("Elem\n");
-		to->add(createWidgetFromXML(elem),elem->IntAttribute("gridx"),elem->IntAttribute("gridy"),elem->IntAttribute("gridw"),elem->IntAttribute("gridh"));
+		Widget*w=createWidgetFromXML(elem,ui);
+		to->add(w,elem->IntAttribute("gridx"),elem->IntAttribute("gridy"),elem->IntAttribute("gridw"),elem->IntAttribute("gridh"));
+		if(elem->Attribute("name")!=0)ui->addNamedElement(w,std::string(elem->Attribute("name")));
 		printf("Elem added\n");
 		XMLNode*newNode=elem->NextSibling();
 		if(newNode==NULL)return;
@@ -47,7 +51,7 @@ void addChildrenGrid(Grid*to,tinyxml2::XMLNode*node){
 		printf("Next sibling\n");
 	}
 }
-Widget* createWidgetFromXML(tinyxml2::XMLNode*n){
+Widget* createWidgetFromXML(tinyxml2::XMLNode*n,UI*ui){
 	printf("Creating widget\n");
 	using namespace tinyxml2;
 	XMLElement*elem=n->ToElement();
@@ -58,6 +62,7 @@ Widget* createWidgetFromXML(tinyxml2::XMLNode*n){
 		Label*lbl=new Label();
 		lbl->create();
 		lbl->setText(std::string(elem->GetText()));
+		if(elem->Attribute("name")!=0)ui->addNamedElement(lbl,std::string(elem->Attribute("name")));
 		printf("Done with label elem\n");
 		return lbl;
 	}
@@ -74,14 +79,16 @@ Widget* createWidgetFromXML(tinyxml2::XMLNode*n){
 		Box*bx=new Box();
 		bx->create(o,spacing);
 		printf("Adding children to box\n");
-		addChildren(bx,n);
+		if(elem->Attribute("name")!=0)ui->addNamedElement(bx,std::string(elem->Attribute("name")));
+		addChildren(bx,n,ui);
 		printf("Children added\n");
 		return bx;
 	}
 	if(elemName=="button"){
 		Button*btn=new Button();
 		btn->create();
-		addChildren(btn,n);
+		addChildren(btn,n,ui);
+		if(elem->Attribute("name")!=0)ui->addNamedElement(btn,std::string(elem->Attribute("name")));
 		return btn;
 	}
 	if(elemName=="button-with-label"){
@@ -91,12 +98,14 @@ Widget* createWidgetFromXML(tinyxml2::XMLNode*n){
 		lbl->create();
 		lbl->setText(std::string(elem->GetText()));
 		btn->add(lbl);
+		if(elem->Attribute("name")!=0)ui->addNamedElement(btn,std::string(elem->Attribute("name")));
 		return btn;
 	}
 	if(elemName=="grid"){
 		Grid*grid=new Grid();
 		grid->create();
-		addChildrenGrid(grid,n);
+		addChildrenGrid(grid,n,ui);
+		if(elem->Attribute("name")!=0)ui->addNamedElement(grid,std::string(elem->Attribute("name")));
 		return grid;
 	}
 //	return NULL;
@@ -110,6 +119,13 @@ UI::UI() {
 
 UI::~UI() {
 	// TODO Auto-generated destructor stub
+}
+
+void UI::addNamedElement(Widget*w,std::string n){
+	UIElement uie;
+	uie.id=n;
+	uie.widget=w;
+	elements.push_back(uie);
 }
 
 void UI::loadUI(std::string fileName,std::string name){
@@ -132,10 +148,18 @@ void UI::loadUI(std::string fileName,std::string name){
 	}
 }
 
+Widget* UI::findWidgetWithName(std::string n,bool failIfNotFound){
+	for(UIElement uie:elements){
+		if(uie.id==n)return uie.widget;
+	}
+	printf("Element with name %s not found. Exiting.\n",n.c_str());
+	exit(EXIT_FAILURE);
+}
+
 void UI::parseNode(tinyxml2::XMLElement*node){
 	using namespace tinyxml2;
 	printf("Before creating widget\n");
-	Widget*w=createWidgetFromXML(node->FirstChild());
+	Widget*w=createWidgetFromXML(node->FirstChild(),this);
 	printf("Created widget\n");
 	if(w!=NULL)add(w);
 }

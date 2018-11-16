@@ -17,9 +17,11 @@
 namespace gtk {
 namespace xml {
 
-void addChildrenGrid(Grid*to,tinyxml2::XMLNode*node);
-void addChildren(Container*to,tinyxml2::XMLNode*node);
-Widget* createWidgetFromXML(tinyxml2::XMLNode*elem);
+class UI;
+
+void addChildrenGrid(Grid*to,tinyxml2::XMLNode*node,UI*ui);
+void addChildren(Container*to,tinyxml2::XMLNode*node,UI*ui);
+Widget* createWidgetFromXML(tinyxml2::XMLNode*elem,UI*ui);
 
 struct UIElement {
 	std::string id;
@@ -34,6 +36,12 @@ public:
 	void loadUI(std::string fileName,std::string name);
 
 	void parseNode(tinyxml2::XMLElement*node);
+
+	void addNamedElement(Widget*w,std::string n);
+
+	Widget* findWidgetWithName(std::string n,bool failIfNotFound=true);
+
+	std::vector<UIElement>elements;
 };
 
 } /* namespace xml */

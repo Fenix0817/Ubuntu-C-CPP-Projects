@@ -27,16 +27,17 @@ int main(int argc, char *argv[]) {
 	window->setSize(500,500);
 	window->setTitle("Hello GTK");
 
-//	gtk::xml::UI*ui=new gtk::xml::UI();
-//	ui->loadUI("ui.xml","my_ui");
-//	window->add(ui);
+	gtk::xml::UI*ui=new gtk::xml::UI();
+	ui->loadUI("ui.xml","my_ui");
+	gtk::button(ui->findWidgetWithName("clickableButton"))->addClickListener(click,(gpointer)nullptr);
+	window->add(ui);
 
-	gtk::Button*btn=new gtk::Button();
-	btn->create();
-	btn->addLabel("Hi");
-	btn->addClickListener(click,(gpointer)nullptr);
-	btn->addClickListener(otherClick,(gpointer)nullptr);
-	window->add(btn);
+//	gtk::Button*btn=new gtk::Button();
+//	btn->create();
+//	btn->addLabel("Hi");
+//	btn->addClickListener(click,(gpointer)nullptr);
+//	btn->addClickListener(otherClick,(gpointer)nullptr);
+//	window->add(btn);
 
 	window->enableQuitOnExit();
 

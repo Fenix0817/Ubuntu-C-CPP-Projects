@@ -21,6 +21,10 @@ namespace gtk {
 //	return b;
 //}
 
+Button*button(Widget*w){
+	return static_cast<Button*>(w);
+}
+
 };
 
 
