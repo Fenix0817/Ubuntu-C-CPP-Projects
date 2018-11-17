@@ -35,6 +35,10 @@ namespace ShaderType {
 
 }
 
+//#define GL_SHADER_DEBUG_setVec3
+//#define GL_SHADER_DEBUG_setFloat
+//#define GL_SHADER_DEBUG_setInt
+
 class Shader {
 public:
 	Shader();

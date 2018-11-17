@@ -10,40 +10,13 @@
 
 #include <glm/glm.hpp>
 
-#define MATERIAL_MATTE 0
-#define MATERIAL_PHONG 1
-
-#define BRDF_LAMBERTIAN 0
-#define BRDF_GLOSSY_SPECULAR 1
-
 #define OBJECT_PLANE 0
 #define OBJECT_SPHERE 1
 
-
-struct BRDF {
-	//lambertian
-	float lambertian_intensity;
-	glm::vec3 lambertian_color;
-
-	//glossy specular
-	float glossy_specular_intensity;
-	glm::vec3 glossy_specular_color;
-	float glossy_specular_exp;
-
-	int type;
-};
-
 struct Material {
-	//matte
-	BRDF matte_ambient;
-	BRDF matte_diffuse;
-
-	//phong
-	BRDF phong_ambient;
-	BRDF phong_diffuse;
-	BRDF phong_specular;
-
-	int type;
+	glm::vec3 color;
+	glm::vec3 light_color;
+	float roughness;
 };
 
 struct Sphere {
