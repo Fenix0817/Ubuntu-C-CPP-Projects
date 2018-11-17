@@ -40,10 +40,9 @@ RGBColor MaterialMatte::giShade(ShadeInfo&si){
 	float pdf;
 	RGBColor f=diffuse->sampleF(si,wi,wo,pdf);
 	float ndotwi=dotVectors(si.normal,wi);
-//	if(ndotwi<0)ndotwi=0;
 	Vector3 hitPoint=si.ray.pos+si.ray.dir*si.t;
 	Ray reflectedRay(hitPoint,wi);
-	return f*si.world->tracer->getColor(reflectedRay,si.depth+1)*ndotwi/pdf;
+	return f*si.world->tracer->getColor(reflectedRay,si.depth+1)*ndotwi*pdf;
 }
 
 void MaterialMatte::setAmbient(float i,RGBColor c){

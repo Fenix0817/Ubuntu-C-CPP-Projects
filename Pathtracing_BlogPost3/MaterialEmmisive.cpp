@@ -20,8 +20,8 @@ RGBColor MaterialEmmisive::shade(ShadeInfo&si){
 	return intensity*color;
 }
 RGBColor MaterialEmmisive::giShade(ShadeInfo&si){
-	if(-dotVectors(si.normal,si.ray.dir)>0){
-		return intensity*color;
-	}
-	return Colors::black;
+//	if(-dotVectors(si.normal,si.ray.dir)>0){
+//		return intensity*color;
+//	}
+	return intensity*color;
 }

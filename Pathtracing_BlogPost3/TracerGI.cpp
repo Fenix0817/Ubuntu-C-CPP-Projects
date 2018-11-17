@@ -17,9 +17,10 @@ TracerGI::~TracerGI() {
 }
 
 RGBColor TracerGI::getColor(Ray ray,int depth){
-	if(depth>world->maxDepth)return Colors::black;
+	if(depth>world->maxDepth)return world->bgColor;
 	ShadeInfo si=intersectWorld(world,ray);
 	si.depth=depth;
 	if(si.hit)return si.object->material->giShade(si);
 	return world->bgColor;//background
+//	return Colors::red;
 }

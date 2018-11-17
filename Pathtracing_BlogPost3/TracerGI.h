@@ -19,17 +19,14 @@ public:
 	TracerGI();
 	virtual ~TracerGI();
 
-	inline RGBColor getColor(Ray ray){
-		return getColor(ray,0);
-	}
-
 	World*world;
 
 	TracerGI(World*w){
 		world=w;
 	}
 
-	RGBColor getColor(Ray ray,int depth);
+	RGBColor getColor(Ray ray){return getColor(ray,0);}
+	RGBColor getColor(Ray ray,int depth=0);
 };
 
 #endif /* TRACERGI_H_ */
