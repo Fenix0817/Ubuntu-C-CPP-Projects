@@ -108,6 +108,13 @@ Widget* createWidgetFromXML(tinyxml2::XMLNode*n,UI*ui){
 		if(elem->Attribute("name")!=0)ui->addNamedElement(grid,std::string(elem->Attribute("name")));
 		return grid;
 	}
+	if(elemName=="entry"){
+		Entry*entry=new Entry();
+		entry->create();
+		if(elem->Attribute("text")!=0)entry->setText(std::string(elem->Attribute("text")));
+		if(elem->Attribute("name")!=0)ui->addNamedElement(entry,std::string(elem->Attribute("name")));
+		return entry;
+	}
 //	return NULL;
 	return nullptr;
 }

@@ -12,6 +12,7 @@
 #include "Widget.h"
 #include "Container.h"
 #include "Button.h"
+#include "Entry.h"
 
 namespace gtk {
 
@@ -21,8 +22,12 @@ namespace gtk {
 //	return b;
 //}
 
-Button*button(Widget*w){
+inline Button*button(void*w){
 	return static_cast<Button*>(w);
+}
+
+inline Entry*entry(void*w){
+	return static_cast<Entry*>(w);
 }
 
 };

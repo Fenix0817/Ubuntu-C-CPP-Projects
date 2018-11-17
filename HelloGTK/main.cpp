@@ -8,11 +8,23 @@
 #include <gtkhpp/gtk.hpp>
 
 void click(GtkButton*w,gpointer userData){
+	gtk::Button*button=gtk::button(userData);
 	printf("Clicked\n");
 }
 
 void otherClick(GtkButton*w,gpointer userData){
+	gtk::Button*button=gtk::button(userData);
 	printf("Other clicked\n");
+}
+
+void inserted(GtkEntryBuffer*buffer,int pos,gchar*chars,guint n_chars,gpointer userData){
+	gtk::Entry*entry=gtk::entry(userData);
+	printf("Inserted, text is now: %s\n",entry->getText().c_str());
+}
+
+void deleted(GtkEntryBuffer*buffer,int pos,guint n_chars,gpointer userData){
+	gtk::Entry*entry=gtk::entry(userData);
+	printf("Deleted, text is now: %s\n",entry->getText().c_str());
 }
 
 int main(int argc, char *argv[]) {
@@ -29,7 +41,15 @@ int main(int argc, char *argv[]) {
 
 	gtk::xml::UI*ui=new gtk::xml::UI();
 	ui->loadUI("ui.xml","my_ui");
-	gtk::button(ui->findWidgetWithName("clickableButton"))->addClickListener(click,(gpointer)nullptr);
+
+	gtk::Button*button=gtk::button(ui->findWidgetWithName("clickableButton"));
+	button->addClickListener(click,button);
+	button->addClickListener(otherClick,button);
+
+	gtk::Entry*entry1=gtk::entry(ui->findWidgetWithName("text-field-1"));
+
+	entry1->buffer->addInsertListener(inserted,entry1);
+	entry1->buffer->addDeleteListener(deleted,entry1);
 	window->add(ui);
 
 //	gtk::Button*btn=new gtk::Button();

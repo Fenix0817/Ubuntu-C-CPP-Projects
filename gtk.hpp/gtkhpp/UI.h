@@ -13,6 +13,7 @@
 #include "Box.h"
 #include "Button.h"
 #include "Grid.h"
+#include "Entry.h"
 
 namespace gtk {
 namespace xml {

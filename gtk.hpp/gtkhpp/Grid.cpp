@@ -5,7 +5,7 @@
  *      Author: jack
  */
 
-#include <gtkhpp/Grid.h>
+#include "Grid.h"
 
 namespace gtk {
 

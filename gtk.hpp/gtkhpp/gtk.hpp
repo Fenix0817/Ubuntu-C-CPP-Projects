@@ -15,6 +15,8 @@
 #include "Button.h"
 #include "Box.h"
 #include "ButtonBox.h"
+#include "Entry.h"
+#include "EntryBuffer.h"
 #include "Conversions.h"
 
 #include "UI.h"

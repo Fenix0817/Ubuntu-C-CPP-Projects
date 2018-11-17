@@ -27,6 +27,7 @@
 		<button-with-label gridx="2" gridy="2" gridw="1" gridh="1">2,2,   1,1</button-with-label>
 	</grid>
 	<button-with-label name="clickableButton">Click Me!</button-with-label>
+	<entry name="text-field-1" text="Text Field 1"></entry>
 </box>
 
 </ui>
