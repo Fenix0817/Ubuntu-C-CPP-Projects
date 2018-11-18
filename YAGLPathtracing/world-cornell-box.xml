@@ -1,0 +1,158 @@
+<!-- Cornell box scene -->
+
+<xml>
+
+<camera
+	pos_x="0"
+	pos_y="0"
+	pos_z="0"
+	dir_x="1"
+	dir_y="0"
+	dir_z="0"
+></camera>
+
+<material
+	name="matte_red"
+	roughness="1"
+	color_r="1.0"
+	color_g="0.0"
+	color_b="0.0"
+></material>
+
+<material
+	name="matte_white"
+	roughness="1"
+	color_r="1.0"
+	color_g="1.0"
+	color_b="1.0"
+></material>
+
+<material
+	name="matte_green"
+	roughness="1"
+	color_r="0.0"
+	color_g="1.0"
+	color_b="0.0"
+></material>
+
+<material
+	name="light"
+	roughness="1"
+	light_color_r="1"
+	light_color_g="1"
+	light_color_b="1"
+	light_color_scale="100"
+></material>
+
+<material
+	name="object1"
+	roughness="0"
+	color_r="1"
+	color_g="1"
+	color_b="1"
+></material>
+
+<material
+	name="object2"
+	roughness="0.2"
+	color_r="1"
+	color_g="1"
+	color_b="1"
+></material>
+
+<!-- Floor -->
+<plane
+	material="matte_white"
+	pos_x="0"
+	pos_y="-1"
+	pos_z="0"
+	normal_x="0"
+	normal_y="1"
+	normal_z="0"
+></plane>
+
+<!-- Wall -->
+<plane
+	material="matte_green"
+	pos_x="0"
+	pos_y="0"
+	pos_z="-1"
+	normal_x="0"
+	normal_y="0"
+	normal_z="1"
+></plane>
+
+<!-- Wall -->
+<plane
+	material="matte_red"
+	pos_x="0"
+	pos_y="0"
+	pos_z="1"
+	normal_x="0"
+	normal_y="0"
+	normal_z="-1"
+></plane>
+
+<!-- Wall -->
+<plane
+	material="matte_white"
+	pos_x="2"
+	pos_y="0"
+	pos_z="0"
+	normal_x="-1"
+	normal_y="0"
+	normal_z="0"
+></plane>
+
+<!-- Ceiling -->
+<plane
+	material="matte_white"
+	pos_x="0"
+	pos_y="1"
+	pos_z="0"
+	normal_x="0"
+	normal_y="-1"
+	normal_z="0"
+></plane>
+
+<!-- Back wall -->
+<plane
+	material="matte_white"
+	pos_x="-0.1"
+	pos_y="0"
+	pos_z="0"
+	normal_x="1"
+	normal_y="0"
+	normal_z="0"
+></plane>
+
+<!-- Object 1 -->
+<sphere
+	material="object1"
+	pos_x="1.5"
+	pos_y="0"
+	pos_z="0.8"
+	rad="0.5"
+></sphere>
+
+<!-- Object 2 -->
+<sphere
+	material="object2"
+	pos_x="1.7"
+	pos_y="0"
+	pos_z="-0.5"
+	rad="0.7"
+></sphere>
+
+<!-- Light -->
+<disk
+	material="light"
+	pos_x="1"
+	pos_y="0.999"
+	pos_z="0"
+	normal_x="0"
+	normal_y="-1"
+	normal_z="0"
+	rad="0.5"
+></disk>
+</xml>

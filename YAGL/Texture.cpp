@@ -99,7 +99,7 @@ void Texture::setParam(TextureParamName::param_name pn,TextureParamValue::param_
 void Texture::setData(int w,int h,TextureData data){
 	width=w;
 	height=h;
-	glTexImage2D(TextureTarget::texture_target_enum_to_int(target),0,GL_RGBA,w,h,0,GL_RGBA,GL_UNSIGNED_BYTE,data);
+	glTexImage2D(TextureTarget::texture_target_enum_to_int(target),0,GL_RGBA32F,w,h,0,GL_RGBA,GL_UNSIGNED_BYTE,data);
 
 
 //	int num_mipmaps=8;

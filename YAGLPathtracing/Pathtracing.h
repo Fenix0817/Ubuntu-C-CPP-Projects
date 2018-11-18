@@ -23,13 +23,22 @@ struct Sphere {
 	glm::vec3 pos;
 	float rad;
 	Material mat;
+	Sphere(){}
 	Sphere(glm::vec3 p,float r,Material m){pos=p;rad=r;mat=m;}
+};
+
+struct Disk {
+	glm::vec3 pos;
+	glm::vec3 normal;
+	float rad;
+	Material mat;
 };
 
 struct Plane {
 	glm::vec3 pos;
 	glm::vec3 normal;
 	Material mat;
+	Plane(){}
 	Plane(glm::vec3 p,glm::vec3 n,Material m){pos=p;normal=glm::normalize(n);mat=m;}
 };
 

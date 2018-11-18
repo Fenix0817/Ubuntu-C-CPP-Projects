@@ -1,0 +1,63 @@
+<xml>
+<camera
+pos_x="7"
+pos_y="5"
+pos_z="7"
+look_x="0"
+look_y="0"
+look_z="0"
+></camera>
+<material name="matte_white" roughness="1" color_r="1"
+										   color_g="1"
+										   color_b="1"
+></material>
+<material name="reflective" roughness="0"></material>
+<material name="glossy_red" roughness="0.2" color_r="1"
+											   color_g="0"
+											   color_b="0"
+></material>
+<material name="glossy_green" roughness="0.2" color_r="0"
+											   color_g="1"
+											   color_b="0"
+></material>
+<material name="glossy_white" roughness="0.5" color_r="1"
+											   color_g="1"
+											   color_b="1"
+></material>
+<material name="light" roughness="1" light_color_r="1"
+									 light_color_g="1"
+									 light_color_b="1"
+									 light_color_scale="10"
+></material>
+<material name="ground" roughness="0.8" color_r="0.8"
+									    color_g="0.8"
+									    color_b="0.8"
+></material>
+<plane material="ground" pos_x="0"
+							  pos_y="0"
+							  pos_z="0"
+							  normal_x="0"
+							  normal_y="1"
+							  normal_z="0"
+></plane>
+<sphere material="glossy_green" pos_x="5"
+							  pos_y="0"
+							  pos_z="-3"
+							  rad="3"
+></sphere>
+<sphere material="glossy_red" pos_x="-3"
+							  pos_y="0"
+							  pos_z="5"
+							  rad="3"
+></sphere>
+<sphere material="glossy_white" pos_x="-3"
+							  pos_y="0"
+							  pos_z="-3"
+							  rad="3"
+></sphere>
+<sphere material="light" pos_x="0"
+						 pos_y="9"
+						 pos_z="4"
+						 rad="3"
+></sphere>
+</xml>

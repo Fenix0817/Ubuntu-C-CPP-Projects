@@ -1,5 +1,7 @@
 #version 450 core
 
+precision highp float;
+
 #define PI 3.14159265359
 #define TWO_PI 6.28318530718
 #define HALF_PI 1.57079632679
@@ -72,14 +74,9 @@ in vec2 uv;
 
 out vec4 fragColor;
 
-#define MATERIAL_MATTE 0
-#define MATERIAL_PHONG 1
-
-#define BRDF_LAMBERTIAN 0
-#define BRDF_GLOSSY_SPECULAR 1
-
 #define OBJECT_PLANE 0
 #define OBJECT_SPHERE 1
+#define OBJECT_DISK 2
 
 #define PI 3.14159265359
 #define ONE_OVER_PI 0.31830988618
@@ -110,19 +107,30 @@ struct Sphere {
     Material mat;
 };
 
+struct Disk {
+	vec3 pos;
+	vec3 normal;
+	float rad;
+	Material mat;
+};
+
 struct Plane {
     vec3 pos;
     vec3 normal;
     Material mat;
 };
 
-const int MAX_SPHERES=10;
+const int MAX_SPHERES=50;
 uniform int numSpheres;
 uniform Sphere spheres[MAX_SPHERES];
 
-const int MAX_PLANES=10;
+const int MAX_PLANES=50;
 uniform int numPlanes;
 uniform Plane planes[MAX_PLANES];
+
+const int MAX_DISKS=50;
+uniform int numDisks;
+uniform Disk disks[MAX_DISKS];
 
 uniform vec3 lightPos;
 
@@ -177,6 +185,20 @@ ShadeInfo intersectPlane(int index,vec3 pos,vec3 normal,Ray ray){
     return si;
 }
 
+ShadeInfo intersectDisk(int index,vec3 pos,vec3 normal,float rad,Ray ray){
+	float t=dot(pos-ray.pos,normal)/dot(ray.dir,normal);
+	ShadeInfo si;
+	si.hit=false;
+	vec3 hitPoint=ray.pos+ray.dir*t;
+	if(t<0.001||length(hitPoint-pos)>rad)return si;
+	si.hit=true;
+	si.normal=normal;
+	si.t=t;
+	si.objectIndex=index;
+	si.objectType=OBJECT_DISK;
+	return si;
+}
+
 vec3 material_shade(Material material,ShadeInfo si){
     vec3 hitPoint=si.ray.pos+si.ray.dir*si.t;
     vec3 normal=normalize(si.normal);
@@ -193,6 +215,10 @@ ShadeInfo intersectWorld(Ray ray){
     for(int i=0;i<MAX_PLANES;i++){
         if(i>=numPlanes)continue;
         si=minSI(si,intersectPlane(i,planes[i].pos,planes[i].normal,ray));
+    }
+    for(int i=0;i<MAX_DISKS;i++){
+    	if(i>=numDisks)continue;
+    	si=minSI(si,intersectDisk(i,disks[i].pos,disks[i].normal,disks[i].rad,ray));
     }
     si.ray=ray;
     return si;
@@ -214,7 +240,7 @@ vec3 tracePixel(Ray camRay){
     vec3 accum=vec3(0.0);
     vec3 mask=vec3(1.0);
 
-    for(int i=0;i<3;i++){
+    for(int i=0;i<10;i++){
         float t;
         vec3 normal;
         Material mat;
@@ -228,15 +254,27 @@ vec3 tracePixel(Ray camRay){
         normal=normalize(si.normal);
         if(si.objectType==OBJECT_SPHERE)mat=spheres[si.objectIndex].mat;
         if(si.objectType==OBJECT_PLANE)mat=planes[si.objectIndex].mat;
+        if(si.objectType==OBJECT_DISK)mat=disks[si.objectIndex].mat;
 
         vec3 normal_facing=dot(normal,r.dir)<0.0?normal:-normal;
 
         vec3 hemisphereSample=sampleUnitSphere();
 
+		vec3 w=normal_facing;
+        vec3 axis=abs(w.x)>0.1?vec3(0.0,1.0,0.0):vec3(1.0,0.0,0.0);
+        vec3 u=normalize(cross(axis,w));
+        vec3 v=cross(w,u);
+
+
         vec3 hitPoint=r.pos+r.dir*t;
+        
+        float rand1=TWO_PI*getRand();
+        float rand2=getRand();
+        float rand2s=sqrt(rand2);
 
         vec3 newdir_diffuse=hemisphereSample;
-        vec3 newdir_reflect=reflect(normalize(hitPoint-r.pos),normal);
+        //vec3 newdir_diffuse=normalize(u*hemisphereSample.x+v*hemisphereSample.y+w*hemisphereSample.z);
+		vec3 newdir_reflect=reflect(normalize(hitPoint-r.pos),normal);
 
         vec3 newdir=normalize(mix(newdir_reflect,newdir_diffuse,mat.roughness));
         r.pos=hitPoint+newdir*0.01;
@@ -253,6 +291,7 @@ vec3 tracePixel(Ray camRay){
 void main(){
     initRandom(int(uv.x*1000000.0),uint(uv.y*10000000.0),uint(numFrames));
     vec2 coords=uv;
+    coords+=(vec2(getRand(),getRand())*2.0-1.0)/windowSize.xy;
     coords*=2.0;
     coords-=1.0;
     coords.x*=windowSize.x/windowSize.y;
@@ -270,8 +309,5 @@ void main(){
 
     vec3 shaded=tracePixel(camRay);
 
-    if(shaded.x>1.0||shaded.y>1.0||shaded.z>1.0){
-    	shaded/=max(shaded.x,max(shaded.y,shaded.z));
-    }
     fragColor=vec4(shaded,1.0);
 }
