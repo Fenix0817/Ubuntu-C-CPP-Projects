@@ -43,32 +43,32 @@ void Chunk::createBuffers(){
 	vboPos.setData(sizeof(posData),posData);
 	vboPos.unbind();
 
-	gl::VertexBuffer vboXMI=ChunkUtils::createStaticArrayIntBuffer();
+	vboXMI=ChunkUtils::createStaticArrayIntBuffer();
 	vboXMI.bind();
 	vboXMI.addVertexAttrib(1,1,false,1,(const GLvoid*)0);
 	vboXMI.unbind();
 
-	gl::VertexBuffer vboXPL=ChunkUtils::createStaticArrayIntBuffer();
+	vboXPL=ChunkUtils::createStaticArrayIntBuffer();
 	vboXPL.bind();
 	vboXPL.addVertexAttrib(2,1,false,1,(const GLvoid*)0);
 	vboXPL.unbind();
 
-	gl::VertexBuffer vboYMI=ChunkUtils::createStaticArrayIntBuffer();
+	vboYMI=ChunkUtils::createStaticArrayIntBuffer();
 	vboYMI.bind();
 	vboYMI.addVertexAttrib(3,1,false,1,(const GLvoid*)0);
 	vboYMI.unbind();
 
-	gl::VertexBuffer vboYPL=ChunkUtils::createStaticArrayIntBuffer();
+	vboYPL=ChunkUtils::createStaticArrayIntBuffer();
 	vboYPL.bind();
 	vboYPL.addVertexAttrib(4,1,false,1,(const GLvoid*)0);
 	vboYPL.unbind();
 
-	gl::VertexBuffer vboZMI=ChunkUtils::createStaticArrayIntBuffer();
+	vboZMI=ChunkUtils::createStaticArrayIntBuffer();
 	vboZMI.bind();
 	vboZMI.addVertexAttrib(5,1,false,1,(const GLvoid*)0);
 	vboZMI.unbind();
 
-	gl::VertexBuffer vboZPL=ChunkUtils::createStaticArrayIntBuffer();
+	vboZPL=ChunkUtils::createStaticArrayIntBuffer();
 	vboZPL.bind();
 	vboZPL.addVertexAttrib(6,1,false,1,(const GLvoid*)0);
 	vboZPL.unbind();
@@ -79,9 +79,9 @@ void Chunk::updateBuffers(){
 	for(int x=0;x<C_SIZE;x++){
 		for(int y=0;y<C_HEIGHT;y++){
 			for(int z=0;z<C_SIZE;z++){
-				if(dirtyBlocks[x][y][z]){
+//				if(dirtyBlocks[x][y][z]){
 					//Update block position (x,y,z)
-					xmiData[x][y][z]=xplData[x][y][z]=ymiData[x][y][z]=yplData[x][y][z]=zmiData[x][y][z]=zplData[x][y][z]=false;
+					xmiData[x][y][z]=xplData[x][y][z]=ymiData[x][y][z]=yplData[x][y][z]=zmiData[x][y][z]=zplData[x][y][z]=true;
 					if(!blockData[x][y][z].empty){
 						printf("%i %i %i\n",x,y,z);
 						if(x>0)if(blockData[x-1][y][z].empty)xmiData[x][y][z]=true;
@@ -92,12 +92,16 @@ void Chunk::updateBuffers(){
 						if(z<C_SIZE-1)if(blockData[x][y][z+1].empty)zplData[x][y][z]=true;
 					}
 					dirtyBlocks[x][y][z]=false;
-				}
+//				}
 			}
 		}
 	}
 
 	vao.bind();
+
+//	vboPos.bind();
+//	vboPos.setData(sizeof(posData),posData);
+//	vboPos.unbind();
 
 	vboXMI.bind();
 	vboXMI.setData(sizeof(xmiData),xmiData);
