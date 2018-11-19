@@ -7,6 +7,8 @@ precision highp float;
 #define HALF_PI 1.57079632679
 #define ONE_OVER_PI 0.31830988618
 
+#define EPSILON 0.0001
+
 //https://www.shadertoy.com/view/lltBWX
 float randSeed;
 
@@ -164,7 +166,7 @@ ShadeInfo intersectSphere(int index,vec3 pos,float rad,Ray ray){
     float t1=(-b+discr)/(2.0*a);
     float t2=(-b-discr)/(2.0*a);
     si.t=min(t1,t2);
-    if(si.t<0.001)return si;
+    if(si.t<EPSILON)return si;
     si.hit=true;
     si.normal=normalize(ray.pos+si.t*ray.dir-pos);
     si.objectIndex=index;
@@ -176,7 +178,7 @@ ShadeInfo intersectPlane(int index,vec3 pos,vec3 normal,Ray ray){
     float t=dot(pos-ray.pos,normal)/dot(ray.dir,normal);
     ShadeInfo si;
     si.hit=false;
-    if(t<0.001)return si;
+    if(t<EPSILON)return si;
     si.hit=true;
     si.normal=normal;
     si.t=t;
@@ -190,7 +192,7 @@ ShadeInfo intersectDisk(int index,vec3 pos,vec3 normal,float rad,Ray ray){
 	ShadeInfo si;
 	si.hit=false;
 	vec3 hitPoint=ray.pos+ray.dir*t;
-	if(t<0.001||length(hitPoint-pos)>rad)return si;
+	if(t<EPSILON||length(hitPoint-pos)>rad)return si;
 	si.hit=true;
 	si.normal=normal;
 	si.t=t;
@@ -240,7 +242,7 @@ vec3 tracePixel(Ray camRay){
     vec3 accum=vec3(0.0);
     vec3 mask=vec3(1.0);
 
-    for(int i=0;i<10;i++){
+    for(int i=0;i<6;i++){
         float t;
         vec3 normal;
         Material mat;
@@ -272,12 +274,16 @@ vec3 tracePixel(Ray camRay){
         float rand2=getRand();
         float rand2s=sqrt(rand2);
 
-        vec3 newdir_diffuse=hemisphereSample;
+        //vec3 newdir_diffuse=hemisphereSample;
         //vec3 newdir_diffuse=normalize(u*hemisphereSample.x+v*hemisphereSample.y+w*hemisphereSample.z);
+        
+        //I think that this diffuse sampling is cosine-weighted, but I am not sure
+        //Taken from here: http://raytracey.blogspot.com/2016/11/opencl-path-tracing-tutorial-2-path.html
+        vec3 newdir_diffuse=normalize(u*cos(rand1)*rand2s+v*sin(rand1)*rand2s+w*sqrt(1.0-rand2));
 		vec3 newdir_reflect=reflect(normalize(hitPoint-r.pos),normal);
 
         vec3 newdir=normalize(mix(newdir_reflect,newdir_diffuse,mat.roughness));
-        r.pos=hitPoint+newdir*0.01;
+        r.pos=hitPoint+newdir*EPSILON;
         r.dir=newdir;
 
         accum+=mask*mat.light_color;

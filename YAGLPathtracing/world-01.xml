@@ -1,0 +1,93 @@
+<xml>
+
+<background
+	r="0.15"
+	g="0.15"
+	b="0.25"
+></background>
+
+<camera
+	pos_x="5"
+	pos_y="6"
+	pos_z="15"
+	look_x="0"
+	look_y="3"
+	look_z="0"
+></camera>
+
+<material
+	name="mat_ground"
+	color_r="0.9"
+	color_g="0.3"
+	color_b="0.0"
+	roughness="1"
+></material>
+
+
+
+<material
+	name="mat_light"
+	light_color_r="1"
+	light_color_g="1"
+	light_color_b="1"
+	light_color_scale="30"
+	roughness="1"
+></material>
+
+<material
+	name="mat_object1"
+	color_r="1.0"
+	color_g="1.0"
+	color_b="1.0"
+	roughness="1"
+></material>
+
+<material
+	name="mat_object2"
+	color_r="1.0"
+	color_g="1.0"
+	color_b="1.0"
+	roughness="1"
+></material>
+
+<plane
+	name="plane_ground"
+	material="mat_ground"
+	pos_x="0"
+	pos_y="0"
+	pos_z="0"
+	normal_x="0"
+	normal_y="1"
+	normal_z="0"
+></plane>
+
+
+<sphere
+	name="sphere_light"
+	material="mat_light"
+	pos_x="0"
+	pos_y="20"
+	pos_z="0"
+	rad="5"
+></sphere>
+
+<sphere
+	name="sphere_object1"
+	material="mat_object1"
+	pos_x="3"
+	pos_y="4"
+	pos_z="-5"
+	rad="9"
+></sphere>
+
+<sphere
+	name="sphere_object2"
+	material="mat_object2"
+	pos_x="-15"
+	pos_y="4"
+	pos_z="-5"
+	rad="6"
+></sphere>
+
+
+</xml>

@@ -23,6 +23,12 @@
 
 #include "tinyxml2.h"
 
+#define IMG_W 100
+#define IMG_H 100
+
+#define WINDOW_W 1000
+#define WINDOW_H 1000
+
 void setMaterial(gl::Shader shader,Material mat,std::string name){
 	shader.setVec3(string_format("%s.mat.color",name.c_str()),mat.color);
 	shader.setVec3(string_format("%s.mat.light_color",name.c_str()),mat.light_color);
@@ -112,6 +118,7 @@ struct NamedMat{
 };
 
 std::vector<NamedMat>materials;
+glm::vec3 background;
 
 void addMaterial(tinyxml2::XMLElement*elem){
 	NamedMat m;
@@ -181,6 +188,12 @@ void setCamera(tinyxml2::XMLElement*elem){
 	zoom=elem->FloatAttribute("zoom",1);
 }
 
+void setBackground(tinyxml2::XMLElement*elem){
+	background.x=elem->FloatAttribute("r",1);
+	background.y=elem->FloatAttribute("g",1);
+	background.z=elem->FloatAttribute("b",1);
+}
+
 void initWorld(){
 
 	using namespace tinyxml2;
@@ -214,6 +227,9 @@ void initWorld(){
 		}
 		if(elemName=="camera"){
 			setCamera(elem);
+		}
+		if(elemName=="background"){
+			setBackground(elem);
 		}
 		child=child->NextSibling();
 	}
@@ -279,8 +295,8 @@ void initWorld(){
 //	spheres.push_back(Sphere(glm::vec3(4,0,4),2,sphere3));
 }
 
-void setWorld(gl::Shader sampleShader,int w,int h,int f){
-	sampleShader.setVec2("windowSize",w,h);
+void setWorld(gl::Shader sampleShader,int f){
+	sampleShader.setVec2("windowSize",IMG_W,IMG_H);
 
 	sampleShader.setInt("numSpheres",spheres.size());
 	for(int i=0;i<spheres.size();i++){
@@ -307,7 +323,7 @@ void setWorld(gl::Shader sampleShader,int w,int h,int f){
 		setMaterial(sampleShader,disks[i].mat,string_format("disks[%i]",i));
 	}
 
-	sampleShader.setVec3("background",0.8,0.8,1);
+	sampleShader.setVec3("background",background);
 	sampleShader.setInt("numFrames",f);
 
 	sampleShader.setVec3("camPos",camPos);
@@ -325,7 +341,7 @@ gl::Framebuffer sampleFBO;
 gl::Texture accumTextures[2];
 gl::Framebuffer accumFBOs[2];
 
-void initGL(int w,int h){
+void initGL(){
 	sampleShader.create();
 	sampleShader.attachFile("Shaders/shader.vert",gl::ShaderType::Vertex);
 	sampleShader.attachFile("Shaders/sample.frag",gl::ShaderType::Fragment);
@@ -344,7 +360,7 @@ void initGL(int w,int h){
 	sampleTexture.setTarget(gl::TextureTarget::Tex2D);
 	sampleTexture.create();
 	sampleTexture.bind();
-	sampleTexture.setData(w,h,nullptr);
+	sampleTexture.setData(IMG_W,IMG_H,nullptr);
 	sampleTexture.unbind();
 
 	sampleFBO.create();
@@ -358,7 +374,7 @@ void initGL(int w,int h){
 		accumTextures[i].setTarget(gl::TextureTarget::Tex2D);
 		accumTextures[i].create();
 		accumTextures[i].bind();
-		accumTextures[i].setData(w,h,nullptr);
+		accumTextures[i].setData(IMG_W,IMG_H,nullptr);
 		accumTextures[i].unbind();
 	}
 
@@ -385,10 +401,24 @@ void initGL(int w,int h){
 
 int buffer=0;
 
-void computeIteration(int w,int h,int n){
+int counter=0;
+
+int texDisplayMode=0;
+
+void setLinear(){
+	texDisplayMode=0;
+}
+
+void setNearest(){
+	texDisplayMode=1;
+}
+
+void computeIteration(){
+	counter++;
+	glViewport(0,0,IMG_W,IMG_H);
 	sampleFBO.bind();
 	sampleShader.bind();
-	setWorld(sampleShader,w,h,n);
+	setWorld(sampleShader,counter);
 	renderQuad();
 	sampleShader.unbind();
 	sampleFBO.unbind();
@@ -403,7 +433,7 @@ void computeIteration(int w,int h,int n){
 	accumShader.setInt("tex2",1);
 	accumTextures[1-buffer].bindToUnit(1);
 
-	accumShader.setFloat("n",n);
+	accumShader.setFloat("n",counter);
 
 	renderQuad();
 	accumShader.unbind();
@@ -417,10 +447,11 @@ int main(){
 
 	gl::Window window;
 	window.create();
-	window.setSize(1000,500);
+	window.setSize(WINDOW_W,WINDOW_H);
 	window.setTitle("YAGL Path Tracing");
 
 	window.bind();
+	glfwSwapInterval(0);
 	glClampColorARB(GL_CLAMP_VERTEX_COLOR_ARB, GL_FALSE);
 	glClampColorARB(GL_CLAMP_READ_COLOR_ARB, GL_FALSE);
 	glClampColorARB(GL_CLAMP_FRAGMENT_COLOR_ARB, GL_FALSE);
@@ -429,9 +460,10 @@ int main(){
 
 	initBuffers();
 
-	initGL(window.width,window.height);
+	initGL();
 
-
+	gl::setClearColor(1,1,1);
+	gl::clearScreen();
 
 	window.unbind();
 
@@ -439,38 +471,49 @@ int main(){
 
 	float startTime=gl::time();
 	int frames=0;
-	int frameCounter=0;
+	int numIters=100000000;
+	bool continueCompute=true;
 	while(window.isOpen()){
 		frames++;
-		frameCounter++;
 		if(gl::time()-startTime>.3){
 			float endTime=gl::time();
 			float diffTime=endTime-startTime;
 
-			printf("FPS: %f, SPF: %f, Frames: %i\n",frames/diffTime,diffTime/frames,frameCounter);
+			printf("FPS: %f, SPF: %f, Iterations: %i\n",frames/diffTime,diffTime/frames,counter);
 
 			frames=0;
 			startTime=gl::time();
 		}
 		window.bind();
 
-		gl::defaultViewport(window);
 		gl::setClearColor(1,1,1);
 		gl::clearScreen();
 
-		computeIteration(window.width,window.height,frameCounter);
+//		computeIteration(window.width,window.height);
+//
+//		if(window.wasJustPressed('1'))computeIteration(window.width,window.height);
+//		if(window.wasJustPressed('2'))for(int i=0;i<5;i++)computeIteration(window.width,window.height);
+//		if(window.wasJustPressed('3'))for(int i=0;i<20;i++)computeIteration(window.width,window.height);
+//		if(window.wasJustPressed('4'))for(int i=0;i<100;i++)computeIteration(window.width,window.height);
+//		if(window.wasJustPressed('5'))for(int i=0;i<500;i++)computeIteration(window.width,window.height);
+		if(counter<numIters&&continueCompute)for(int i=0;i<10;i++)computeIteration();
 
-		if(window.wasJustPressed('1'))computeIteration(window.width,window.height,frameCounter);
-		if(window.wasJustPressed('2'))for(int i=0;i<5;i++)computeIteration(window.width,window.height,frameCounter);
-		if(window.wasJustPressed('3'))for(int i=0;i<20;i++)computeIteration(window.width,window.height,frameCounter);
-		if(window.wasJustPressed('4'))for(int i=0;i<100;i++)computeIteration(window.width,window.height,frameCounter);
-		if(window.wasJustPressed('5'))for(int i=0;i<500;i++)computeIteration(window.width,window.height,frameCounter);
+		if(window.isKeyDown('L')){
+			setLinear();
+		}
+		if(window.isKeyDown('N')){
+			setNearest();
+		}
 
+		if(window.isKeyDown(GLFW_KEY_ESCAPE)||window.isKeyDown(GLFW_KEY_Q))continueCompute=false;
 
+		gl::defaultViewport(window);
 		displayShader.bind();
+		displayShader.setInt("uvMode",texDisplayMode);
+		displayShader.setVec2("size",IMG_W,IMG_H);
 		displayShader.setInt("tex",0);
 		accumTextures[buffer].bindToUnit(0);
-		displayShader.setFloat("n",frameCounter);
+		displayShader.setFloat("n",counter);
 		// ^ Always render first accumulation texture, it doesn't matter which
 		//   one, because this shader outputs to the window, not a texture
 		renderQuad();
