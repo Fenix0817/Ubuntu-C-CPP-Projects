@@ -11,35 +11,14 @@
 #include "VertexArray.h"
 #include "VertexBuffer.h"
 
+#include "ChunkUtils.h"
+#include "ChunkFace.h"
+
 #include "Atlas.h"
 #include "AtlasPos.h"
 #include "Block.h"
 #include "BlockFace.h"
-
-#define C_SIZE 16
-#define C_HEIGHT 32
-
-namespace ChunkUtils {
-
-inline gl::VertexBuffer createStaticArrayFloatBuffer(){
-	gl::VertexBuffer vbo;
-	vbo.setTarget(gl::VertexBufferTarget::Array);
-	vbo.setUsage(gl::VertexBufferUsage::StaticDraw);
-	vbo.setType(gl::Type::Float);
-	vbo.create();
-	return vbo;
-}
-
-inline gl::VertexBuffer createStaticArrayIntBuffer(){
-	gl::VertexBuffer vbo;
-	vbo.setTarget(gl::VertexBufferTarget::Array);
-	vbo.setUsage(gl::VertexBufferUsage::StaticDraw);
-	vbo.setType(gl::Type::Int);
-	vbo.create();
-	return vbo;
-}
-
-}
+#include "config.h"
 
 class Chunk {
 public:
@@ -48,14 +27,10 @@ public:
 
 	gl::VertexArray vao;
 	gl::VertexBuffer vboPos;
-	gl::VertexBuffer vboXMI,vboXPL,vboYMI,vboYPL,vboZMI,vboZPL;
 
-	int xmiData[C_SIZE][C_HEIGHT][C_SIZE];
-	int xplData[C_SIZE][C_HEIGHT][C_SIZE];
-	int ymiData[C_SIZE][C_HEIGHT][C_SIZE];
-	int yplData[C_SIZE][C_HEIGHT][C_SIZE];
-	int zmiData[C_SIZE][C_HEIGHT][C_SIZE];
-	int zplData[C_SIZE][C_HEIGHT][C_SIZE];
+	ChunkFace xmi,xpl,ymi,ypl,zmi,zpl;
+
+	float posData[C_SIZE][C_HEIGHT][C_SIZE][3];
 
 	Block blockData[C_SIZE][C_HEIGHT][C_SIZE];
 

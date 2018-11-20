@@ -19,24 +19,6 @@
 #include "Chunk.h"
 #define PI 3.14159265359
 
-gl::VertexBuffer createStaticArrayFloatBuffer(){
-	gl::VertexBuffer vbo;
-	vbo.setTarget(gl::VertexBufferTarget::Array);
-	vbo.setUsage(gl::VertexBufferUsage::StaticDraw);
-	vbo.setType(gl::Type::Float);
-	vbo.create();
-	return vbo;
-}
-
-gl::VertexBuffer createStaticArrayIntBuffer(){
-	gl::VertexBuffer vbo;
-	vbo.setTarget(gl::VertexBufferTarget::Array);
-	vbo.setUsage(gl::VertexBufferUsage::StaticDraw);
-	vbo.setType(gl::Type::Int);
-	vbo.create();
-	return vbo;
-}
-
 float lerp(float t,float a,float b){return a+(b-a)*t;}
 float norm(float t,float a,float b){return (t-a)/(b-a);}
 float map(float t,float s1,float e1,float s2,float e2){return lerp(norm(t,s1,e1),s2,e2);}
@@ -55,7 +37,7 @@ int main(){
 	for(int x=0;x<C_SIZE;x++){
 		for(int y=0;y<C_HEIGHT;y++){
 			for(int z=0;z<C_SIZE;z++){
-				int h=(x+z)/2;
+				int h=sqrt(pow(x-C_SIZE/2,2)+pow(z-C_SIZE/2,2));
 				if(y<=h)chunk.setBlock(x,y,z,blockGrass);
 				else chunk.setBlock(x,y,z,blockEmpty);
 			}

@@ -30,7 +30,6 @@ void Chunk::createBuffers(){
 	vboPos.bind();
 	vboPos.addVertexAttrib(0,3,false,3,(const GLvoid*)0);
 
-	float posData[C_SIZE][C_HEIGHT][C_SIZE][3];
 	for(int x=0;x<C_SIZE;x++){
 		for(int y=0;y<C_HEIGHT;y++){
 			for(int z=0;z<C_SIZE;z++){
@@ -43,35 +42,12 @@ void Chunk::createBuffers(){
 	vboPos.setData(sizeof(posData),posData);
 	vboPos.unbind();
 
-	vboXMI=ChunkUtils::createStaticArrayIntBuffer();
-	vboXMI.bind();
-	vboXMI.addVertexAttrib(1,1,false,1,(const GLvoid*)0);
-	vboXMI.unbind();
-
-	vboXPL=ChunkUtils::createStaticArrayIntBuffer();
-	vboXPL.bind();
-	vboXPL.addVertexAttrib(2,1,false,1,(const GLvoid*)0);
-	vboXPL.unbind();
-
-	vboYMI=ChunkUtils::createStaticArrayIntBuffer();
-	vboYMI.bind();
-	vboYMI.addVertexAttrib(3,1,false,1,(const GLvoid*)0);
-	vboYMI.unbind();
-
-	vboYPL=ChunkUtils::createStaticArrayIntBuffer();
-	vboYPL.bind();
-	vboYPL.addVertexAttrib(4,1,false,1,(const GLvoid*)0);
-	vboYPL.unbind();
-
-	vboZMI=ChunkUtils::createStaticArrayIntBuffer();
-	vboZMI.bind();
-	vboZMI.addVertexAttrib(5,1,false,1,(const GLvoid*)0);
-	vboZMI.unbind();
-
-	vboZPL=ChunkUtils::createStaticArrayIntBuffer();
-	vboZPL.bind();
-	vboZPL.addVertexAttrib(6,1,false,1,(const GLvoid*)0);
-	vboZPL.unbind();
+	xmi.init(1);
+	xpl.init(2);
+	ymi.init(3);
+	ypl.init(4);
+	zmi.init(5);
+	zpl.init(6);
 
 	vao.unbind();
 }
@@ -79,53 +55,44 @@ void Chunk::updateBuffers(){
 	for(int x=0;x<C_SIZE;x++){
 		for(int y=0;y<C_HEIGHT;y++){
 			for(int z=0;z<C_SIZE;z++){
-//				if(dirtyBlocks[x][y][z]){
+				if(dirtyBlocks[x][y][z]){
 					//Update block position (x,y,z)
-					xmiData[x][y][z]=xplData[x][y][z]=ymiData[x][y][z]=yplData[x][y][z]=zmiData[x][y][z]=zplData[x][y][z]=true;
+					xmi.visData[x][y][z]=xpl.visData[x][y][z]=ymi.visData[x][y][z]=ypl.visData[x][y][z]=zmi.visData[x][y][z]=zpl.visData[x][y][z]=false;
 					if(!blockData[x][y][z].empty){
 						printf("%i %i %i\n",x,y,z);
-						if(x>0)if(blockData[x-1][y][z].empty)xmiData[x][y][z]=true;
-						if(x<C_SIZE-1)if(blockData[x+1][y][z].empty)xplData[x][y][z]=true;
-						if(y>0)if(blockData[x][y-1][z].empty)ymiData[x][y][z]=true;
-						if(y<C_HEIGHT-1)if(blockData[x][y+1][z].empty)yplData[x][y][z]=true;
-						if(z>0)if(blockData[x][y][z-1].empty)zmiData[x][y][z]=true;
-						if(z<C_SIZE-1)if(blockData[x][y][z+1].empty)zplData[x][y][z]=true;
+						if(x>0)if(blockData[x-1][y][z].empty)xmi.visData[x][y][z]=true;
+						if(x<C_SIZE-1)if(blockData[x+1][y][z].empty)xpl.visData[x][y][z]=true;
+						if(y>0)if(blockData[x][y-1][z].empty)ymi.visData[x][y][z]=true;
+						if(y<C_HEIGHT-1)if(blockData[x][y+1][z].empty)ypl.visData[x][y][z]=true;
+						if(z>0)if(blockData[x][y][z-1].empty)zmi.visData[x][y][z]=true;
+						if(z<C_SIZE-1)if(blockData[x][y][z+1].empty)zpl.visData[x][y][z]=true;
 					}
+//					xmiData[x][y][z]=xplData[x][y][z]=ymiData[x][y][z]=yplData[x][y][z]=zmiData[x][y][z]=zplData[x][y][z]=true;
+//					if(!blockData[x][y][z].empty)
 					dirtyBlocks[x][y][z]=false;
-//				}
+				}
+				xmi.setUV(x,y,z,0,0);
+				xpl.setUV(x,y,z,0,0);
+				ymi.setUV(x,y,z,0,0);
+				ypl.setUV(x,y,z,0,0);
+				zmi.setUV(x,y,z,0,0);
+				zpl.setUV(x,y,z,0,0);
 			}
 		}
 	}
 
 	vao.bind();
 
-//	vboPos.bind();
-//	vboPos.setData(sizeof(posData),posData);
-//	vboPos.unbind();
+	vboPos.bind();
+	vboPos.setData(sizeof(posData),posData);
+	vboPos.unbind();
 
-	vboXMI.bind();
-	vboXMI.setData(sizeof(xmiData),xmiData);
-	vboXMI.unbind();
-
-	vboXPL.bind();
-	vboXPL.setData(sizeof(xplData),xplData);
-	vboXPL.unbind();
-
-	vboYMI.bind();
-	vboYMI.setData(sizeof(ymiData),ymiData);
-	vboYMI.unbind();
-
-	vboYPL.bind();
-	vboYPL.setData(sizeof(yplData),yplData);
-	vboYPL.unbind();
-
-	vboZMI.bind();
-	vboZMI.setData(sizeof(zmiData),zmiData);
-	vboZMI.unbind();
-
-	vboZPL.bind();
-	vboZPL.setData(sizeof(zplData),zplData);
-	vboZPL.unbind();
+	xmi.updateBuffers();
+	xpl.updateBuffers();
+	ymi.updateBuffers();
+	ypl.updateBuffers();
+	zmi.updateBuffers();
+	zpl.updateBuffers();
 
 	vao.unbind();
 }
