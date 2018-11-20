@@ -34,7 +34,7 @@ struct Block{
 	}
 };
 
-const Block blockGrass(Grass,Dirt,Dirt);
+const Block blockGrass(GrassTop,GrassSide,Dirt);
 const Block blockDirt(Dirt);
 const Block blockStone(Stone);
 const Block blockEmpty;

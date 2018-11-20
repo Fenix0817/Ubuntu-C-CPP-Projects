@@ -35,7 +35,7 @@ public:
 	Block blockData[C_SIZE][C_HEIGHT][C_SIZE];
 
 	void createBuffers();
-	void updateBuffers();
+	void updateBuffers(Atlas*atlas);
 
 	void render();
 

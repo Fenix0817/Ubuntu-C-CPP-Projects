@@ -7,17 +7,17 @@ layout (location=3) in int inYMI;
 layout (location=4) in int inYPL;
 layout (location=5) in int inZMI;
 layout (location=6) in int inZPL;
-layout (location=7) in vec2 inUVXMI;
-layout (location=8) in vec2 inUVXPL;
-layout (location=9) in vec2 inUVYMI;
-layout (location=10) in vec2 inUVYPL;
-layout (location=11) in vec2 inUVZMI;
-layout (location=12) in vec2 inUVZPL;
+layout (location=7) in vec4 inUVXMI;
+layout (location=8) in vec4 inUVXPL;
+layout (location=9) in vec4 inUVYMI;
+layout (location=10) in vec4 inUVYPL;
+layout (location=11) in vec4 inUVZMI;
+layout (location=12) in vec4 inUVZPL;
 
 out VertexOut {
 	vec3 pos;
 	int xmi,xpl,ymi,ypl,zmi,zpl;
-	vec2 uv_xmi,uv_xpl,uv_ymi,uv_ypl,uv_zmi,uv_zpl;
+	vec4 uv_xmi,uv_xpl,uv_ymi,uv_ypl,uv_zmi,uv_zpl;
 } vout;
 
 void main(){

@@ -51,7 +51,7 @@ void Chunk::createBuffers(){
 
 	vao.unbind();
 }
-void Chunk::updateBuffers(){
+void Chunk::updateBuffers(Atlas*atlas){
 	for(int x=0;x<C_SIZE;x++){
 		for(int y=0;y<C_HEIGHT;y++){
 			for(int z=0;z<C_SIZE;z++){
@@ -71,12 +71,12 @@ void Chunk::updateBuffers(){
 //					if(!blockData[x][y][z].empty)
 					dirtyBlocks[x][y][z]=false;
 				}
-				xmi.setUV(x,y,z,0,0);
-				xpl.setUV(x,y,z,0,0);
-				ymi.setUV(x,y,z,0,0);
-				ypl.setUV(x,y,z,0,0);
-				zmi.setUV(x,y,z,0,0);
-				zpl.setUV(x,y,z,0,0);
+				xmi.setUV(x,y,z,atlas->getAtlasPos(blockData[x][y][z].xmi));
+				xpl.setUV(x,y,z,atlas->getAtlasPos(blockData[x][y][z].xpl));
+				ymi.setUV(x,y,z,atlas->getAtlasPos(blockData[x][y][z].ymi));
+				ypl.setUV(x,y,z,atlas->getAtlasPos(blockData[x][y][z].ypl));
+				zmi.setUV(x,y,z,atlas->getAtlasPos(blockData[x][y][z].zmi));
+				zpl.setUV(x,y,z,atlas->getAtlasPos(blockData[x][y][z].zpl));
 			}
 		}
 	}

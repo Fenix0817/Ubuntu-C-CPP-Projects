@@ -10,7 +10,8 @@
 
 
 enum BlockFace {
-	Grass,
+	GrassTop,
+	GrassSide,
 	Dirt,
 	Stone
 };

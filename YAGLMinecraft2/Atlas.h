@@ -18,8 +18,6 @@ public:
 	Atlas();
 	virtual ~Atlas();
 
-	gl::Texture texture;
-
 	virtual std::string getFileName()=0;
 	virtual AtlasPos getAtlasPos(BlockFace face)=0;
 };

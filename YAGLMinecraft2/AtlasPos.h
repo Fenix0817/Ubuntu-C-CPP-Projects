@@ -15,7 +15,7 @@ struct AtlasPos {
 	glm::vec2 dim;
 	AtlasPos(int x,int y,int sx,int sy,int w,int h){
 		pos=glm::vec2(x,y)/glm::vec2(w,h);
-		dim=glm::vec2(x,y)/glm::vec2(sx,sy);
+		dim=glm::vec2(sx,sy)/glm::vec2(w,h);
 	}
 	glm::vec2 get00(){
 		return pos;

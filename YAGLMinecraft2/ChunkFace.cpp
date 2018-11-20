@@ -23,15 +23,17 @@ void ChunkFace::init(int num){
 	vboVis.unbind();
 	vboUV=ChunkUtils::createStaticArrayFloatBuffer();
 	vboUV.bind();
-	vboUV.addVertexAttrib(num+6,1,false,1,(const GLvoid*)0);
+	vboUV.addVertexAttrib(num+6,4,false,4,(const GLvoid*)0);//Fix the uvs
 }
 
 void ChunkFace::setVis(int x,int y,int z,bool b){
 	visData[x][y][z]=b;
 }
-void ChunkFace::setUV(int x,int y,int z,float u,float v){
-	uvData[x][y][z][0]=u;
-	uvData[x][y][z][1]=v;
+void ChunkFace::setUV(int x,int y,int z,AtlasPos p){
+	uvData[x][y][z][0]=p.pos.x;
+	uvData[x][y][z][1]=p.pos.y;
+	uvData[x][y][z][2]=p.dim.x;
+	uvData[x][y][z][3]=p.dim.y;
 }
 
 void ChunkFace::updateVisBuffer(){

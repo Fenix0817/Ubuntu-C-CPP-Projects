@@ -17,6 +17,10 @@
 #include <glm/gtx/vector_angle.hpp>
 #include <stdio.h>
 #include "Chunk.h"
+
+#include "Atlas.h"
+#include "AtlasFogleman.h"
+
 #define PI 3.14159265359
 
 float lerp(float t,float a,float b){return a+(b-a)*t;}
@@ -37,13 +41,15 @@ int main(){
 	for(int x=0;x<C_SIZE;x++){
 		for(int y=0;y<C_HEIGHT;y++){
 			for(int z=0;z<C_SIZE;z++){
-				int h=sqrt(pow(x-C_SIZE/2,2)+pow(z-C_SIZE/2,2));
+				int h=C_SIZE-sqrt(pow(x-C_SIZE/2,2)+pow(z-C_SIZE/2,2));
 				if(y<=h)chunk.setBlock(x,y,z,blockGrass);
 				else chunk.setBlock(x,y,z,blockEmpty);
 			}
 		}
 	}
-	chunk.updateBuffers();
+	Atlas*atlas=new AtlasFogleman();
+
+	chunk.updateBuffers(atlas);
 
 	gl::Shader shader;
 	shader.create();
@@ -51,6 +57,9 @@ int main(){
 	shader.attachFile("Shaders/shader.frag",gl::ShaderType::Fragment);
 	shader.attachFile("Shaders/shader.geom",gl::ShaderType::Geometry);
 	shader.link();
+
+
+	gl::Texture atlasTex=gl::loadTexture(atlas->getFileName());
 
 	window.unbind();
 
@@ -76,6 +85,10 @@ int main(){
 		shader.bind();
 		shader.setMat4("perspectiveMatrix",perspectiveMatrix);
 		shader.setMat4("viewMatrix",viewMatrix);
+
+		shader.setInt("atlasTex",0);
+		atlasTex.bindToUnit(0);
+
 		chunk.render();
 		shader.unbind();
 

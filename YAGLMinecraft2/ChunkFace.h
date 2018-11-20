@@ -10,6 +10,7 @@
 
 #include "ChunkUtils.h"
 #include "config.h"
+#include "AtlasPos.h"
 
 class ChunkFace {
 public:
@@ -20,12 +21,12 @@ public:
 	gl::VertexBuffer vboUV;
 
 	int visData[C_SIZE][C_HEIGHT][C_SIZE];
-	float uvData[C_SIZE][C_HEIGHT][C_SIZE][2];
+	float uvData[C_SIZE][C_HEIGHT][C_SIZE][4];//x,y, w,h
 
 	void init(int num);
 
 	void setVis(int x,int y,int z,bool b);
-	void setUV(int x,int y,int z,float u,float v);
+	void setUV(int x,int y,int z,AtlasPos p);
 
 	void updateVisBuffer();
 	void updateUVBuffer();
