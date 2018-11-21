@@ -8,6 +8,8 @@
 #ifndef CHUNK_H_
 #define CHUNK_H_
 
+#include <omp.h>
+
 #include "utils.h"
 #include "Block.h"
 #include "TexturePos.h"

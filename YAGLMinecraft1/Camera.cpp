@@ -36,8 +36,8 @@ void Camera::updateDirection(glm::vec2 newMouse){
 	mouse=newMouse;
 
 
-	float dx=map(diff.y,-10,10,-PI*0.5,PI*0.5);
-	float dy=map(diff.x,-10,10,-PI,PI);
+	float dx=map(diff.y,-10,10,PI*0.5,-PI*0.5);
+	float dy=map(diff.x,-10,10,PI,-PI);
 
 	rotX+=0.01*dx;
 	rotY+=0.01*dy;
@@ -59,11 +59,11 @@ glm::vec3 Camera::getForwardMovement(){
 	return glm::normalize(glm::vec3(camDir.x,0,camDir.z));
 }
 glm::vec3 Camera::getRightMovement(){
-	return glm::rotateY(getForwardMovement(),glm::radians(90.0f));
+	return glm::rotateY(getForwardMovement(),-glm::radians(90.0f));
 }
 
 glm::mat4 Camera::getPerspectiveMatrix(){
-	return glm::perspective(-glm::radians(fovy),1.0f*windowW/windowH,0.01f,1000.0f);
+	return glm::perspective(glm::radians(fovy),1.0f*windowW/windowH,0.01f,1000.0f);
 }
 glm::mat4 Camera::getViewMatrix(){
 	return glm::lookAt(camPos,camPos+camDir,glm::vec3(0,1,0));

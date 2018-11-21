@@ -165,15 +165,15 @@ int main(){
 		if(window.isKeyDown('A'))camera.moveLeft();
 		if(window.isKeyDown('D'))camera.moveRight();
 
-		if(window.isKeyDown(' '))camera.camPos.y-=0.5;
-		if(window.isKeyDown(GLFW_KEY_LEFT_SHIFT))camera.camPos.y+=0.5;
+		if(window.isKeyDown(' '))camera.camPos.y+=0.5;
+		if(window.isKeyDown(GLFW_KEY_LEFT_SHIFT))camera.camPos.y-=0.5;
 		if(window.isKeyDown(GLFW_KEY_ESCAPE)||window.isKeyDown('/'))window.close();
 		// ABOVE - '/' is a exit key because touchbar ESCAPE sometimes doesn't work
 
-//		if(window.isKeyDown('C')){
-		if(true){
+		if(window.isKeyDown('C')){
+//		if(true){
 			int posX=(int)camera.camPos.x;
-			int posY=-(int)camera.camPos.y;
+			int posY=(int)camera.camPos.y;
 			int posZ=(int)camera.camPos.z;
 			int a=2;//Why is this only kind of working?
 			printf("start %f\n",camera.camPos.y);
@@ -181,7 +181,7 @@ int main(){
 			for(int x=-a;x<=a;x++){
 				for(int y=-a;y<=a;y++){
 					for(int z=-a;z<=a;z++){
-						printf("%i %i %i\n",x,y+(int)camera.camPos.z,z);
+						printf("%i %i %i\n",x,y,z);
 						glm::ivec2 worldXZ=glm::ivec2(x+posX,z+posZ);
 						glm::ivec2 chunkCoord=getChunkCoord(worldXZ);
 						if(!contains_ivec2(changes,chunkCoord))changes.push_back(chunkCoord);

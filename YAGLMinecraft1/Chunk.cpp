@@ -54,7 +54,7 @@ void Chunk::addTriangle(unsigned int a,unsigned int b,unsigned int c){
 
 void Chunk::addPos(float x,float y,float z){
 	posData.push_back(x);
-	posData.push_back(16-y);
+	posData.push_back(y);
 	posData.push_back(z);
 }
 
@@ -103,31 +103,48 @@ bool Chunk::isEmptyReal(int x,int y,int z){
 }
 
 void Chunk::createChunkData(FastNoisePtr fn){
+	fn->SetFractalOctaves(10);
+	fn->SetFractalLacunarity(2);
+	fn->SetFractalType(FractalTypeFBM);
+
+#pragma omp parallel for
 	for(int x=0;x<CHUNK_SIZE;x++){
+#pragma omp parallel for
 		for(int z=0;z<CHUNK_SIZE;z++){
 
-//			int h=x;
-			float zoom=1;
-			fn->SetFractalOctaves(10);
-			fn->SetFractalLacunarity(2);
-			fn->SetFractalType(FractalTypeFBM);
-			float fh=CHUNK_HEIGHT/2+20*fn->GetSimplexFractal( zoom*(chunkPos.x*CHUNK_SIZE+x),zoom*(chunkPos.y*CHUNK_SIZE+z));
-			int h=(int)fh;
-//			int h=chunkPos.x*chunkPos.y;
-			for(int y=0;y<CHUNK_HEIGHT;y++){
-//				if(y==h)blockData[x][y][z]=blockGrass;
-//				else blockData[x][y][z]=blockEmpty;
-				if(y<h-10)blockData[x][y][z]=blockStone;
-				else if(y<h)blockData[x][y][z]=blockDirt;
-				else if(y==h){
-					blockData[x][y][z]=blockGrass;
+////			int h=x;
+//			float zoom=1;
+//			fn->SetFractalOctaves(10);
+//			fn->SetFractalLacunarity(2);
+//			fn->SetFractalType(FractalTypeFBM);
+//			float fh=CHUNK_HEIGHT/2+20*fn->GetSimplexFractal( zoom*(chunkPos.x*CHUNK_SIZE+x),zoom*(chunkPos.y*CHUNK_SIZE+z));
+//			int h=(int)fh;
+////			int h=chunkPos.x*chunkPos.y;
+//			for(int y=0;y<CHUNK_HEIGHT;y++){
+////				if(y==h)blockData[x][y][z]=blockGrass;
+////				else blockData[x][y][z]=blockEmpty;
+//				if(y<h-10)blockData[x][y][z]=blockStone;
+//				else if(y<h)blockData[x][y][z]=blockDirt;
+//				else if(y==h){
+//					blockData[x][y][z]=blockGrass;
 //					int r=rand()%5;
-//					if(r==0)chunk[x][y][z]=blockGrass;
+//					if(r==0)blockData[x][y][z]=blockGrass;
 //					if(r==1)blockData[x][y][z]=blockDirt;
 //					if(r==2)blockData[x][y][z]=blockStone;
 //					if(r==3)blockData[x][y][z]=blockSand;
 //					if(r==4)blockData[x][y][z]=blockSnow;
-				}
+//				}
+//				else blockData[x][y][z]=blockEmpty;
+//			}
+			float zoom=1;
+#pragma omp parallel for
+			for(int y=0;y<CHUNK_HEIGHT;y++){
+				int rx=chunkPos.x*CHUNK_SIZE+x;
+				int ry=y;
+				int rz=chunkPos.y*CHUNK_SIZE+z;
+//				float f=1-64*pow(.5- ((float)y)/((float)CHUNK_HEIGHT),6);
+				float f=0;
+				if(fn->GetSimplexFractal(rx*zoom,ry*zoom,rz*zoom)<f)blockData[x][y][z]=blockDirt;
 				else blockData[x][y][z]=blockEmpty;
 			}
 
