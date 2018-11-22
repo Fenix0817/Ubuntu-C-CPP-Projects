@@ -103,60 +103,35 @@ bool Chunk::isEmptyReal(int x,int y,int z){
 }
 
 void Chunk::createChunkData(FastNoisePtr fn){
-	fn->SetFractalOctaves(10);
-	fn->SetFractalLacunarity(2);
+	fn->SetFractalOctaves(1);
+	fn->SetFractalLacunarity(100);
+	fn->SetFractalGain(0.1);
 	fn->SetFractalType(FractalTypeFBM);
 
 #pragma omp parallel for
 	for(int x=0;x<CHUNK_SIZE;x++){
 #pragma omp parallel for
 		for(int z=0;z<CHUNK_SIZE;z++){
-
-////			int h=x;
-//			float zoom=1;
-//			fn->SetFractalOctaves(10);
-//			fn->SetFractalLacunarity(2);
-//			fn->SetFractalType(FractalTypeFBM);
-//			float fh=CHUNK_HEIGHT/2+20*fn->GetSimplexFractal( zoom*(chunkPos.x*CHUNK_SIZE+x),zoom*(chunkPos.y*CHUNK_SIZE+z));
-//			int h=(int)fh;
-////			int h=chunkPos.x*chunkPos.y;
-//			for(int y=0;y<CHUNK_HEIGHT;y++){
-////				if(y==h)blockData[x][y][z]=blockGrass;
-////				else blockData[x][y][z]=blockEmpty;
-//				if(y<h-10)blockData[x][y][z]=blockStone;
-//				else if(y<h)blockData[x][y][z]=blockDirt;
-//				else if(y==h){
-//					blockData[x][y][z]=blockGrass;
-//					int r=rand()%5;
-//					if(r==0)blockData[x][y][z]=blockGrass;
-//					if(r==1)blockData[x][y][z]=blockDirt;
-//					if(r==2)blockData[x][y][z]=blockStone;
-//					if(r==3)blockData[x][y][z]=blockSand;
-//					if(r==4)blockData[x][y][z]=blockSnow;
-//				}
-//				else blockData[x][y][z]=blockEmpty;
-//			}
 			float zoom=1;
+			fn->SetFractalOctaves(10);
+			fn->SetFractalLacunarity(2);
+			fn->SetFractalType(FractalTypeFBM);
+			float fh=CHUNK_HEIGHT/2+20*fn->GetSimplexFractal( zoom*(chunkPos.x*CHUNK_SIZE+x),zoom*(chunkPos.y*CHUNK_SIZE+z));
+			int h=(int)fh;
 #pragma omp parallel for
 			for(int y=0;y<CHUNK_HEIGHT;y++){
-				int rx=chunkPos.x*CHUNK_SIZE+x;
-				int ry=y;
-				int rz=chunkPos.y*CHUNK_SIZE+z;
-//				float f=1-64*pow(.5- ((float)y)/((float)CHUNK_HEIGHT),6);
-				float f=0;
-				if(fn->GetSimplexFractal(rx*zoom,ry*zoom,rz*zoom)<f)blockData[x][y][z]=blockDirt;
+				if(y<h-10)blockData[x][y][z]=blockStone;
+				else if(y<h)blockData[x][y][z]=blockDirt;
+				else if(y==h){
+					blockData[x][y][z]=blockGrass;
+				}
 				else blockData[x][y][z]=blockEmpty;
 			}
-
 		}
 	}
 }
 
 void Chunk::prepareMesh(Atlas*atlas){
-//	this->cXMI=xmi;
-//	this->cXPL=xpl;
-//	this->cZMI=zpl;
-//	this->cZPL=zpl;
 	posData.clear();
 	uvData.clear();
 	triData.clear();
@@ -232,14 +207,27 @@ void Chunk::prepareMesh(Atlas*atlas){
 			}
 		}
 	}
-//	printf("%i,%i,%i\n",posData.size(),uvData.size(),triData.size());
 }
 
 void Chunk::prepareGL(){
-	if(vao.isCreated())vao.del();
-	if(vboPos.isCreated())vboPos.del();
-	if(vboUV.isCreated())vboUV.del();
-	if(ebo.isCreated())ebo.del();
+	if(vao.isCreated()){
+		vao.bind();
+
+		vboPos.bind();
+		vboPos.setData(sizeof(float)*posData.size(),posData.data());
+		vboPos.unbind();
+
+		vboUV.bind();
+		vboUV.setData(sizeof(float)*uvData.size(),uvData.data());
+		vboUV.unbind();
+
+		ebo.bind();
+		ebo.setData(sizeof(unsigned int)*triData.size(),triData.data());
+		ebo.unbind();
+
+		vao.unbind();
+		return;
+	}
 
 	vao.create();
 	vao.bind();
@@ -271,8 +259,8 @@ void Chunk::prepareGL(){
 glm::mat4 Chunk::getModelMatrix(){
 	return glm::translate(glm::mat4(1),glm::vec3(CHUNK_SIZE*chunkPos.x,0,CHUNK_SIZE*chunkPos.y));
 }
+
 void Chunk::render(){
-//	printf("%i,%i,%i,%i\n",vao.id,vboPos.id,vboUV.id,ebo.id);
 	vao.bind();
 	ebo.bind();
 	ebo.render();

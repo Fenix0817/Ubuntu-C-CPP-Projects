@@ -21,6 +21,7 @@
 #include "AtlasLow.h"
 #include "AtlasNormal.h"
 #include "AtlasFogleman.h"
+#include "AtlasMCSimple.h"
 #include "Chunk.h"
 #include "ChunkManager.h"
 
@@ -73,11 +74,13 @@ int main(){
 	window.create();
 	window.setTitle("YAGL Minecraft #1");
 	window.setSize(1000,1000);
+	glfwSetWindowPos(window.ptr,10,10);
 	window.bind();
 
 //	atlas=new AtlasNormal();
 //	atlas=new AtlasHD();
-	atlas=new AtlasFogleman();
+//	atlas=new AtlasFogleman();
+	atlas=new AtlasMCSimple();
 
 	noise=new FastNoise();
 
@@ -104,12 +107,12 @@ int main(){
 	window.unbind();
 
 	Camera camera;
-	camera.camPos=glm::vec3(CHUNK_SIZE/2,-40,CHUNK_SIZE/2);
+	camera.camPos=glm::vec3(CHUNK_SIZE/2,40,CHUNK_SIZE/2);
 	camera.camDir=glm::vec3(1,0,0);
 
-	camera.forwardSpeed=0.1;
-	camera.sideSpeed   =0.1;
-	camera.backSpeed   =0.1;
+	camera.forwardSpeed=0.5;
+	camera.sideSpeed   =0.5;
+	camera.backSpeed   =0.5;
 
 	float prevTime=0;
 	float time=0;
@@ -143,6 +146,7 @@ int main(){
 		shader.setInt("tex",0);
 
 		camera.fovy=80;
+		if(window.isKeyDown('F'))camera.fovy=20;
 		camera.windowW=window.width;
 		camera.windowH=window.height;
 
@@ -175,16 +179,21 @@ int main(){
 			int posX=(int)camera.camPos.x;
 			int posY=(int)camera.camPos.y;
 			int posZ=(int)camera.camPos.z;
-			int a=2;//Why is this only kind of working?
+			int a=1;//Why is this only kind of working?
 			printf("start %f\n",camera.camPos.y);
 			std::vector<glm::ivec2>changes;
 			for(int x=-a;x<=a;x++){
 				for(int y=-a;y<=a;y++){
 					for(int z=-a;z<=a;z++){
+						if(y+posY<0)continue;
 						printf("%i %i %i\n",x,y,z);
 						glm::ivec2 worldXZ=glm::ivec2(x+posX,z+posZ);
 						glm::ivec2 chunkCoord=getChunkCoord(worldXZ);
 						if(!contains_ivec2(changes,chunkCoord))changes.push_back(chunkCoord);
+						if(!contains_ivec2(changes,chunkCoord+glm::ivec2(-1,0)))changes.push_back(chunkCoord+glm::ivec2(-1,0));
+						if(!contains_ivec2(changes,chunkCoord+glm::ivec2( 1,0)))changes.push_back(chunkCoord+glm::ivec2( 1,0));
+						if(!contains_ivec2(changes,chunkCoord+glm::ivec2(0,-1)))changes.push_back(chunkCoord+glm::ivec2(0,-1));
+						if(!contains_ivec2(changes,chunkCoord+glm::ivec2(0, 1)))changes.push_back(chunkCoord+glm::ivec2(0, 1));
 						chunkManager.setBlock(x+posX,y+posY,z+posZ,blockEmpty);
 					}
 				}
