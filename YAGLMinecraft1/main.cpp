@@ -24,6 +24,10 @@
 #include "AtlasMCSimple.h"
 #include "Chunk.h"
 #include "ChunkManager.h"
+#include "SelectedBlock.h"
+#include "TextAtlas.h"
+#include "TextAtlasMonospaced.h"
+#include "TextRenderer.h"
 
 #include <utility>
 
@@ -77,6 +81,12 @@ int main(){
 	glfwSetWindowPos(window.ptr,10,10);
 	window.bind();
 
+	TextAtlas*textAtlas=new TextAtlasMonospaced();
+
+	TextRenderer txtRenderer;
+	txtRenderer.atlas=textAtlas;
+	txtRenderer.init();
+
 //	atlas=new AtlasNormal();
 //	atlas=new AtlasHD();
 //	atlas=new AtlasFogleman();
@@ -89,8 +99,8 @@ int main(){
 
 	gl::Shader shader;
 	shader.create();
-	shader.attachFile("Shaders/shader.vert",gl::ShaderType::Vertex);
-	shader.attachFile("Shaders/shader.frag",gl::ShaderType::Fragment);
+	shader.attachFile("Shaders/chunk.vert",gl::ShaderType::Vertex);
+	shader.attachFile("Shaders/chunk.frag",gl::ShaderType::Fragment);
 	shader.link();
 
 	gl::Texture texture=gl::loadTexture(atlas->getFileName());
@@ -121,7 +131,10 @@ int main(){
 
 	float fogR=0.7;
 	float fogG=0.7;
-	float fogB=0.7;
+	float fogB=0.8;
+
+	SelectedBlock selectedBlock;
+	selectedBlock.init();
 
 	while(window.isOpen()){
 		frames++;
@@ -150,7 +163,17 @@ int main(){
 		camera.windowW=window.width;
 		camera.windowH=window.height;
 
+		printf("Camera position: %f,%f,%f\nCamera direction: %f,%f,%f\n",camera.camPos.x,camera.camPos.y,camera.camPos.z,camera.camDir.x,camera.camDir.y,camera.camDir.z);
+
 		chunkManager.render(shader,camera.getPerspectiveViewMatrix());
+
+		Intersection selectedIntersection=chunkManager.intersectWorld(camera.camPos,camera.camDir,5000);
+
+		if(selectedIntersection.hit){
+			glm::ivec3 s=selectedIntersection.pos;
+			printf("Selection hit: %i,%i,%i\n",s.x,s.y,s.z);
+			selectedBlock.render(s.x,s.y,s.z,camera);
+		}
 
 		shader.unbind();
 
@@ -174,12 +197,26 @@ int main(){
 		if(window.isKeyDown(GLFW_KEY_ESCAPE)||window.isKeyDown('/'))window.close();
 		// ABOVE - '/' is a exit key because touchbar ESCAPE sometimes doesn't work
 
-		if(window.isKeyDown('C')){
+		if(window.mouseLeftJustPressed){
+			chunkManager.setBlock(selectedIntersection.pos.x,selectedIntersection.pos.y,selectedIntersection.pos.z,blockEmpty);
+			glm::ivec2 c=getChunkCoord(glm::ivec2(selectedIntersection.pos.x,selectedIntersection.pos.z));
+			chunkManager.remeshChunk(c.x,c.y);
+			glm::ivec2 p=getPosInChunk(glm::ivec2(selectedIntersection.pos.x,selectedIntersection.pos.z));
+			if(p.x==0)chunkManager.remeshChunk(c.x-1,c.y);
+			if(p.y==0)chunkManager.remeshChunk(c.x,c.y-1);
+			if(p.x==CHUNK_SIZE-1)chunkManager.remeshChunk(c.x+1,c.y);
+			if(p.y==CHUNK_SIZE-1)chunkManager.remeshChunk(c.x,c.y+1);
+		}
+
+		if(window.isKeyDown('C')&&selectedIntersection.hit){
 //		if(true){
-			int posX=(int)camera.camPos.x;
-			int posY=(int)camera.camPos.y;
-			int posZ=(int)camera.camPos.z;
-			int a=1;//Why is this only kind of working?
+//			int posX=(int)camera.camPos.x;
+//			int posY=(int)camera.camPos.y;
+//			int posZ=(int)camera.camPos.z;
+			int posX=(int)selectedIntersection.pos.x;
+			int posY=(int)selectedIntersection.pos.y;
+			int posZ=(int)selectedIntersection.pos.z;
+			int a=4;//Why is this only kind of working?
 			printf("start %f\n",camera.camPos.y);
 			std::vector<glm::ivec2>changes;
 			for(int x=-a;x<=a;x++){
@@ -203,6 +240,9 @@ int main(){
 				chunkManager.remeshChunk(changes[i].x,changes[i].y);
 			}
 		}
+
+		txtRenderer.setText("Hello World");
+		txtRenderer.render(-1,1,0.1);
 
 		window.clearInputs();
 		window.updateSize();

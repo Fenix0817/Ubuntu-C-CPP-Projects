@@ -7,11 +7,13 @@
 
 #include "Chunk.h"
 
+//Get chunk position
 glm::ivec2 getChunkCoord(glm::ivec2 worldXZ){
 	glm::ivec2 offset=getPosInChunk(worldXZ);
 	worldXZ-=offset;
 	return worldXZ/CHUNK_SIZE;
 }
+//Get position in chunk
 glm::ivec2 getPosInChunk(glm::ivec2 worldXZ){
 	while(worldXZ.x<0)worldXZ.x+=CHUNK_SIZE;
 	while(worldXZ.y<0)worldXZ.y+=CHUNK_SIZE;

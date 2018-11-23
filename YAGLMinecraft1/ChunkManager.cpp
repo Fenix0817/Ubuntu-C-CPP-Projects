@@ -139,3 +139,73 @@ void ChunkManager::update(int frames,glm::ivec2 chunkPos){
 		if(d>o+2&&!contains_ivec2(chunksToRemove,chunks[i]->chunkPos))chunksToRemove.push_back(chunks[i]->chunkPos);
 	}
 }
+
+Block ChunkManager::getBlock(int x,int y,int z){
+	glm::ivec2 chunkPos=getChunkCoord(glm::ivec2(x,z));
+	glm::ivec2 posInChunk=getPosInChunk(glm::ivec2(x,z));
+	ChunkPtr c=getChunk(chunkPos.x,chunkPos.y,false);
+	return c->blockData[posInChunk.x][y][posInChunk.y];
+}
+Block ChunkManager::getBlock(glm::ivec3 p){
+	return getBlock(p.x,p.y,p.z);
+}
+
+//In world coordinates, not pos in chunk coordinates
+Intersection ChunkManager::intersectWorld(glm::vec3 start,glm::vec3 dir,int range){
+	//Line 70 of https://bitbucket.org/volumesoffun/polyvox/src/9a71004b1e72d6cf92c41da8995e21b652e6b836/include/PolyVox/Raycast.inl?at=develop&fileviewer=file-view-default
+	//Don't use the callbacks until later
+	start+=dir;
+
+	float x=floor(start.x);
+	float y=floor(start.y);
+	float z=floor(start.z);
+
+	float dx=dir.x;
+	float dy=dir.y;
+	float dz=dir.z;
+
+	float stepX=sign(dx);
+	float stepY=sign(dy);
+	float stepZ=sign(dz);
+
+	float tMaxX=intbound(start.x,dx);
+	float tMaxY=intbound(start.y,dy);
+	float tMaxZ=intbound(start.z,dz);
+
+	float tDeltaX=stepX/dx;
+	float tDeltaY=stepY/dy;
+	float tDeltaZ=stepZ/dz;
+
+	std::vector<glm::ivec3>blocks;
+
+	for(int i=0;i<range;i++){
+		if(tMaxX<tMaxY){
+			if(tMaxX<tMaxZ){
+				x+=stepX;
+				tMaxX+=tDeltaX;
+				//normal of this face is -1,0,0
+			}else{
+				z+=stepZ;
+				tMaxZ+=tDeltaZ;
+				//normal of this face is 0,0,-1
+			}
+		}else{
+			if(tMaxY<tMaxZ){
+				y+=stepY;
+				tMaxY+=tDeltaY;
+				//normal of this face is 0,-1,0
+			}else{
+				z+=stepZ;
+				tMaxZ+=tDeltaZ;
+				//normal of this face is 0,0,-1
+			}
+		}
+		blocks.push_back(glm::ivec3(x,y,z));
+	}
+
+	for(glm::ivec3 p:blocks){
+		if(!getBlock(p).empty)return Intersection(p);
+	}
+
+	return Intersection(false);
+}
