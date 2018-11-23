@@ -174,8 +174,6 @@ int main(){
 		camera.windowW=window.width;
 		camera.windowH=window.height;
 
-		printf("Camera position: %f,%f,%f\nCamera direction: %f,%f,%f\n",camera.camPos.x,camera.camPos.y,camera.camPos.z,camera.camDir.x,camera.camDir.y,camera.camDir.z);
-
 		chunkManager.render(shader,camera.getPerspectiveViewMatrix());
 		shader.unbind();
 
@@ -191,8 +189,9 @@ int main(){
 
 		crosshair.render();
 
-		txtRenderer.setText("Hello World");
-		txtRenderer.render(-1,1,0.1);
+		txtRenderer.setText("YAGLMinecraft1\nCamera position : "+std::to_string(camera.camPos.x)+","+std::to_string(camera.camPos.y)+","+std::to_string(camera.camPos.z)
+										 +"\nCamera direction: "+std::to_string(camera.camDir.x)+","+std::to_string(camera.camDir.y)+","+std::to_string(camera.camDir.z));
+		txtRenderer.render(-1,1,0.03);
 
 		glm::vec2 chunkPos=getChunkCoord(glm::ivec2((int)camera.camPos.x,(int)camera.camPos.z));
 		chunkManager.update(frames,chunkPos);

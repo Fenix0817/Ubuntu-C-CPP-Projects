@@ -11,8 +11,8 @@
 struct TextAtlasPos{
 	float x,y,w,h;
 	TextAtlasPos(float x,float y,float w,float h){
-		this->x=x;
-		this->y=y;
+		this->x=x/w;
+		this->y=(h-y-1)/h;
 		this->w=1/w;
 		this->h=1/h;
 	}

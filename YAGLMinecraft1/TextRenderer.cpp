@@ -17,9 +17,9 @@ TextRenderer::~TextRenderer() {
 }
 
 void TextRenderer::init(){
-//	tex=gl::loadTexture(atlas->getFile());
+	tex=gl::loadTexture(atlas->getFile());
 //	assert(glGetError()==GL_NO_ERROR);
-	tex=gl::loadTexture("Assets/crosshair.png");
+//	tex=gl::loadTexture("Assets/crosshair.png");
 //	printf("Text atlas: \"%s\"\n",atlas->getFile().c_str());
 
 	shader.create();
@@ -27,9 +27,25 @@ void TextRenderer::init(){
 	shader.attachFile("Shaders/text.frag",gl::ShaderType::Fragment);
 	shader.link();
 
-	float posData[]={};
-	float uvData[]={};
-	unsigned int triData[]={};
+	float posData[]={
+			-1,-1,
+			-1, 1,
+			 1, 1,
+			 1,-1
+	};
+
+	float uvData[]={
+			0,0,
+			0,1,
+			1,1,
+			1,0
+	};
+
+	unsigned int triData[]={
+			0,1,2,
+			0,2,3
+	};
+
 
 	vao.create();
 	vao.bind();
@@ -39,8 +55,8 @@ void TextRenderer::init(){
 	vboPos.setType(gl::Type::Float);
 	vboPos.create();
 	vboPos.bind();
-	vboPos.setData(sizeof(posData),posData);
 	vboPos.addVertexAttrib(0,2,false,2,(const GLvoid*)0);
+	vboPos.setData(sizeof(posData),posData);
 	vboPos.unbind();
 
 	vboUV.setTarget(gl::VertexBufferTarget::Array);
@@ -48,8 +64,8 @@ void TextRenderer::init(){
 	vboUV.setType(gl::Type::Float);
 	vboUV.create();
 	vboUV.bind();
-	vboUV.setData(sizeof(uvData),uvData);
 	vboUV.addVertexAttrib(1,2,false,2,(const GLvoid*)0);
+	vboUV.setData(sizeof(uvData),uvData);
 	vboUV.unbind();
 
 	ebo.setTarget(gl::VertexBufferTarget::ElementArray);
@@ -66,13 +82,10 @@ void TextRenderer::setText(std::string txt){
 
 	int numChars=txt.size();
 
-	float posData[8*numChars];
-	float uvData[8*numChars];
-	unsigned int triData[6*numChars];
+	std::vector<float>posData;
+	std::vector<float>uvData;
+	std::vector<unsigned int>triData;
 
-	int i_p=0;
-	int i_u=0;
-	int i_t=0;
 	int x=0;
 	int y=-1;
 	int numCharsSoFar=0;
@@ -90,38 +103,69 @@ void TextRenderer::setText(std::string txt){
 			continue;
 		}
 
-		posData[i_p]=x*w;i_p++;
-		posData[i_p]=y*h;i_p++;
+		posData.push_back(x*w);
+		posData.push_back(y*h);
 
-		posData[i_p]=(x+1)*w;i_p++;
-		posData[i_p]=y*h;i_p++;
+		posData.push_back((x+1)*w);
+		posData.push_back(y*h);
 
-		posData[i_p]=(x+1)*w;i_p++;
-		posData[i_p]=(y+1)*h;i_p++;
+		posData.push_back((x+1)*w);
+		posData.push_back((y+1)*h);
 
-		posData[i_p]=x*w;i_p++;
-		posData[i_p]=(y+1)*h;i_p++;
+		posData.push_back(x*w);
+		posData.push_back((y+1)*h);
 
+		uvData.push_back(pos.x);
+		uvData.push_back(pos.y);
 
-		uvData[i_u]=pos.x;i_u++;
-		uvData[i_u]=pos.y+pos.h;i_u++;
+		uvData.push_back(pos.x+pos.w);
+		uvData.push_back(pos.y);
 
-		uvData[i_u]=pos.x+pos.w;i_u++;
-		uvData[i_u]=pos.y+pos.h;i_u++;
+		uvData.push_back(pos.x+pos.w);
+		uvData.push_back(pos.y+pos.h);
 
-		uvData[i_u]=pos.x+pos.w;i_u++;
-		uvData[i_u]=pos.y;i_u++;
+		uvData.push_back(pos.x);
+		uvData.push_back(pos.y+pos.h);
 
-		uvData[i_u]=pos.x;i_u++;
-		uvData[i_u]=pos.y;i_u++;
+		triData.push_back(numCharsSoFar*4+0);
+		triData.push_back(numCharsSoFar*4+1);
+		triData.push_back(numCharsSoFar*4+2);
+		triData.push_back(numCharsSoFar*4+0);
+		triData.push_back(numCharsSoFar*4+3);
+		triData.push_back(numCharsSoFar*4+2);
 
-
-		triData[i_t]=numCharsSoFar*4+0;i_t++;
-		triData[i_t]=numCharsSoFar*4+1;i_t++;
-		triData[i_t]=numCharsSoFar*4+2;i_t++;
-		triData[i_t]=numCharsSoFar*4+0;i_t++;
-		triData[i_t]=numCharsSoFar*4+3;i_t++;
-		triData[i_t]=numCharsSoFar*4+2;i_t++;
+//		posData[i_p]=x*w;i_p++;
+//		posData[i_p]=y*h;i_p++;
+//
+//		posData[i_p]=(x+1)*w;i_p++;
+//		posData[i_p]=y*h;i_p++;
+//
+//		posData[i_p]=(x+1)*w;i_p++;
+//		posData[i_p]=(y+1)*h;i_p++;
+//
+//		posData[i_p]=x*w;i_p++;
+//		posData[i_p]=(y+1)*h;i_p++;
+//
+//
+//		uvData[i_u]=pos.x;i_u++;
+//		uvData[i_u]=pos.y+pos.h;i_u++;
+//
+//		uvData[i_u]=pos.x+pos.w;i_u++;
+//		uvData[i_u]=pos.y+pos.h;i_u++;
+//
+//		uvData[i_u]=pos.x+pos.w;i_u++;
+//		uvData[i_u]=pos.y;i_u++;
+//
+//		uvData[i_u]=pos.x;i_u++;
+//		uvData[i_u]=pos.y;i_u++;
+//
+//
+//		triData[i_t]=numCharsSoFar*4+0;i_t++;
+//		triData[i_t]=numCharsSoFar*4+1;i_t++;
+//		triData[i_t]=numCharsSoFar*4+2;i_t++;
+//		triData[i_t]=numCharsSoFar*4+0;i_t++;
+//		triData[i_t]=numCharsSoFar*4+3;i_t++;
+//		triData[i_t]=numCharsSoFar*4+2;i_t++;
 
 		x++;
 		numCharsSoFar++;
@@ -129,13 +173,13 @@ void TextRenderer::setText(std::string txt){
 
 	vao.bind();
 	vboPos.bind();
-	vboPos.setData(sizeof(posData),posData);
+	vboPos.setData(sizeof(float)*posData.size(),posData.data());
 	vboPos.unbind();
 	vboUV.bind();
-	vboUV.setData(sizeof(uvData),uvData);
+	vboUV.setData(sizeof(uvData)*uvData.size(),uvData.data());
 	vboUV.unbind();
 	ebo.bind();
-	ebo.setData(sizeof(triData),triData);
+	ebo.setData(sizeof(unsigned int)*triData.size(),triData.data());
 	ebo.unbind();
 	vao.unbind();
 
