@@ -44,6 +44,10 @@
 //#define DEBUG_FPS
 //#define DEBUG_CHUNKMANAGER
 
+const char*b2s(bool b){
+	return b?"true":"false";
+}
+
 bool printError(){
 	GLenum e=glGetError();
 	switch(e){
@@ -169,9 +173,11 @@ int main(){
 
 		Intersection selectedIntersection=chunkManager.intersectWorld(camera.camPos,camera.camDir,5000);
 
+
 		if(selectedIntersection.hit){
-			glm::ivec3 s=selectedIntersection.pos;
-			printf("Selection hit: %i,%i,%i\n",s.x,s.y,s.z);
+			glm::ivec3 s=selectedIntersection.abs;
+			Block hitBlock=chunkManager.getBlock(s);
+			printf("Selection hit: %i,%i,%i   Block name: %s     Block empty: %s\n",s.x,s.y,s.z,hitBlock.name.c_str(),b2s(hitBlock.empty));
 			selectedBlock.render(s.x,s.y,s.z,camera);
 		}
 
@@ -197,11 +203,12 @@ int main(){
 		if(window.isKeyDown(GLFW_KEY_ESCAPE)||window.isKeyDown('/'))window.close();
 		// ABOVE - '/' is a exit key because touchbar ESCAPE sometimes doesn't work
 
-		if(window.mouseLeftJustPressed){
-			chunkManager.setBlock(selectedIntersection.pos.x,selectedIntersection.pos.y,selectedIntersection.pos.z,blockEmpty);
-			glm::ivec2 c=getChunkCoord(glm::ivec2(selectedIntersection.pos.x,selectedIntersection.pos.z));
+		if(window.mouseLeftPressed&&selectedIntersection.hit){
+			glm::ivec3 pos=selectedIntersection.abs;
+			chunkManager.setBlock(pos.x,pos.y,pos.z,blockEmpty);
+			glm::ivec2 c=getChunkCoord(glm::ivec2(pos.x,pos.z));
 			chunkManager.remeshChunk(c.x,c.y);
-			glm::ivec2 p=getPosInChunk(glm::ivec2(selectedIntersection.pos.x,selectedIntersection.pos.z));
+			glm::ivec2 p=getPosInChunk(glm::ivec2(pos.x,pos.z));
 			if(p.x==0)chunkManager.remeshChunk(c.x-1,c.y);
 			if(p.y==0)chunkManager.remeshChunk(c.x,c.y-1);
 			if(p.x==CHUNK_SIZE-1)chunkManager.remeshChunk(c.x+1,c.y);
@@ -213,10 +220,11 @@ int main(){
 //			int posX=(int)camera.camPos.x;
 //			int posY=(int)camera.camPos.y;
 //			int posZ=(int)camera.camPos.z;
-			int posX=(int)selectedIntersection.pos.x;
-			int posY=(int)selectedIntersection.pos.y;
-			int posZ=(int)selectedIntersection.pos.z;
-			int a=4;//Why is this only kind of working?
+			glm::ivec3 pos=selectedIntersection.abs;
+			int posX=(int)pos.x;
+			int posY=(int)pos.y;
+			int posZ=(int)pos.z;
+			int a=10;
 			printf("start %f\n",camera.camPos.y);
 			std::vector<glm::ivec2>changes;
 			for(int x=-a;x<=a;x++){

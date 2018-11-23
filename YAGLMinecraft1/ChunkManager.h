@@ -17,18 +17,23 @@
 
 bool contains_ivec2(std::vector<glm::ivec2>list,glm::ivec2 v);
 struct Intersection{
-	glm::ivec2 chunk;
-	glm::ivec3 pos;
+	glm::ivec3 abs;
 	bool hit;
+//	glm::ivec2 chunkCoord(){
+//		glm::ivec2 pos(abs.x,abs.z);
+//		return getChunkCoord(pos);
+//	}
+	glm::ivec3 posInChunk(){
+		glm::ivec2 pos(abs.x,abs.z);
+		glm::ivec2 pInChunk=getPosInChunk(pos);
+		return glm::ivec3(pInChunk.x,abs.y,pInChunk.y);
+	}
 	glm::ivec3 absPos(){
-		return pos+glm::ivec3(chunk.x,0,chunk.y)*CHUNK_SIZE;
+		return abs;
 	}
 	Intersection(glm::ivec3 p){
 		hit=true;
-		glm::ivec2 chunkCoord=getChunkCoord(glm::ivec2(p.x,p.z));
-		glm::ivec2 posInChunk=getPosInChunk(glm::ivec2(p.x,p.z));
-		chunk=chunkCoord;
-		pos=glm::ivec3(posInChunk.x,p.y,posInChunk.y);
+		abs=p;
 	}
 	Intersection(bool b){
 		hit=b;
@@ -75,7 +80,7 @@ public:
 	Block getBlock(glm::ivec3 p);
 
 	//In world coordinates, not pos in chunk coordinates
-	Intersection intersectWorld(glm::vec3 start,glm::vec3 dir,int range);
+	Intersection intersectWorld(glm::vec3 start,glm::vec3 dir,float range);
 
 private:
 	void eraseChunk(int x,int z);

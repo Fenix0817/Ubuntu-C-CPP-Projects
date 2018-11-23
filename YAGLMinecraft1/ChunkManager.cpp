@@ -151,61 +151,132 @@ Block ChunkManager::getBlock(glm::ivec3 p){
 }
 
 //In world coordinates, not pos in chunk coordinates
-Intersection ChunkManager::intersectWorld(glm::vec3 start,glm::vec3 dir,int range){
+Intersection ChunkManager::intersectWorld(glm::vec3 start,glm::vec3 dir,float range){
 	//Line 70 of https://bitbucket.org/volumesoffun/polyvox/src/9a71004b1e72d6cf92c41da8995e21b652e6b836/include/PolyVox/Raycast.inl?at=develop&fileviewer=file-view-default
 	//Don't use the callbacks until later
-	start+=dir;
 
-	float x=floor(start.x);
-	float y=floor(start.y);
-	float z=floor(start.z);
+	glm::vec3 end=start+dir*range;
 
-	float dx=dir.x;
-	float dy=dir.y;
-	float dz=dir.z;
+	float o=0;
+	const float x1=start.x+o;
+	const float y1=start.y+o;
+	const float z1=start.z+o;
+	const float x2=end.x+o;
+	const float y2=end.y+o;
+	const float z2=end.z+o;
 
-	float stepX=sign(dx);
-	float stepY=sign(dy);
-	float stepZ=sign(dz);
+	int i=floor(x1);
+	int j=floor(y1);
+	int k=floor(z1);
 
-	float tMaxX=intbound(start.x,dx);
-	float tMaxY=intbound(start.y,dy);
-	float tMaxZ=intbound(start.z,dz);
+	const int iend=floor(x2);
+	const int jend=floor(y2);
+	const int kend=floor(z2);
 
-	float tDeltaX=stepX/dx;
-	float tDeltaY=stepY/dy;
-	float tDeltaZ=stepZ/dz;
+	const int di = ((x1 < x2) ? 1 : ((x1 > x2) ? -1 : 0));
+	const int dj = ((y1 < y2) ? 1 : ((y1 > y2) ? -1 : 0));
+	const int dk = ((z1 < z2) ? 1 : ((z1 > z2) ? -1 : 0));
 
-	std::vector<glm::ivec3>blocks;
+	const float deltax=1/std::abs(x2-x1);
+	const float deltay=1/std::abs(y2-y1);
+	const float deltaz=1/std::abs(z2-z1);
 
-	for(int i=0;i<range;i++){
-		if(tMaxX<tMaxY){
-			if(tMaxX<tMaxZ){
-				x+=stepX;
-				tMaxX+=tDeltaX;
-				//normal of this face is -1,0,0
-			}else{
-				z+=stepZ;
-				tMaxZ+=tDeltaZ;
-				//normal of this face is 0,0,-1
-			}
+	const float minx=floor(x1),maxx=minx+1;
+	float tx=((x1>x2)?(x1-minx):(maxx-x1))*deltax;
+
+	const float miny=floor(y1),maxy=miny+1;
+	float ty=((y1>y2)?(y1-miny):(maxy-y1))*deltay;
+
+	const float minz=floor(z1),maxz=minz+1;
+	float tz=((z1>z2)?(z1-minz):(maxz-z1))*deltaz;
+
+	std::vector<glm::ivec3>list;
+
+	for(int num=0;num<range;num++){
+		if(j<0||j>=CHUNK_HEIGHT)break;
+		list.push_back(glm::ivec3(i,j,k));
+		if(tx<=ty&&tx<=tz){
+			//if(i==iend)break;
+			tx+=deltax;
+			i+=di;
+
+			//if(di==1)sampler.movePositiveX();
+			//if(di==-1)sampler.moveNegativeX();
+		}else if(ty<=tz){
+			//if(j==jend)break;
+			ty+=deltay;
+			j+=dj;
+
+			//if(dj==1)sampler.movePositiveY();
+			//if(dj==-1)sampler.moveNegativeY();
 		}else{
-			if(tMaxY<tMaxZ){
-				y+=stepY;
-				tMaxY+=tDeltaY;
-				//normal of this face is 0,-1,0
-			}else{
-				z+=stepZ;
-				tMaxZ+=tDeltaZ;
-				//normal of this face is 0,0,-1
-			}
+			//if(k==kend)break;
+			tz+=deltaz;
+			k+=dk;
+
+			//if(dk==1)sampler.movePositiveZ();
+			//if(dk==-1)sampler.moveNegativeZ();
 		}
-		blocks.push_back(glm::ivec3(x,y,z));
 	}
 
-	for(glm::ivec3 p:blocks){
-		if(!getBlock(p).empty)return Intersection(p);
+	for(unsigned int i=0;i<list.size();i++){
+		if(!getBlock(list[i]).empty){
+			printf("Intersection at %i,%i,%i   ",list[i].x,list[i].y,list[i].z);return Intersection(list[i]);
+		}
 	}
+
+//	start+=dir;
+//
+//	float x=floor(start.x);
+//	float y=floor(start.y);
+//	float z=floor(start.z);
+//
+//	float dx=dir.x;
+//	float dy=dir.y;
+//	float dz=dir.z;
+//
+//	float stepX=sign(dx);
+//	float stepY=sign(dy);
+//	float stepZ=sign(dz);
+//
+//	float tMaxX=intbound(start.x,dx);
+//	float tMaxY=intbound(start.y,dy);
+//	float tMaxZ=intbound(start.z,dz);
+//
+//	float tDeltaX=stepX/dx;
+//	float tDeltaY=stepY/dy;
+//	float tDeltaZ=stepZ/dz;
+//
+//	std::vector<glm::ivec3>blocks;
+//
+//	for(int i=0;i<range;i++){
+//		if(tMaxX<tMaxY){
+//			if(tMaxX<tMaxZ){
+//				x+=stepX;
+//				tMaxX+=tDeltaX;
+//				//normal of this face is -1,0,0
+//			}else{
+//				z+=stepZ;
+//				tMaxZ+=tDeltaZ;
+//				//normal of this face is 0,0,-1
+//			}
+//		}else{
+//			if(tMaxY<tMaxZ){
+//				y+=stepY;
+//				tMaxY+=tDeltaY;
+//				//normal of this face is 0,-1,0
+//			}else{
+//				z+=stepZ;
+//				tMaxZ+=tDeltaZ;
+//				//normal of this face is 0,0,-1
+//			}
+//		}
+//		blocks.push_back(glm::ivec3(x,y,z));
+//	}
+//
+//	for(glm::ivec3 p:blocks){
+//		if(!getBlock(p).empty)return Intersection(p);
+//	}
 
 	return Intersection(false);
 }
