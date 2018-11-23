@@ -18,6 +18,7 @@ public:
 
 	gl::VertexArray vao;
 	gl::VertexBuffer vboPos;
+	gl::VertexBuffer vboUV;
 	gl::VertexBuffer ebo;
 
 	gl::Shader shader;

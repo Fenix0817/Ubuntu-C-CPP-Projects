@@ -96,10 +96,10 @@ void Texture::setParam(TextureParamName::param_name pn,TextureParamValue::param_
 	glTexParameteri(TextureTarget::texture_target_enum_to_int(target),TextureParamName::param_name_to_int(pn),TextureParamValue::param_value_to_int(pv));
 }
 
-void Texture::setData(int w,int h,TextureData data){
+void Texture::setData(int w,int h,TextureData data,GLint internalFormat,GLint format){
 	width=w;
 	height=h;
-	glTexImage2D(TextureTarget::texture_target_enum_to_int(target),0,GL_RGBA32F,w,h,0,GL_RGBA,GL_UNSIGNED_BYTE,data);
+	glTexImage2D(TextureTarget::texture_target_enum_to_int(target),0,internalFormat,w,h,0,format,GL_UNSIGNED_BYTE,data);
 
 
 //	int num_mipmaps=8;
@@ -114,7 +114,7 @@ void Texture::bindToUnit(int u){
 	bind();
 }
 
-Texture createTexture(int w,int h,TextureData data){
+Texture createTexture(int w,int h,TextureData data,GLint internalFormat,GLint format){
 	Texture t;
 	t.setTarget(TextureTarget::Tex2D);
 	t.create();
@@ -123,7 +123,7 @@ Texture createTexture(int w,int h,TextureData data){
 	t.setParam(TextureParamName::WrapT,TextureParamValue::ClampToBorder);
 	t.setParam(TextureParamName::MinFilter,TextureParamValue::Nearest);
 	t.setParam(TextureParamName::MagFilter,TextureParamValue::Nearest);
-	t.setData(w,h,data);
+	t.setData(w,h,data,internalFormat,format);
 	t.unbind();
 	return t;
 }
@@ -132,14 +132,15 @@ Texture createEmptyTexture(int w,int h){
 	return createTexture(w,h,nullptr);
 }
 
-Texture loadTexture(std::string fn){
+Texture loadTexture(std::string fn,int i,GLint internalFormat,GLint format){
 	TextureData img;
 	int w;
 	int h;
 	int channels;
 	stbi_set_flip_vertically_on_load(true);
-	img=stbi_load(fn.c_str(),&w,&h,&channels,4);
-	return createTexture(w,h,img);
+	img=stbi_load(fn.c_str(),&w,&h,&channels,i);
+	printf("Texture %s   width=%i, height=%i, channels=%i\n",fn.c_str(),w,h,channels);
+	return createTexture(w,h,img,internalFormat,format);
 }
 
 void Texture::del(){

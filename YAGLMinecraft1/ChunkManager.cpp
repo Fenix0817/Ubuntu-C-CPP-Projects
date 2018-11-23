@@ -221,7 +221,7 @@ Intersection ChunkManager::intersectWorld(glm::vec3 start,glm::vec3 dir,float ra
 
 	for(unsigned int i=0;i<list.size();i++){
 		if(!getBlock(list[i]).empty){
-			printf("Intersection at %i,%i,%i   ",list[i].x,list[i].y,list[i].z);return Intersection(list[i]);
+			printf("Intersection at %i,%i,%i   ",list[i].x,list[i].y,list[i].z);return Intersection(list[i],list[i-1]);
 		}
 	}
 

@@ -118,7 +118,7 @@ TextAtlasPos TextAtlasMonospaced::getPos(char c){
 	if(c=='/')return TextAtlasPos(11,5, w,h);
 
 	if(c==' ')return TextAtlasPos(w-2,h-1, w,h);
-	return TextAtlasPos(w-1,h-1,w,h);
+	return TextAtlasPos(0,0,1,1);
 }
 std::string TextAtlasMonospaced::getFile(){
 	return "TextAtlas/monospaced.png";

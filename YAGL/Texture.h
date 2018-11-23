@@ -89,16 +89,16 @@ public:
 	void unbind();
 	void setTarget(TextureTarget::texture_target_enum tte);
 	void setParam(TextureParamName::param_name pn,TextureParamValue::param_value pv);
-	void setData(int w,int h,TextureData data);
+	void setData(int w,int h,TextureData data,GLint internalFormat=GL_RGBA32F,GLint format=GL_RGBA);
 	void bindToUnit(int u);
 
 	void del();
 
 };
 
-Texture createTexture(int w,int h,TextureData data);
+Texture createTexture(int w,int h,TextureData data,GLint internalFormat=GL_RGBA32F,GLint format=GL_RGBA);
 Texture createEmptyTexture(int w,int h);
-Texture loadTexture(std::string fn);
+Texture loadTexture(std::string fn,int i=4,GLint internalFormat=GL_RGBA32F,GLint format=GL_RGBA);
 
 } /* namespace gl */
 

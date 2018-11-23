@@ -17,8 +17,10 @@ TextRenderer::~TextRenderer() {
 }
 
 void TextRenderer::init(){
-	tex=gl::loadTexture(atlas->getFile());
-	printf("Text atlas: %s\n",atlas->getFile().c_str());
+//	tex=gl::loadTexture(atlas->getFile());
+//	assert(glGetError()==GL_NO_ERROR);
+	tex=gl::loadTexture("Assets/crosshair.png");
+//	printf("Text atlas: \"%s\"\n",atlas->getFile().c_str());
 
 	shader.create();
 	shader.attachFile("Shaders/text.vert",gl::ShaderType::Vertex);
@@ -140,8 +142,11 @@ void TextRenderer::setText(std::string txt){
 }
 void TextRenderer::render(float x,float y,float size){
 	shader.bind();
+//	glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+
 	tex.bindToUnit(0);
 	shader.setInt("tex",0);
+
 	shader.setMat4("matrix", glm::translate(glm::mat4(1),glm::vec3(x,y,0))*glm::scale(glm::mat4(1),glm::vec3(size,size,0)));
 //	shader.setMat4("matrix",glm::mat4(
 //			1/size,0,0,-x,
@@ -154,6 +159,7 @@ void TextRenderer::render(float x,float y,float size){
 	ebo.render();
 	ebo.unbind();
 	vao.unbind();
+	shader.unbind();
 }
 
 

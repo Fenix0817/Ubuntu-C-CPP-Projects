@@ -18,6 +18,7 @@
 bool contains_ivec2(std::vector<glm::ivec2>list,glm::ivec2 v);
 struct Intersection{
 	glm::ivec3 abs;
+	glm::ivec3 prev;
 	bool hit;
 //	glm::ivec2 chunkCoord(){
 //		glm::ivec2 pos(abs.x,abs.z);
@@ -31,9 +32,10 @@ struct Intersection{
 	glm::ivec3 absPos(){
 		return abs;
 	}
-	Intersection(glm::ivec3 p){
+	Intersection(glm::ivec3 p,glm::ivec3 prev){
 		hit=true;
 		abs=p;
+		this->prev=prev;
 	}
 	Intersection(bool b){
 		hit=b;

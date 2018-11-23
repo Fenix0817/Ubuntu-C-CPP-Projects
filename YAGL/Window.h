@@ -73,6 +73,8 @@ public:
 
 	void setMouse(double x,double y);
 
+	void hideMouse();
+
 	void clearInputs();
 	void updateSize();
 

@@ -28,6 +28,7 @@
 #include "TextAtlas.h"
 #include "TextAtlasMonospaced.h"
 #include "TextRenderer.h"
+#include "Crosshair.h"
 
 #include <utility>
 
@@ -118,7 +119,6 @@ int main(){
 
 	texture.unbind();
 
-	window.unbind();
 
 	Camera camera;
 	camera.camPos=glm::vec3(CHUNK_SIZE/2,40,CHUNK_SIZE/2);
@@ -133,12 +133,19 @@ int main(){
 
 	int frames=0;
 
-	float fogR=0.7;
-	float fogG=0.7;
-	float fogB=0.8;
+	float fogR=0.8;
+	float fogG=0.8;
+	float fogB=0.9;
 
 	SelectedBlock selectedBlock;
 	selectedBlock.init();
+
+	Crosshair crosshair;
+	crosshair.init();
+
+	window.hideMouse();
+
+	window.unbind();
 
 	while(window.isOpen()){
 		frames++;
@@ -170,6 +177,7 @@ int main(){
 		printf("Camera position: %f,%f,%f\nCamera direction: %f,%f,%f\n",camera.camPos.x,camera.camPos.y,camera.camPos.z,camera.camDir.x,camera.camDir.y,camera.camDir.z);
 
 		chunkManager.render(shader,camera.getPerspectiveViewMatrix());
+		shader.unbind();
 
 		Intersection selectedIntersection=chunkManager.intersectWorld(camera.camPos,camera.camDir,5000);
 
@@ -181,7 +189,10 @@ int main(){
 			selectedBlock.render(s.x,s.y,s.z,camera);
 		}
 
-		shader.unbind();
+		crosshair.render();
+
+		txtRenderer.setText("Hello World");
+		txtRenderer.render(-1,1,0.1);
 
 		glm::vec2 chunkPos=getChunkCoord(glm::ivec2((int)camera.camPos.x,(int)camera.camPos.z));
 		chunkManager.update(frames,chunkPos);
@@ -189,7 +200,7 @@ int main(){
 		glm::vec2 mouse=window.getMouse();
 		camera.updateDirection(mouse);
 		if(mouse.x<0||mouse.y<0||mouse.x>window.width||mouse.y>window.height)
-				glfwSetCursorPos(window.ptr,window.width/2,window.height/2);
+				window.setMouse(window.width/2,window.height/2);
 		mouse=window.getMouse();
 		camera.mouse=mouse;
 
@@ -203,9 +214,21 @@ int main(){
 		if(window.isKeyDown(GLFW_KEY_ESCAPE)||window.isKeyDown('/'))window.close();
 		// ABOVE - '/' is a exit key because touchbar ESCAPE sometimes doesn't work
 
-		if(window.mouseLeftPressed&&selectedIntersection.hit){
+		if(window.mouseLeftJustPressed&&selectedIntersection.hit){
 			glm::ivec3 pos=selectedIntersection.abs;
 			chunkManager.setBlock(pos.x,pos.y,pos.z,blockEmpty);
+			glm::ivec2 c=getChunkCoord(glm::ivec2(pos.x,pos.z));
+			chunkManager.remeshChunk(c.x,c.y);
+			glm::ivec2 p=getPosInChunk(glm::ivec2(pos.x,pos.z));
+			if(p.x==0)chunkManager.remeshChunk(c.x-1,c.y);
+			if(p.y==0)chunkManager.remeshChunk(c.x,c.y-1);
+			if(p.x==CHUNK_SIZE-1)chunkManager.remeshChunk(c.x+1,c.y);
+			if(p.y==CHUNK_SIZE-1)chunkManager.remeshChunk(c.x,c.y+1);
+		}
+
+		if(window.mouseRightJustPressed&&selectedIntersection.hit){
+			glm::ivec3 pos=selectedIntersection.prev;
+			chunkManager.setBlock(pos.x,pos.y,pos.z,blockStone);
 			glm::ivec2 c=getChunkCoord(glm::ivec2(pos.x,pos.z));
 			chunkManager.remeshChunk(c.x,c.y);
 			glm::ivec2 p=getPosInChunk(glm::ivec2(pos.x,pos.z));
@@ -249,8 +272,6 @@ int main(){
 			}
 		}
 
-		txtRenderer.setText("Hello World");
-		txtRenderer.render(-1,1,0.1);
 
 		window.clearInputs();
 		window.updateSize();

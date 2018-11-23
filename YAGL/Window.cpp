@@ -96,6 +96,10 @@ void Window::setSize(int w,int h){
 	glfwSetWindowSize(ptr, w, h);
 }
 
+void Window::hideMouse(){
+	glfwSetInputMode(ptr,GLFW_CURSOR,GLFW_CURSOR_HIDDEN);
+}
+
 glm::vec2 Window::getMouse(){
 	double x,y;
 	glfwGetCursorPos(ptr,&x,&y);
