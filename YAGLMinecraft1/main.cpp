@@ -85,6 +85,7 @@ int main(){
 	window.setSize(1000,1000);
 	glfwSetWindowPos(window.ptr,10,10);
 	window.bind();
+//	glEnable(GL_MULTISAMPLE);
 
 	TextAtlas*textAtlas=new TextAtlasMonospaced();
 
@@ -190,7 +191,9 @@ int main(){
 		crosshair.render();
 
 		txtRenderer.setText("YAGLMinecraft1\nCamera position : "+std::to_string(camera.camPos.x)+","+std::to_string(camera.camPos.y)+","+std::to_string(camera.camPos.z)
-										 +"\nCamera direction: "+std::to_string(camera.camDir.x)+","+std::to_string(camera.camDir.y)+","+std::to_string(camera.camDir.z));
+										 +"\nCamera direction: "+std::to_string(camera.camDir.x)+","+std::to_string(camera.camDir.y)+","+std::to_string(camera.camDir.z)
+										 +"\n# of chunks in memory: "+std::to_string(chunkManager.getNumChunksInMemory())+
+										 +"\n# of chunks rendered : "+std::to_string(chunkManager.getNumChunksRendered()));
 		txtRenderer.render(-1,1,0.03);
 
 		glm::vec2 chunkPos=getChunkCoord(glm::ivec2((int)camera.camPos.x,(int)camera.camPos.z));

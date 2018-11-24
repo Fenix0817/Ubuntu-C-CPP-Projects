@@ -108,6 +108,18 @@ void ChunkManager::render(gl::Shader shader,glm::mat4 vp){
 	}
 }
 
+int ChunkManager::getNumChunksInMemory(){
+	return chunks.size();
+}
+
+int ChunkManager::getNumChunksRendered(){
+	int i=0;
+	for(ChunkPtr c:chunks){
+		if(c->instantiated)i++;
+	}
+	return i;
+}
+
 void ChunkManager::update(int frames,glm::ivec2 chunkPos){
 	int chunkX=chunkPos.x;
 	int chunkZ=chunkPos.y;

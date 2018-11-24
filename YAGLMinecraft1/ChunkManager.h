@@ -81,6 +81,9 @@ public:
 	Block getBlock(int x,int y,int z);
 	Block getBlock(glm::ivec3 p);
 
+	int getNumChunksInMemory();
+	int getNumChunksRendered();
+
 	//In world coordinates, not pos in chunk coordinates
 	Intersection intersectWorld(glm::vec3 start,glm::vec3 dir,float range);
 

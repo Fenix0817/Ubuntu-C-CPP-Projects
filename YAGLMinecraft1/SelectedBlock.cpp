@@ -145,12 +145,15 @@ void SelectedBlock::init(){
 }
 
 void SelectedBlock::render(float x,float y,float z,Camera cam){
+//	gl::setDepth(false);
+	glEnable(GL_LINE_SMOOTH);
+	glLineWidth(3);
 	shader.bind();
 
 	shader.setVec3("offset",x,y,z);
 	shader.setMat4("mvp",cam.getPerspectiveViewMatrix());
 
-	shader.setFloat("scale",0.1);
+	shader.setFloat("scale",0.01);
 
 	shader.setFloat("margin",0.1);
 
@@ -161,5 +164,6 @@ void SelectedBlock::render(float x,float y,float z,Camera cam){
 	ebo.unbind();
 	vao.unbind();
 	shader.unbind();
+//	gl::setDepth(true);
 }
 
