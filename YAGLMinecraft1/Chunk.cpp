@@ -24,6 +24,13 @@ glm::ivec2 getPosInChunk(glm::ivec2 worldXZ){
 
 Chunk::Chunk() {
 	// TODO Auto-generated constructor stub
+	for(int x=0;x<CHUNK_SIZE;x++){
+		for(int y=0;y<CHUNK_HEIGHT;y++){
+			for(int z=0;z<CHUNK_SIZE;z++){
+				lightData[x][y][z]=((float)rand())/((float)RAND_MAX);
+			}
+		}
+	}
 }
 
 Chunk::~Chunk() {
@@ -33,6 +40,13 @@ Chunk::~Chunk() {
 
 Chunk::Chunk(int x,int z){
 	chunkPos=glm::ivec2(x,z);
+	for(int x=0;x<CHUNK_SIZE;x++){
+		for(int y=0;y<CHUNK_HEIGHT;y++){
+			for(int z=0;z<CHUNK_SIZE;z++){
+				lightData[x][y][z]=((float)rand())/((float)RAND_MAX);
+			}
+		}
+	}
 }
 
 Chunk* emptyChunk(){
@@ -79,6 +93,16 @@ void Chunk::addUV(TexturePos tp,bool flip){
 		addUV(tp._10);
 	}
 	addUV(tp._11);
+}
+
+void Chunk::addLight(int x,int y,int z){
+	float val;
+	if(x<0)val=cXMI->lightData[CHUNK_SIZE+x][y][z];
+	else if(z<0)val=cZMI->lightData[x][y][CHUNK_SIZE+z];
+	else if(x>CHUNK_SIZE-1)val=cXPL->lightData[x-CHUNK_SIZE][y][z];
+	else if(z>CHUNK_SIZE-1)val=cZPL->lightData[x][y][z-CHUNK_SIZE];
+	else val=lightData[x][y][z];
+	lightMeshData.push_back(val);
 }
 
 void Chunk::addTriangleFace(){
@@ -136,6 +160,7 @@ void Chunk::createChunkData(FastNoisePtr fn){
 void Chunk::prepareMesh(Atlas*atlas){
 	posData.clear();
 	uvData.clear();
+	lightMeshData.clear();
 	triData.clear();
 	for(int x=0;x<CHUNK_SIZE;x++){
 		for(int y=0;y<CHUNK_HEIGHT;y++){
@@ -159,6 +184,7 @@ void Chunk::prepareMesh(Atlas*atlas){
 					addPos(x,y,z+1);
 					addPos(x,y+1,z+1);
 					addUV(xmiTP);
+					for(int i=0;i<4;i++)addLight(x,y-1,z);
 				}
 
 				if(isEmpty(x+1,y,z)){//xpl
@@ -168,6 +194,7 @@ void Chunk::prepareMesh(Atlas*atlas){
 					addPos(x+1,y,z+1);
 					addPos(x+1,y+1,z+1);
 					addUV(xplTP);
+					for(int i=0;i<4;i++)addLight(x+1,y,z);
 				}
 
 				if(isEmpty(x,y-1,z)){//ymi
@@ -177,6 +204,7 @@ void Chunk::prepareMesh(Atlas*atlas){
 					addPos(x,y,z+1);
 					addPos(x+1,y,z+1);
 					addUV(ymiTP);
+					for(int i=0;i<4;i++)addLight(x,y-1,z);
 				}
 
 				if(isEmpty(x,y+1,z)){//ypl
@@ -186,6 +214,7 @@ void Chunk::prepareMesh(Atlas*atlas){
 					addPos(x,y+1,z+1);
 					addPos(x+1,y+1,z+1);
 					addUV(yplTP);
+					for(int i=0;i<4;i++)addLight(x,y+1,z);
 				}
 
 				if(isEmpty(x,y,z-1)){//zmi
@@ -195,6 +224,7 @@ void Chunk::prepareMesh(Atlas*atlas){
 					addPos(x+1,y,z);
 					addPos(x+1,y+1,z);
 					addUV(zmiTP);
+					for(int i=0;i<4;i++)addLight(x,y,z-1);
 				}
 
 				if(isEmpty(x,y,z+1)){//zpl
@@ -204,6 +234,7 @@ void Chunk::prepareMesh(Atlas*atlas){
 					addPos(x+1,y,z+1);
 					addPos(x+1,y+1,z+1);
 					addUV(zplTP);
+					for(int i=0;i<4;i++)addLight(x,y,z+1);
 				}
 
 			}
@@ -222,6 +253,10 @@ void Chunk::prepareGL(){
 		vboUV.bind();
 		vboUV.setData(sizeof(float)*uvData.size(),uvData.data());
 		vboUV.unbind();
+
+		vboLight.bind();
+		vboLight.setData(sizeof(float)*lightMeshData.size(),lightMeshData.data());
+		vboLight.unbind();
 
 		ebo.bind();
 		ebo.setData(sizeof(unsigned int)*triData.size(),triData.data());
@@ -247,6 +282,13 @@ void Chunk::prepareGL(){
 	vboUV.setData(sizeof(float)*uvData.size(),uvData.data());
 	vboUV.addVertexAttrib(1,2,false,2,0);
 	vboUV.unbind();
+
+	vboLight=gl::VertexBuffer(gl::VertexBufferTarget::Array,gl::VertexBufferUsage::StaticDraw,gl::Type::Float);
+	vboLight.create();
+	vboLight.bind();
+	vboLight.setData(sizeof(float)*lightMeshData.size(),lightMeshData.data());
+	vboLight.addVertexAttrib(2,1,false,1,0);
+	vboLight.unbind();
 
 	ebo=gl::VertexBuffer(gl::VertexBufferTarget::ElementArray,gl::VertexBufferUsage::StaticDraw,gl::Type::UnsignedInt);
 	ebo.create();

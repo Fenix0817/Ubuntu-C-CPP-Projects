@@ -39,6 +39,7 @@ class Chunk {
 private:
 	std::vector<float>posData;
 	std::vector<float>uvData;
+	std::vector<float>lightMeshData;
 	std::vector<unsigned int>triData;
 
 	void addTriangle(unsigned int a,unsigned int b,unsigned int c);
@@ -46,6 +47,7 @@ private:
 	void addUV(float u,float v);
 	void addUV(glm::vec2 v);
 	void addUV(TexturePos tp,bool flip=false);
+	void addLight(int x,int y,int z);
 	void addTriangleFace();
 
 public:
@@ -64,10 +66,12 @@ public:
 	Chunk *cZPL;
 
 	Block blockData[CHUNK_SIZE][CHUNK_HEIGHT][CHUNK_SIZE];
+	float lightData[CHUNK_SIZE][CHUNK_HEIGHT][CHUNK_SIZE];
 
 	gl::VertexArray vao;
 	gl::VertexBuffer vboPos;
 	gl::VertexBuffer vboUV;
+	gl::VertexBuffer vboLight;
 	gl::VertexBuffer ebo;
 
 	bool instantiated=false;

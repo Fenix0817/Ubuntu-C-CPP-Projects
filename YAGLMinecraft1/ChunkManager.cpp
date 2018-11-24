@@ -181,9 +181,9 @@ Intersection ChunkManager::intersectWorld(glm::vec3 start,glm::vec3 dir,float ra
 	int j=floor(y1);
 	int k=floor(z1);
 
-	const int iend=floor(x2);
-	const int jend=floor(y2);
-	const int kend=floor(z2);
+//	const int iend=floor(x2);
+//	const int jend=floor(y2);
+//	const int kend=floor(z2);
 
 	const int di = ((x1 < x2) ? 1 : ((x1 > x2) ? -1 : 0));
 	const int dj = ((y1 < y2) ? 1 : ((y1 > y2) ? -1 : 0));

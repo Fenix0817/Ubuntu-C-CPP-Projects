@@ -93,10 +93,10 @@ int main(){
 	txtRenderer.atlas=textAtlas;
 	txtRenderer.init();
 
-//	atlas=new AtlasNormal();
+	atlas=new AtlasNormal();
 //	atlas=new AtlasHD();
 //	atlas=new AtlasFogleman();
-	atlas=new AtlasMCSimple();
+//	atlas=new AtlasMCSimple();
 
 	noise=new FastNoise();
 
@@ -178,7 +178,7 @@ int main(){
 		chunkManager.render(shader,camera.getPerspectiveViewMatrix());
 		shader.unbind();
 
-		Intersection selectedIntersection=chunkManager.intersectWorld(camera.camPos,camera.camDir,5000);
+		Intersection selectedIntersection=chunkManager.intersectWorld(camera.camPos,camera.camDir,50);
 
 
 		if(selectedIntersection.hit){
@@ -230,7 +230,7 @@ int main(){
 
 		if(window.mouseRightJustPressed&&selectedIntersection.hit){
 			glm::ivec3 pos=selectedIntersection.prev;
-			chunkManager.setBlock(pos.x,pos.y,pos.z,blockStone);
+			chunkManager.setBlock(pos.x,pos.y,pos.z,blockSnow);
 			glm::ivec2 c=getChunkCoord(glm::ivec2(pos.x,pos.z));
 			chunkManager.remeshChunk(c.x,c.y);
 			glm::ivec2 p=getPosInChunk(glm::ivec2(pos.x,pos.z));
