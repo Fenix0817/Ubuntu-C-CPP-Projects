@@ -17,14 +17,19 @@ ChunkManager::~ChunkManager() {
 }
 
 bool contains_ivec2(std::vector<glm::ivec2> list,glm::ivec2 v){
-	for(int i=0;i<list.size();i++)if(list[i]==v)return true;
+	for(unsigned int i=0;i<list.size();i++)if(list[i]==v)return true;
+	return false;
+}
+
+bool contains_lightnode(std::vector<LightNode*>list,LightNode*n){
+	for(unsigned int i=0;i<list.size();i++)if(list[i]->pos==n->pos&&list[i]->val==n->val)return true;
 	return false;
 }
 
 ChunkPtr ChunkManager::getChunk(int x,int z,bool instantiateChunk){
 	bool foundChunk=false;
 	ChunkPtr c=nullptr;
-	for(int i=0;i<chunks.size()&&!foundChunk;i++){
+	for(unsigned int i=0;i<chunks.size()&&!foundChunk;i++){
 		if(chunks[i]->chunkPos.x==x&&chunks[i]->chunkPos.y==z){
 			c=chunks[i];
 			foundChunk=true;
@@ -37,6 +42,7 @@ ChunkPtr ChunkManager::getChunk(int x,int z,bool instantiateChunk){
 		c=new Chunk();
 		c->chunkPos=glm::ivec2(x,z);
 		c->createChunkData(noise);
+		setLighting(c);
 		chunks.push_back(c);
 #ifdef DEBUG_CHUNKMANAGER
 		printf("\tFinished creating data for %i,%i\n",x,z);
@@ -58,7 +64,8 @@ ChunkPtr ChunkManager::getChunk(int x,int z,bool instantiateChunk){
 		c->cXPL=xpl;
 		c->cZMI=zmi;
 		c->cZPL=zpl;
-		c->prepareMesh(atlas);
+		setLighting(c);
+		c->prepareMesh(atlas,false);
 		c->prepareGL();
 #ifdef DEBUG_CHUNKMANAGER
 		printf("Finished instantiating %i,%i:  %i,%i,%i,%i\n",x,z,c->vao.id,c->vboPos.id,c->vboUV.id,c->ebo.id);
@@ -68,7 +75,7 @@ ChunkPtr ChunkManager::getChunk(int x,int z,bool instantiateChunk){
 }
 
 void ChunkManager::eraseChunk(int x,int z){
-	for(int i=0;i<chunks.size();i++){
+	for(unsigned int i=0;i<chunks.size();i++){
 		if(chunks[i]->chunkPos==glm::ivec2(x,z)){
 			chunks[i]->instantiated=false;
 		}
@@ -83,6 +90,43 @@ void ChunkManager::setBlock(int x,int y,int z,Block b){
 	chunk->blockData[pos.x][y][pos.y]=b;
 }
 
+void ChunkManager::setLighting(ChunkPtr c){
+	for(int x=0;x<CHUNK_SIZE;x++){
+		for(int y=0;y<CHUNK_HEIGHT;y++){
+			for(int z=0;z<CHUNK_SIZE;z++){
+				c->lightData[x][y][z]=getLight(x+c->chunkPos.x*CHUNK_SIZE,y,z+c->chunkPos.y*CHUNK_SIZE);
+			}
+		}
+	}
+}
+
+void ChunkManager::addLight(int x,int y,int z,float f){
+	LightSource*s=new LightSource();
+	s->pos=glm::ivec3(x,y,z);
+	s->val=f;
+	lights.push_back(s);
+}
+
+float ChunkManager::getLight(int x,int y,int z){
+	return getLight(glm::ivec3(x,y,z));
+}
+
+float ChunkManager::getLight(glm::ivec3 p){
+	float f=0;
+//	for(LightSource*s:lights){
+//		if(s->pos==p){
+//			f+=s->val;
+//		}
+//	}
+	for(LightNode*n:lightNodes){
+		if(n->pos==p){
+			f+=n->val;
+		}
+	}
+	return f;
+//	return 1;
+}
+
 void ChunkManager::remeshChunk(int x,int z){
 	ChunkPtr chunk=getChunk(x,z,false);
 	ChunkPtr xmi=getChunk(x-1,z,false);
@@ -93,7 +137,9 @@ void ChunkManager::remeshChunk(int x,int z){
 	chunk->cXPL=xpl;
 	chunk->cZMI=zmi;
 	chunk->cZPL=zpl;
-	chunk->prepareMesh(atlas);
+	computeLighting();
+	setLighting(chunk);
+	chunk->prepareMesh(atlas,false);
 	chunk->prepareGL();
 }
 
@@ -120,11 +166,70 @@ int ChunkManager::getNumChunksRendered(){
 	return i;
 }
 
+void ChunkManager::computeLighting(){
+	lightNodes.clear();
+	lightChanges.clear();
+	for(LightSource*source:lights){
+		propogateLight(source);
+	}
+}
+
+void ChunkManager::propogateLight(LightSource*light){
+	float df=0.2;
+	std::vector<LightNode*>open;
+	std::vector<LightNode*>closed;
+
+	LightNode*lightNode=new LightNode();
+	lightNode->pos=light->pos;
+	lightNode->val=light->val;
+	open.push_back(lightNode);
+	while(open.size()>0){
+		LightNode*node=open[0];
+		open.erase(open.begin());
+		if(!contains_lightnode(open,node)&&!contains_lightnode(closed,node)&&getBlock(node->pos).empty){
+			closed.push_back(node);
+			if(node->val>df){
+				int ix=(int)node->pos.x;
+				int iy=(int)node->pos.y;
+				int iz=(int)node->pos.z;
+				float f=node->val;
+				open.push_back(new_lightnode(ix-1,iy,iz,f-df));
+				open.push_back(new_lightnode(ix+1,iy,iz,f-df));
+				open.push_back(new_lightnode(ix,iy-1,iz,f-df));
+				open.push_back(new_lightnode(ix,iy+1,iz,f-df));
+				open.push_back(new_lightnode(ix,iy,iz-1,f-df));
+				open.push_back(new_lightnode(ix,iy,iz+1,f-df));
+			}
+		}
+	}
+
+	for(LightNode*n:closed){
+		lightNodes.push_back(n);
+		addLightChange(getChunkCoord(glm::ivec2(n->pos.x,n->pos.z)));
+	}
+}
+
+void ChunkManager::addLightChange(glm::ivec2 v){
+	if(!contains_ivec2(lightChanges,v))lightChanges.push_back(v);
+}
+
+void ChunkManager::updateLightMesh(){
+	for(glm::ivec2 v:lightChanges){
+		ChunkPtr c=getChunk(v.x,v.y,false);
+		setLighting(c);
+		if(c->instantiated){
+			c->prepareMesh(atlas,true);
+			c->prepareGL();
+		}
+	}
+	lightChanges.clear();
+}
+
 void ChunkManager::update(int frames,glm::ivec2 chunkPos){
 	int chunkX=chunkPos.x;
 	int chunkZ=chunkPos.y;
 
-	int o=10;
+	int o=4;
 	for(int x=-o;x<=o;x++){
 		for(int z=-o;z<=o;z++){
 			if(!contains_ivec2(chunksToAdd,glm::ivec2(x+chunkX,z+chunkZ))){
@@ -134,19 +239,21 @@ void ChunkManager::update(int frames,glm::ivec2 chunkPos){
 		}
 	}
 	for(int i=0;i<10;i++){
-	if(frames%1==0&&chunksToAdd.size()>0){
-		glm::ivec2 chunkToAdd=chunksToAdd[0];
-		getChunk(chunkToAdd.x,chunkToAdd.y,true);
-		chunksToAdd.erase(chunksToAdd.begin());
-	}}
+		if(frames%1==0&&chunksToAdd.size()>0){
+			glm::ivec2 chunkToAdd=chunksToAdd[0];
+			getChunk(chunkToAdd.x,chunkToAdd.y,true);
+			chunksToAdd.erase(chunksToAdd.begin());
+		}
+	}
 	for(int i=0;i<200;i++){
-	if(frames%1==0&&chunksToRemove.size()>0){
-		glm::ivec2 chunkToRem=chunksToRemove[0];
-		eraseChunk(chunkToRem.x,chunkToRem.y);
-		chunksToRemove.erase(chunksToRemove.begin());
-	}}
+		if(frames%1==0&&chunksToRemove.size()>0){
+			glm::ivec2 chunkToRem=chunksToRemove[0];
+			eraseChunk(chunkToRem.x,chunkToRem.y);
+			chunksToRemove.erase(chunksToRemove.begin());
+		}
+	}
 
-	for(int i=0;i<chunks.size();i++){
+	for(unsigned int i=0;i<chunks.size();i++){
 		float d=max(abs(chunks[i]->chunkPos.x-chunkX),abs(chunks[i]->chunkPos.y-chunkZ));
 		if(d>o+2&&!contains_ivec2(chunksToRemove,chunks[i]->chunkPos))chunksToRemove.push_back(chunks[i]->chunkPos);
 	}
@@ -231,11 +338,13 @@ Intersection ChunkManager::intersectWorld(glm::vec3 start,glm::vec3 dir,float ra
 		}
 	}
 
-	for(unsigned int i=0;i<list.size();i++){
+	for(unsigned int i=1;i<list.size();i++){//Start at 1, so that when retrieving previous block list[i-1] we stay inside the array
 		if(!getBlock(list[i]).empty){
 			printf("Intersection at %i,%i,%i   ",list[i].x,list[i].y,list[i].z);return Intersection(list[i],list[i-1]);
 		}
 	}
+//	Block camBlock=getBlock(start);
+//	if(!camBlock.empty)printf("CAMERA INSIDE TERRAIN\n");
 
 //	start+=dir;
 //

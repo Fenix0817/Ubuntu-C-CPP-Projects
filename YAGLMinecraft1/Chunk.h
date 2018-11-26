@@ -35,11 +35,18 @@ typedef Chunk* ChunkPtr;
 glm::ivec2 getChunkCoord(glm::ivec2 worldXZ);
 glm::ivec2 getPosInChunk(glm::ivec2 worldXZ);
 
+class ChunkManager;
+
+typedef ChunkManager* ChunkManagerPtr;
+
+float getAO(bool xmi,bool xpl,bool ymi,bool ypl,bool zmi,bool zpl);
+
 class Chunk {
 private:
 	std::vector<float>posData;
 	std::vector<float>uvData;
 	std::vector<float>lightMeshData;
+	std::vector<float>aoMeshData;
 	std::vector<unsigned int>triData;
 
 	void addTriangle(unsigned int a,unsigned int b,unsigned int c);
@@ -48,7 +55,11 @@ private:
 	void addUV(glm::vec2 v);
 	void addUV(TexturePos tp,bool flip=false);
 	void addLight(int x,int y,int z);
+	void addAO(int x,int y,int z);
 	void addTriangleFace();
+
+	Block getLocalBlock(int x,int y,int z);
+	float getChunkAO(int x,int y,int z);
 
 public:
 	bool isEmpty(int x,int y,int z);
@@ -57,6 +68,8 @@ public:
 	virtual ~Chunk();
 
 	Chunk(int x,int z);
+
+	ChunkManagerPtr cm;
 
 	glm::ivec2 chunkPos;
 
@@ -67,18 +80,21 @@ public:
 
 	Block blockData[CHUNK_SIZE][CHUNK_HEIGHT][CHUNK_SIZE];
 	float lightData[CHUNK_SIZE][CHUNK_HEIGHT][CHUNK_SIZE];
+	float 	 aoData[CHUNK_SIZE][CHUNK_HEIGHT][CHUNK_SIZE];
 
 	gl::VertexArray vao;
 	gl::VertexBuffer vboPos;
 	gl::VertexBuffer vboUV;
 	gl::VertexBuffer vboLight;
+	gl::VertexBuffer vboAO;
 	gl::VertexBuffer ebo;
 
 	bool instantiated=false;
 	bool meshCreated=false;
 
 	void createChunkData(FastNoise*fn);
-	void prepareMesh(Atlas*atlas);
+	void prepareMesh(Atlas*atlas,bool onlyLighting);
+	void computeAO();
 	void prepareGL();
 
 	bool isEmptyReal(int x,int y,int z);

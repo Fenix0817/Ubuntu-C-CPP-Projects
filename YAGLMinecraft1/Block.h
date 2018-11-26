@@ -16,7 +16,7 @@ public:
 
 	AtlasPos xmi,xpl,ymi,ypl,zmi,zpl;
 	bool empty=false;
-	std::string name;
+//	std::string name="";
 
 	Block();
 	Block(std::string name,bool empty);

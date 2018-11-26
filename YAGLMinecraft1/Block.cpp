@@ -9,12 +9,12 @@
 
 Block::Block() {
 	// TODO Auto-generated constructor stub
-	name="no name";
+//	name="no name";
 }
 
 Block::Block(std::string n,bool empty){
 	this->empty=empty;
-	name=n;
+//	name=n;
 }
 
 Block::Block(std::string n,AtlasPos xmi,AtlasPos xpl,AtlasPos ymi,AtlasPos ypl,AtlasPos zmi,AtlasPos zpl){
@@ -24,7 +24,7 @@ Block::Block(std::string n,AtlasPos xmi,AtlasPos xpl,AtlasPos ymi,AtlasPos ypl,A
 	this->ypl=ypl;
 	this->zmi=zmi;
 	this->zpl=zpl;
-	name=n;
+//	name=n;
 }
 
 Block::Block(std::string n,AtlasPos top,AtlasPos side,AtlasPos bot){
@@ -34,12 +34,12 @@ Block::Block(std::string n,AtlasPos top,AtlasPos side,AtlasPos bot){
 	ypl=top;
 	zmi=side;
 	zpl=side;
-	name=n;
+//	name=n;
 }
 
 Block::Block(std::string n,AtlasPos p){
 	xmi=xpl=ymi=ypl=zmi=zpl=p;
-	name=n;
+//	name=n;
 }
 
 Block::~Block() {
