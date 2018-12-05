@@ -25,7 +25,7 @@ public:
 	glm::ivec3 pos;
 	float val;
 
-	std::vector<LightNode*>nodes;
+//	std::vector<LightNode*>nodes;
 	std::vector<glm::ivec3>changes;
 
 	std::vector<LightNode*>open;

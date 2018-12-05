@@ -91,7 +91,7 @@ public:
 	void initLighting();
 	void computeLighting();
 	void storeFrameLightChanges();
-	void updateLightMesh(glm::ivec3 v);
+	void updateLightMesh(glm::ivec3 v,bool sumLighting);
 
 	void addLight(int x,int y,int z,float f);
 
