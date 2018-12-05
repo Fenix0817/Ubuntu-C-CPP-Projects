@@ -20,6 +20,10 @@ bool contains_ivec2(std::vector<glm::ivec2> list,glm::ivec2 v){
 	for(unsigned int i=0;i<list.size();i++)if(list[i]==v)return true;
 	return false;
 }
+bool contains_ivec3(std::vector<glm::ivec3> list,glm::ivec3 v){
+	for(unsigned int i=0;i<list.size();i++)if(list[i]==v)return true;
+	return false;
+}
 
 bool contains_lightnode(std::vector<LightNode*>list,LightNode*n){
 	for(unsigned int i=0;i<list.size();i++)if(list[i]->pos==n->pos&&list[i]->val==n->val)return true;
@@ -42,7 +46,6 @@ ChunkPtr ChunkManager::getChunk(int x,int z,bool instantiateChunk){
 		c=new Chunk();
 		c->chunkPos=glm::ivec2(x,z);
 		c->createChunkData(noise);
-		setLighting(c);
 		chunks.push_back(c);
 #ifdef DEBUG_CHUNKMANAGER
 		printf("\tFinished creating data for %i,%i\n",x,z);
@@ -64,7 +67,7 @@ ChunkPtr ChunkManager::getChunk(int x,int z,bool instantiateChunk){
 		c->cXPL=xpl;
 		c->cZMI=zmi;
 		c->cZPL=zpl;
-		setLighting(c);
+//		setLighting(c);
 		c->prepareMesh(atlas,false);
 		c->prepareGL();
 #ifdef DEBUG_CHUNKMANAGER
@@ -90,41 +93,12 @@ void ChunkManager::setBlock(int x,int y,int z,Block b){
 	chunk->blockData[pos.x][y][pos.y]=b;
 }
 
-void ChunkManager::setLighting(ChunkPtr c){
-	for(int x=0;x<CHUNK_SIZE;x++){
-		for(int y=0;y<CHUNK_HEIGHT;y++){
-			for(int z=0;z<CHUNK_SIZE;z++){
-				c->lightData[x][y][z]=getLight(x+c->chunkPos.x*CHUNK_SIZE,y,z+c->chunkPos.y*CHUNK_SIZE);
-			}
-		}
-	}
-}
-
 void ChunkManager::addLight(int x,int y,int z,float f){
-	LightSource*s=new LightSource();
+	Light*s=new Light();
 	s->pos=glm::ivec3(x,y,z);
 	s->val=f;
+	s->initSpread(this);
 	lights.push_back(s);
-}
-
-float ChunkManager::getLight(int x,int y,int z){
-	return getLight(glm::ivec3(x,y,z));
-}
-
-float ChunkManager::getLight(glm::ivec3 p){
-	float f=0;
-//	for(LightSource*s:lights){
-//		if(s->pos==p){
-//			f+=s->val;
-//		}
-//	}
-	for(LightNode*n:lightNodes){
-		if(n->pos==p){
-			f+=n->val;
-		}
-	}
-	return f;
-//	return 1;
 }
 
 void ChunkManager::remeshChunk(int x,int z){
@@ -137,8 +111,7 @@ void ChunkManager::remeshChunk(int x,int z){
 	chunk->cXPL=xpl;
 	chunk->cZMI=zmi;
 	chunk->cZPL=zpl;
-	computeLighting();
-	setLighting(chunk);
+//	setLighting(chunk);
 	chunk->prepareMesh(atlas,false);
 	chunk->prepareGL();
 }
@@ -166,68 +139,62 @@ int ChunkManager::getNumChunksRendered(){
 	return i;
 }
 
+void ChunkManager::initLighting(){
+	for(Light*l:lights){
+		l->initSpread(this);
+	}
+}
+
 void ChunkManager::computeLighting(){
-	lightNodes.clear();
 	lightChanges.clear();
-	for(LightSource*source:lights){
-		propogateLight(source);
-	}
-}
-
-void ChunkManager::propogateLight(LightSource*light){
-	float df=0.2;
-	std::vector<LightNode*>open;
-	std::vector<LightNode*>closed;
-
-	LightNode*lightNode=new LightNode();
-	lightNode->pos=light->pos;
-	lightNode->val=light->val;
-	open.push_back(lightNode);
-	while(open.size()>0){
-		LightNode*node=open[0];
-		open.erase(open.begin());
-		if(!contains_lightnode(open,node)&&!contains_lightnode(closed,node)&&getBlock(node->pos).empty){
-			closed.push_back(node);
-			if(node->val>df){
-				int ix=(int)node->pos.x;
-				int iy=(int)node->pos.y;
-				int iz=(int)node->pos.z;
-				float f=node->val;
-				open.push_back(new_lightnode(ix-1,iy,iz,f-df));
-				open.push_back(new_lightnode(ix+1,iy,iz,f-df));
-				open.push_back(new_lightnode(ix,iy-1,iz,f-df));
-				open.push_back(new_lightnode(ix,iy+1,iz,f-df));
-				open.push_back(new_lightnode(ix,iy,iz-1,f-df));
-				open.push_back(new_lightnode(ix,iy,iz+1,f-df));
-			}
+	for(Light*l:lights){
+		if(!l->isDone()){
+			l->stepSpread(this);
 		}
 	}
+}
 
-	for(LightNode*n:closed){
-		lightNodes.push_back(n);
-		addLightChange(getChunkCoord(glm::ivec2(n->pos.x,n->pos.z)));
+void ChunkManager::addLightChange(glm::ivec3 v){
+	if(!contains_ivec3(lightChanges,v))lightChanges.push_back(v);
+}
+
+void ChunkManager::updateLightMesh(glm::ivec3 pos){
+	glm::ivec2 v=getChunkCoord(glm::ivec2(pos.x,pos.z));
+	glm::ivec2 p=getPosInChunk(glm::ivec2(pos.x,pos.z));
+	ChunkPtr c=getChunk(v.x,v.y,false);
+	if(c->instantiated){
+//		printf("Re-setting light for chunk %i,%i\n",v.x,v.y);
+		c->lightData[p.x][pos.y][p.y]=getLight(pos.x,pos.y,pos.z);
+		c->prepareMesh(atlas,true);//Recreate mesh, only lighting
+//		c->setLighting(this);
+		c->prepareGL();
 	}
 }
 
-void ChunkManager::addLightChange(glm::ivec2 v){
-	if(!contains_ivec2(lightChanges,v))lightChanges.push_back(v);
+float ChunkManager::getLight(int x,int y,int z){
+	float f=0;
+	for(Light*l:lights){
+		f+=l->getValue(x,y,z);
+	}
+	return f;
 }
 
-void ChunkManager::updateLightMesh(){
-	for(glm::ivec2 v:lightChanges){
-		ChunkPtr c=getChunk(v.x,v.y,false);
-		setLighting(c);
-		if(c->instantiated){
-			c->prepareMesh(atlas,true);
-			c->prepareGL();
-		}
+void ChunkManager::storeFrameLightChanges(){
+	if(lightChanges.size()>0){
+		updateLightMesh(lightChanges[0]);
+		lightChanges.erase(lightChanges.begin());
 	}
-	lightChanges.clear();
 }
 
 void ChunkManager::update(int frames,glm::ivec2 chunkPos){
 	int chunkX=chunkPos.x;
 	int chunkZ=chunkPos.y;
+
+	for(int i=0;i<20;i++){
+		computeLighting();
+		storeFrameLightChanges();
+	}
+	printf("Light changes.size() = %i\n",(int)lightChanges.size());
 
 	int o=4;
 	for(int x=-o;x<=o;x++){
@@ -340,7 +307,8 @@ Intersection ChunkManager::intersectWorld(glm::vec3 start,glm::vec3 dir,float ra
 
 	for(unsigned int i=1;i<list.size();i++){//Start at 1, so that when retrieving previous block list[i-1] we stay inside the array
 		if(!getBlock(list[i]).empty){
-			printf("Intersection at %i,%i,%i   ",list[i].x,list[i].y,list[i].z);return Intersection(list[i],list[i-1]);
+//			printf("Intersection at %i,%i,%i   ",list[i].x,list[i].y,list[i].z);
+			return Intersection(list[i],list[i-1]);
 		}
 	}
 //	Block camBlock=getBlock(start);

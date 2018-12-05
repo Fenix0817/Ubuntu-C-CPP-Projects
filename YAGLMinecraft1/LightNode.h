@@ -16,7 +16,7 @@ class Chunk;
 struct LightNode{
 	glm::ivec3 pos;//absolute position
 	float val;
-	bool spread;
+	bool spread=false;
 };
 
 

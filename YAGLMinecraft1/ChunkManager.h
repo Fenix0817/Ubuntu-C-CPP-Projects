@@ -14,15 +14,16 @@
 #include "utils.h"
 #include "Shader.h"
 #include <algorithm>
-#include "LightNode.h"
-#include "LightSource.h"
+#include "Light.h"
 
 bool contains_ivec2(std::vector<glm::ivec2>list,glm::ivec2 v);
+bool contains_ivec3(std::vector<glm::ivec3>list,glm::ivec3 v);
 bool contains_lightnode(std::vector<LightNode*>list,LightNode*n);
 inline LightNode* new_lightnode(int x,int y,int z,float f){
 	LightNode*n=new LightNode();
 	n->pos=glm::ivec3(x,y,z);
 	n->val=f;
+	n->spread=false;
 	return n;
 }
 struct Intersection{
@@ -55,18 +56,10 @@ template<typename T>inline int sign(T x){
 	return (T(0)<x)-(x<T(0));
 }
 
-//inline float intbound(float s,float ds){
-//	if(ds<0){
-//		return intbound(-s,-ds);
-//	}else{
-//		s=fmod(s,1);
-//		return (1-s)/ds;
-//	}
-//}
-
-inline float intbound(float s,float ds){
-	return (ds > 0? ceil(s)-s: s-floor(s)) / fabs(ds);
-}
+//struct LightChangeChunk{
+//	glm::ivec3 p;
+//	glm::ivec2 c;
+//};
 
 class ChunkManager {
 public:
@@ -93,25 +86,22 @@ public:
 	int getNumChunksInMemory();
 	int getNumChunksRendered();
 
-	void setLighting(ChunkPtr c);
-
 	float getLight(int x,int y,int z);
-	float getLight(glm::ivec3 p);
 
+	void initLighting();
 	void computeLighting();
-	void updateLightMesh();
+	void storeFrameLightChanges();
+	void updateLightMesh(glm::ivec3 v);
 
 	void addLight(int x,int y,int z,float f);
-	void propogateLight(LightSource*light);
 
-	void addLightChange(glm::ivec2 v);
+	void addLightChange(glm::ivec3 v);
 
 	//In world coordinates, not pos in chunk coordinates
 	Intersection intersectWorld(glm::vec3 start,glm::vec3 dir,float range);
 
-	std::vector<glm::ivec2>lightChanges;
-	std::vector<LightNode*>lightNodes;
-	std::vector<LightSource*>lights;
+	std::vector<glm::ivec3>lightChanges;
+	std::vector<Light*>lights;
 
 private:
 	void eraseChunk(int x,int z);

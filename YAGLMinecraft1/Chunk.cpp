@@ -83,22 +83,23 @@ float cnoise(glm::vec3 P){
 }
 
 float getAO(bool xmi,bool xpl,bool ymi,bool ypl,bool zmi,bool zpl){
-	return (xmi+xpl+ymi+ypl+zmi+zpl)/6.0f;
+//	return (xmi+xpl+ymi+ypl+zmi+zpl)/6.0f;
+//	return ( (xmi||xpl)+(ymi||ypl)+(zmi||zpl)  )/3.0f;
+//	return (xmi+xpl+zmi+zpl)/4.0f;
+//	return (xpl+zpl)/2.0f;
+//	return xmi;
 	//Fix block offseting problem
 //	bool bs1=xmi||xpl;
 //	bool bs2=zmi||zpl;
 //	bool bc=ymi||ypl;
-//	int s1,s2,c;
-//	if(bs1)s1=0;
-//	else s1=1;
-//	if(bs2)s2=0;
-//	else s2=1;
-//	if(bc)c=0;
-//	else c=1;
+//	int s1=bs1;
+//	int s2=bs2;
+//	int c=bc;
 //	if(bs1&&bs2)return 0;
 //	return 3-s1-s2-c;
 //	return cnoise(glm::vec3(x*0.5,y*0.5,z*0.5));
 //	return ((float)rand())/((float)RAND_MAX);
+	return 1;
 }
 
 //Get chunk position
@@ -118,13 +119,13 @@ glm::ivec2 getPosInChunk(glm::ivec2 worldXZ){
 
 Chunk::Chunk() {
 	// TODO Auto-generated constructor stub
-	for(int x=0;x<CHUNK_SIZE;x++){
-		for(int y=0;y<CHUNK_HEIGHT;y++){
-			for(int z=0;z<CHUNK_SIZE;z++){
-				lightData[x][y][z]=((float)rand())/((float)RAND_MAX);
-			}
-		}
-	}
+//	for(int x=0;x<CHUNK_SIZE;x++){
+//		for(int y=0;y<CHUNK_HEIGHT;y++){
+//			for(int z=0;z<CHUNK_SIZE;z++){
+//				lightData[x][y][z]=((float)rand())/((float)RAND_MAX);
+//			}
+//		}
+//	}
 }
 
 Chunk::~Chunk() {
@@ -134,13 +135,13 @@ Chunk::~Chunk() {
 
 Chunk::Chunk(int x,int z){
 	chunkPos=glm::ivec2(x,z);
-	for(int x=0;x<CHUNK_SIZE;x++){
-		for(int y=0;y<CHUNK_HEIGHT;y++){
-			for(int z=0;z<CHUNK_SIZE;z++){
-				lightData[x][y][z]=((float)rand())/((float)RAND_MAX);
-			}
-		}
-	}
+//	for(int x=0;x<CHUNK_SIZE;x++){
+//		for(int y=0;y<CHUNK_HEIGHT;y++){
+//			for(int z=0;z<CHUNK_SIZE;z++){
+//				lightData[x][y][z]=((float)rand())/((float)RAND_MAX);
+//			}
+//		}
+//	}
 }
 
 Chunk* emptyChunk(){
@@ -161,22 +162,18 @@ void Chunk::addTriangle(unsigned int a,unsigned int b,unsigned int c){
 	triData.push_back(i+b);
 	triData.push_back(i+c);
 }
-
 void Chunk::addPos(float x,float y,float z){
 	posData.push_back(x);
 	posData.push_back(y);
 	posData.push_back(z);
 }
-
 void Chunk::addUV(float u,float v){
 	uvData.push_back(u);
 	uvData.push_back(v);
 }
-
 void Chunk::addUV(glm::vec2 v){
 	addUV(v.x,v.y);
 }
-
 void Chunk::addUV(TexturePos tp,bool flip){
 	addUV(tp._00);
 	if(flip){
@@ -188,7 +185,6 @@ void Chunk::addUV(TexturePos tp,bool flip){
 	}
 	addUV(tp._11);
 }
-
 void Chunk::addLight(int x,int y,int z){
 	float val;
 	if(x<0)val=cXMI->lightData[CHUNK_SIZE+x][y][z];
@@ -198,7 +194,6 @@ void Chunk::addLight(int x,int y,int z){
 	else val=lightData[x][y][z];
 	lightMeshData.push_back(val);
 }
-
 float Chunk::getChunkAO(int x,int y,int z){
 	bool xmi=getLocalBlock(x-1,y,z).empty;
 	bool xpl=getLocalBlock(x+1,y,z).empty;
@@ -208,11 +203,9 @@ float Chunk::getChunkAO(int x,int y,int z){
 	bool zpl=getLocalBlock(x,y,z+1).empty;
 	return getAO(xmi,xpl,ymi,ypl,zmi,zpl);
 }
-
 void Chunk::addAO(int x,int y,int z){
 	aoMeshData.push_back(getChunkAO(x,y,z));
 }
-
 void Chunk::addTriangleFace(){
 	addTriangle(0,1,2);
 	addTriangle(1,2,3);

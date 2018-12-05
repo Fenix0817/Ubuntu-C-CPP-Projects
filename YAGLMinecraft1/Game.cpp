@@ -88,15 +88,13 @@ void Game::loop(gl::Window window) {
 	if(selectedIntersection.hit){
 		glm::ivec3 s=selectedIntersection.abs;
 		Block hitBlock=chunkManager.getBlock(s);
-		printf("Selection hit: %i,%i,%i   Block name: %s     Block empty: %s\n",s.x,s.y,s.z,"no_name",b2s(hitBlock.empty));
+//		printf("Selection hit: %i,%i,%i   Block name: %s     Block empty: %s\n",s.x,s.y,s.z,"no_name",b2s(hitBlock.empty));
 		selectedBlock.render(s.x,s.y,s.z,camera);
 	}
 
 	if(selectedIntersection.hit&&window.wasJustPressed('L')){
 		glm::ivec3 s=selectedIntersection.prev;
 		chunkManager.addLight(s.x,s.y,s.z,1);
-		chunkManager.computeLighting();
-		chunkManager.updateLightMesh();
 	}
 
 	crosshair.render();
@@ -130,6 +128,8 @@ void Game::loop(gl::Window window) {
 	if(window.mouseLeftJustPressed&&selectedIntersection.hit){
 		glm::ivec3 pos=selectedIntersection.abs;
 		chunkManager.setBlock(pos.x,pos.y,pos.z,blockEmpty);
+		chunkManager.initLighting();
+
 		glm::ivec2 c=getChunkCoord(glm::ivec2(pos.x,pos.z));
 		chunkManager.remeshChunk(c.x,c.y);
 		glm::ivec2 p=getPosInChunk(glm::ivec2(pos.x,pos.z));
@@ -142,6 +142,8 @@ void Game::loop(gl::Window window) {
 	if(window.mouseRightJustPressed&&selectedIntersection.hit){
 		glm::ivec3 pos=selectedIntersection.prev;
 		chunkManager.setBlock(pos.x,pos.y,pos.z,blockSnow);
+		chunkManager.initLighting();
+
 		glm::ivec2 c=getChunkCoord(glm::ivec2(pos.x,pos.z));
 		chunkManager.remeshChunk(c.x,c.y);
 		glm::ivec2 p=getPosInChunk(glm::ivec2(pos.x,pos.z));
@@ -167,7 +169,7 @@ void Game::loop(gl::Window window) {
 			for(int y=-a;y<=a;y++){
 				for(int z=-a;z<=a;z++){
 					if(y+posY<0)continue;
-					printf("%i %i %i\n",x,y,z);
+//					printf("%i %i %i\n",x,y,z);
 					glm::ivec2 worldXZ=glm::ivec2(x+posX,z+posZ);
 					glm::ivec2 chunkCoord=getChunkCoord(worldXZ);
 					if(!contains_ivec2(changes,chunkCoord))changes.push_back(chunkCoord);
@@ -179,6 +181,7 @@ void Game::loop(gl::Window window) {
 				}
 			}
 		}
+		chunkManager.initLighting();
 		for(int i=0;i<changes.size();i++){
 			printf("\t%i\n",i);
 			chunkManager.remeshChunk(changes[i].x,changes[i].y);

@@ -146,8 +146,8 @@ void SelectedBlock::init(){
 
 void SelectedBlock::render(float x,float y,float z,Camera cam){
 //	gl::setDepth(false);
-	glEnable(GL_LINE_SMOOTH);
-	glLineWidth(3);
+//	glEnable(GL_LINE_SMOOTH);
+//	glLineWidth(10);
 	shader.bind();
 
 	shader.setVec3("offset",x,y,z);
