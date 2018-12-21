@@ -13,7 +13,9 @@
 #include "square_shader.h"
 #include "entity.h"
 #include "player.h"
-
+#include "ghost.h"
+#include "ghostblinky.h"
+#include "ghostpinky.h"
 
 #include <stdio.h>
 #include <execinfo.h>
@@ -122,6 +124,8 @@ int main(){
 	lvl->put_tiles(__level__);
 
 	player*pacman=new player(lvl);
+	ghost_blinky*blinky=new ghost_blinky(lvl);
+	ghost_pinky*pinky=new ghost_pinky(lvl);
 
 	window.setSize(lvl->GRID_W*30,lvl->GRID_H*30);
 
@@ -138,6 +142,12 @@ int main(){
 		pacman->nextDir=nextDir;
 		pacman->render();
 		pacman->update();
+
+		blinky->render();
+		blinky->update(pacman,blinky);
+
+		pinky->render();
+		pinky->update(pacman,blinky);
 
 		for(int x=0;x<lvl->GRID_W;x++){
 			for(int y=0;y<lvl->GRID_H;y++){
