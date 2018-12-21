@@ -14,6 +14,7 @@
 #define POWER_DOT 3
 
 #include <cstdlib>
+#include "utils.h"
 
 struct level {
 
@@ -27,6 +28,7 @@ struct level {
 	int GHOST_Y;
 	int GHOST_EXIT_X;
 	int GHOST_EXIT_Y;
+	std::vector<vec2>ghost_noup;
 
 	inline void put_tiles(int**__level__){
 		tiles=new int*[GRID_W];

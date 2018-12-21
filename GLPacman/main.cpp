@@ -68,10 +68,14 @@ int main(){
 	lvl->GRID_H=31;
 	lvl->PLAYER_X=15;
 	lvl->PLAYER_Y=17;
-	lvl->GHOST_X=-10000;
-	lvl->GHOST_Y=-10000;
-	lvl->GHOST_EXIT_X=-10000;
-	lvl->GHOST_EXIT_Y=-10000;
+	lvl->GHOST_X=12;
+	lvl->GHOST_Y=13;
+	lvl->GHOST_EXIT_X=12;
+	lvl->GHOST_EXIT_Y=11;
+	lvl->ghost_noup.push_back({12,11});
+	lvl->ghost_noup.push_back({15,11});
+	lvl->ghost_noup.push_back({12,23});
+	lvl->ghost_noup.push_back({15,23});
 	int tiles[lvl->GRID_H][lvl->GRID_W]=
 {
 {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
