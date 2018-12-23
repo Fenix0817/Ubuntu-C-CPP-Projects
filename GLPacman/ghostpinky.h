@@ -18,6 +18,7 @@ public:
 
 	vec3 getColor();
 	vec2 getTarget(player*pacman,ghost*blinky);
+	int getEnterTime();
 };
 
 #endif /* GHOSTPINKY_H_ */

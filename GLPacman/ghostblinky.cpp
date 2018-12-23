@@ -7,7 +7,7 @@
 
 #include "ghostblinky.h"
 
-ghost_blinky::ghost_blinky(level_ptr l) : ghost(l) {
+ghost_blinky::ghost_blinky(level_ptr l) : ghost(l,"blinky") {
 	// TODO Auto-generated constructor stub
 	enterTime=ENTER_TIME_BLINKY;
 }
@@ -21,5 +21,9 @@ vec3 ghost_blinky::getColor(){
 }
 vec2 ghost_blinky::getTarget(player*pacman,ghost*blinky){
 	return {pacman->gx,pacman->gy};
+}
+
+int ghost_blinky::getEnterTime(){
+	return ENTER_TIME_BLINKY;
 }
 

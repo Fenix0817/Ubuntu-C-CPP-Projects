@@ -12,6 +12,7 @@
 #define WALL 1
 #define DOT 2
 #define POWER_DOT 3
+#define GHOST_SLOWDOWN 4
 
 #include <cstdlib>
 #include "utils.h"
@@ -21,6 +22,8 @@ struct level {
 	int GRID_W;
 	int GRID_H;
 	int**tiles;
+	bool**dots;
+	bool**power_dots;
 
 	int PLAYER_X;
 	int PLAYER_Y;
@@ -38,6 +41,20 @@ struct level {
 			tiles[x]=new int[GRID_H];
 			for(int y=0;y<GRID_H;y++){
 				tiles[x][y]=__level__[y][x];
+			}
+		}
+		dots=new bool*[GRID_W];
+		for(int x=0;x<GRID_W;x++){
+			dots[x]=new bool[GRID_H];
+			for(int y=0;y<GRID_H;y++){
+				dots[x][y]=(tiles[x][y]==DOT);
+			}
+		}
+		power_dots=new bool*[GRID_W];
+		for(int x=0;x<GRID_W;x++){
+			power_dots[x]=new bool[GRID_H];
+			for(int y=0;y<GRID_H;y++){
+				power_dots[x][y]=(tiles[x][y]==POWER_DOT);
 			}
 		}
 	}

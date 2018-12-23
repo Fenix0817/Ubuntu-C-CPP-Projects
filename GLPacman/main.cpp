@@ -16,6 +16,10 @@
 #include "ghost.h"
 #include "ghostblinky.h"
 #include "ghostpinky.h"
+#include "ghostinky.h"
+#include "ghostclyde.h"
+
+#include "level1.h"
 
 #include <stdio.h>
 #include <execinfo.h>
@@ -53,7 +57,6 @@ int main(){
 	window.setMinorVersion(5);
 	window.create();
 	window.setTitle("Pacman in OpenGL");
-	window.setSize(500,500);
 	window.bind();
 	glfwSetKeyCallback(window.ptr,key_callback);
 
@@ -65,67 +68,13 @@ int main(){
 
 	initSquare();
 
-	level_ptr lvl=new level();
-	lvl->GRID_W=28;
-	lvl->GRID_H=31;
-	lvl->PLAYER_X=15;
-	lvl->PLAYER_Y=17;
-	lvl->GHOST_X=12;
-	lvl->GHOST_Y=13;
-	lvl->GHOST_EXIT_X=12;
-	lvl->GHOST_EXIT_Y=11;
-	lvl->ghost_noup.push_back({12,11});
-	lvl->ghost_noup.push_back({15,11});
-	lvl->ghost_noup.push_back({12,23});
-	lvl->ghost_noup.push_back({15,23});
-	int tiles[lvl->GRID_H][lvl->GRID_W]=
-{
-{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-{1,2,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,1},
-{1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1},
-{1,4,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,4,1},
-{1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1},
-{1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1},
-{1,2,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,2,1},
-{1,2,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,2,1},
-{1,2,2,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,2,2,1},
-{1,1,1,1,1,1,2,1,1,1,1,1,0,1,1,0,1,1,1,1,1,2,1,1,1,1,1,1},
-{0,0,0,0,0,1,2,1,1,1,1,1,0,1,1,0,1,1,1,1,1,2,1,0,0,0,0,0},
-{0,0,0,0,0,1,2,1,1,0,0,0,0,0,0,0,0,0,0,1,1,2,1,0,0,0,0,0},
-{0,0,0,0,0,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,0,0,0,0,0},
-{1,1,1,1,1,1,2,1,1,0,1,0,0,0,0,0,0,1,0,1,1,2,1,1,1,1,1,1},
-{0,0,0,0,0,0,2,0,0,0,1,0,0,0,0,0,0,1,0,0,0,2,0,0,0,0,0,0},
-{1,1,1,1,1,1,2,1,1,0,1,0,0,0,0,0,0,1,0,1,1,2,1,1,1,1,1,1},
-{0,0,0,0,0,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,0,0,0,0,0},
-{0,0,0,0,0,1,2,1,1,0,0,0,0,0,0,0,0,0,0,1,1,2,1,0,0,0,0,0},
-{0,0,0,0,0,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,0,0,0,0,0},
-{1,1,1,1,1,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,1,1,1,1,1},
-{1,2,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,1},
-{1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1},
-{1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1},
-{1,4,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,4,1},
-{1,1,1,2,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,2,1,1,1},
-{1,1,1,2,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,2,1,1,1},
-{1,2,2,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,2,2,1},
-{1,2,1,1,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,1,1,2,1},
-{1,2,1,1,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,1,1,2,1},
-{1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1},
-{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-};
-
-	//C++ SUCKS AAAAAGGGHGHHHH
-	int**__level__=new int*[lvl->GRID_H];
-	for(int a=0;a<lvl->GRID_H;a++){
-		__level__[a]=new int[lvl->GRID_W];
-		for(int b=0;b<lvl->GRID_W;b++){
-			__level__[a][b]=tiles[a][b];
-		}
-	}
-	lvl->put_tiles(__level__);
+	level_ptr lvl=level1_make();
 
 	player*pacman=new player(lvl);
 	ghost_blinky*blinky=new ghost_blinky(lvl);
 	ghost_pinky*pinky=new ghost_pinky(lvl);
+	ghost_inky*inky=new ghost_inky(lvl);
+	ghost_clyde*clyde=new ghost_clyde(lvl);
 
 	window.setSize(lvl->GRID_W*30,lvl->GRID_H*30);
 
@@ -139,16 +88,9 @@ int main(){
 		gl::setClearColor(0,0,0);
 		gl::clearScreen();
 
-		pacman->nextDir=nextDir;
-		pacman->render();
-		pacman->update();
 
-		blinky->render();
-		blinky->update(pacman,blinky);
-
-		pinky->render();
-		pinky->update(pacman,blinky);
-
+		float dx=1.0f/lvl->GRID_W;
+		float dy=1.0f/lvl->GRID_H;
 		for(int x=0;x<lvl->GRID_W;x++){
 			for(int y=0;y<lvl->GRID_H;y++){
 				if(lvl->tiles[x][y]==WALL){
@@ -156,8 +98,35 @@ int main(){
 					colorShader.setVec3("color",0,0,1);
 					renderSquare();
 				}
+				if(lvl->dots[x][y]){
+					colorShader.render(  (x+0.5-DOT_SIZE)*dx,(y+0.5-DOT_SIZE)*dy,2*DOT_SIZE*dx,2*DOT_SIZE*dy  );
+					colorShader.setVec3("color",1,1,1);
+					renderSquare();
+				}
+				if(lvl->power_dots[x][y]){
+					colorShader.render(  (x+0.5-POWER_DOT_SIZE)*dx,(y+0.5-POWER_DOT_SIZE)*dy,2*POWER_DOT_SIZE*dx,2*POWER_DOT_SIZE*dy  );
+					colorShader.setVec3("color",1,1,1);
+					renderSquare();
+				}
 			}
 		}
+
+		blinky->render();
+		blinky->update(pacman,blinky);
+
+		pinky->render();
+		pinky->update(pacman,blinky);
+
+		inky->render();
+		inky->update(pacman,blinky);
+
+		clyde->render();
+		clyde->update(pacman,blinky);
+
+		pacman->nextDir=nextDir;
+		pacman->render();
+		pacman->update(blinky,pinky,inky,clyde);
+
 
 		window.unbind();
 	}

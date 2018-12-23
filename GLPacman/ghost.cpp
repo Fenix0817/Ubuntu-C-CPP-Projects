@@ -7,15 +7,29 @@
 
 #include "ghost.h"
 
-ghost::ghost(level_ptr l) : entity(l) {
+ghost::ghost(level_ptr l,std::string name) : entity(l) {
 	// TODO Auto-generated constructor stub
 	speed=GHOST_SPEED;
 	gx=l->GHOST_X;
 	gy=l->GHOST_Y;
+	anim=new animator(4,2,name);
+	animWhite=new animator(7,2,"ghostwhite");
+	animBlue=new animator(7,2,"ghostblue");
 }
 
 ghost::~ghost() {
 	// TODO Auto-generated destructor stub
+}
+
+void ghost::reset(){
+	enterTime=getEnterTime();
+	scared=false;
+	scaredTime=0;
+	gx=lvl->GHOST_X;
+	gy=lvl->GHOST_Y;
+	speed=GHOST_SPEED;
+	offx=0;
+	offy=0;
 }
 
 void ghost::scare(){
@@ -31,16 +45,37 @@ void ghost::die(){
 	gy=lvl->GHOST_Y;
 	scared=false;
 	scaredTime=0;
+	enterTime=GHOST_DEATH_ENTER_TIME;
 	speed=GHOST_SPEED;
 	offx=0;
 	offy=0;
 }
 
 void ghost::render(){
-	startRender();
-	vec3 col=getColor();
-	shd->setVec3("color",std::get<0>(col),std::get<1>(col),std::get<2>(col));
-	renderSquare();
+//	startRender();
+//	vec3 col=getColor();
+//	shd->setVec3("color",std::get<0>(col),std::get<1>(col),std::get<2>(col));
+//	if(scared){
+//		shd->setVec3("color",0,0,1);
+//		if(scaredTime<FLASH_TIME&&  (scaredTime/FLASH_SPEED)%2==0  ){
+//			shd->setVec3("color",1,1,1);
+//		}
+//	}
+//	renderSquare();
+
+	animator*a=anim;
+	if(scared){
+		if(scaredTime<FLASH_TIME&&(scaredTime/FLASH_SPEED)%2==0){
+			a=animWhite;
+		}else{
+			a=animBlue;
+		}
+	}
+
+	a->render(gx,gy,offx,offy,dir,lvl->GRID_W,lvl->GRID_H);
+	anim->step();
+	animWhite->step();
+	animBlue->step();
 }
 
 void ghost::update(player*pacman,ghost*blinky){
@@ -52,6 +87,9 @@ void ghost::update(player*pacman,ghost*blinky){
 		}
 	}else{
 		speed=GHOST_SPEED;
+		if(lvl->tiles[gx][gy]==GHOST_SLOWDOWN){
+			speed=GHOST_SLOWDOWN_SPEED;
+		}
 	}
 	enterTime-=1;
 	if(enterTime>0){
@@ -69,7 +107,7 @@ void ghost::update(player*pacman,ghost*blinky){
 		for(int i=0;i<4;i++){
 			if(canMoveInDir(allDirs[i])&&!is_opp(allDirs[i],dir))dirs.push_back(allDirs[i]);
 		}
-		nextDir=dirs[ rand()%4  ];
+		nextDir=dirs[ rand()%dirs.size() ];
 	}else{
 		if(offx==0&&offy==0){
 			vec2 target=getTarget(pacman,blinky);
