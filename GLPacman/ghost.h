@@ -28,6 +28,8 @@ public:
 	animator*anim;
 	animator*animBlue;
 	animator*animWhite;
+	animator*animEyes;
+	bool inGhostHouse=true;
 
 	virtual vec2 getTarget(player*pacman,ghost*blinky)=0;
 	virtual vec3 getColor()=0;

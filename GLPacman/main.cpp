@@ -78,8 +78,10 @@ int main(){
 
 	window.setSize(lvl->GRID_W*30,lvl->GRID_H*30);
 
-	square_shader uvShader("uv.frag");
 	square_shader colorShader("color.frag");
+	square_shader texturedShader("textured.frag");
+
+	gl::Texture tex=gl::loadTexture("Textures/level1.png");
 
 	while(window.isOpen()){
 		window.bind();
@@ -88,16 +90,20 @@ int main(){
 		gl::setClearColor(0,0,0);
 		gl::clearScreen();
 
+		texturedShader.render(0,0,1,1);
+		texturedShader.setInt("tex",0);
+		tex.bindToUnit(0);
+		renderSquare();
 
 		float dx=1.0f/lvl->GRID_W;
 		float dy=1.0f/lvl->GRID_H;
 		for(int x=0;x<lvl->GRID_W;x++){
 			for(int y=0;y<lvl->GRID_H;y++){
-				if(lvl->tiles[x][y]==WALL){
-					colorShader.render(((float)x)/lvl->GRID_W,((float)y)/lvl->GRID_H,1.0/lvl->GRID_W,1.0/lvl->GRID_H);
-					colorShader.setVec3("color",0,0,1);
-					renderSquare();
-				}
+//				if(lvl->tiles[x][y]==WALL){
+//					colorShader.render(((float)x)/lvl->GRID_W,((float)y)/lvl->GRID_H,1.0/lvl->GRID_W,1.0/lvl->GRID_H);
+//					colorShader.setVec3("color",0,0,1);
+//					renderSquare();
+//				}
 				if(lvl->dots[x][y]){
 					colorShader.render(  (x+0.5-DOT_SIZE)*dx,(y+0.5-DOT_SIZE)*dy,2*DOT_SIZE*dx,2*DOT_SIZE*dy  );
 					colorShader.setVec3("color",1,1,1);

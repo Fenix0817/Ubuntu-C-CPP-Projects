@@ -13,6 +13,7 @@
 #define DOT 2
 #define POWER_DOT 3
 #define GHOST_SLOWDOWN 4
+#define GHOST_HOUSE_WALL 5
 
 #include <cstdlib>
 #include "utils.h"
@@ -22,6 +23,7 @@ struct level {
 	int GRID_W;
 	int GRID_H;
 	int**tiles;
+	bool**ghost_house_walls;
 	bool**dots;
 	bool**power_dots;
 
@@ -55,6 +57,18 @@ struct level {
 			power_dots[x]=new bool[GRID_H];
 			for(int y=0;y<GRID_H;y++){
 				power_dots[x][y]=(tiles[x][y]==POWER_DOT);
+			}
+		}
+		ghost_house_walls=new bool*[GRID_W];
+		for(int x=0;x<GRID_W;x++){
+			ghost_house_walls[x]=new bool[GRID_H];
+			for(int y=0;y<GRID_H;y++){
+				if(tiles[x][y]==GHOST_HOUSE_WALL){
+					ghost_house_walls[x][y]=true;
+					tiles[x][y]=WALL;
+				}else{
+					ghost_house_walls[x][y]=false;
+				}
 			}
 		}
 	}

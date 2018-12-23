@@ -15,6 +15,7 @@ ghost::ghost(level_ptr l,std::string name) : entity(l) {
 	anim=new animator(4,2,name);
 	animWhite=new animator(7,2,"ghostwhite");
 	animBlue=new animator(7,2,"ghostblue");
+	animEyes=new animator(1,1,"ghosteyes");
 }
 
 ghost::~ghost() {
@@ -93,7 +94,7 @@ void ghost::update(player*pacman,ghost*blinky){
 	}
 	enterTime-=1;
 	if(enterTime>0){
-		return;
+//		return;
 	}else if(enterTime==0){
 		gx=lvl->GHOST_EXIT_X;
 		gy=lvl->GHOST_EXIT_Y;
@@ -111,6 +112,9 @@ void ghost::update(player*pacman,ghost*blinky){
 	}else{
 		if(offx==0&&offy==0){
 			vec2 target=getTarget(pacman,blinky);
+			if(enterTime>0){
+				target={  rand()%100-50,rand()%100-50  };
+			}
 			std::vector<Dir>dirs;
 			for(int i=0;i<4;i++){
 				if(canMoveInDir(allDirs[i])&&!is_opp(allDirs[i],dir)){
