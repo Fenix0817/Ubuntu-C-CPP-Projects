@@ -21,11 +21,29 @@
 #include "Atlas.h"
 #include "AtlasFogleman.h"
 
+#include "SimplexNoise.h"
+
+float randomFloat(){
+	return ((float)rand())/((float)RAND_MAX);
+}
+
+// NEG Y = UP
+// POS Y = DOWN
+
 #define PI 3.14159265359
 
 float lerp(float t,float a,float b){return a+(b-a)*t;}
 float norm(float t,float a,float b){return (t-a)/(b-a);}
 float map(float t,float s1,float e1,float s2,float e2){return lerp(norm(t,s1,e1),s2,e2);}
+
+std::vector<Chunk*>chunks;
+
+Chunk*findChunk(int x,int z){
+	for(Chunk*c:chunks){
+		if(c->pos.x==x&&c->pos.y==z)return c;
+	}
+	return new Chunk();
+}
 
 int main(){
 	gl::init();
@@ -36,20 +54,62 @@ int main(){
 	window.setSize(1000,1000);
 	window.bind();
 
-	Chunk chunk;
-	chunk.createBuffers();
-	for(int x=0;x<C_SIZE;x++){
-		for(int y=0;y<C_HEIGHT;y++){
-			for(int z=0;z<C_SIZE;z++){
-				int h=C_SIZE-sqrt(pow(x-C_SIZE/2,2)+pow(z-C_SIZE/2,2));
-				if(y<=h)chunk.setBlock(x,y,z,blockGrass);
-				else chunk.setBlock(x,y,z,blockEmpty);
-			}
-		}
-	}
+	SimplexNoise*sn=new SimplexNoise();
+
 	Atlas*atlas=new AtlasFogleman();
 
-	chunk.updateBuffers(atlas);
+	int world_cw=5;
+	int world_ch=5;
+
+	std::vector<glm::vec2>points;
+	for(int i=0;i<5;i++){
+		points.push_back(glm::vec2(randomFloat()*world_cw,randomFloat()*world_ch)*(float)C_SIZE);
+	}
+
+#define taxicab_dist(a,b) (abs(a.x-b.x)+abs(a.y-b.y))
+	for(int cx=0;cx<world_cw;cx++){
+		for(int cz=0;cz<world_ch;cz++){
+			Chunk*c=new Chunk(cx,cz);
+			c->createBuffers();
+			for(int x=0;x<C_SIZE;x++){
+				for(int y=0;y<C_HEIGHT;y++){
+					for(int z=0;z<C_SIZE;z++){
+						float rx=cx*C_SIZE+x;
+						float rz=cz*C_SIZE+z;
+
+//						glm::vec2 pos(rx,rz);
+//						glm::vec2 nearest=points[0];
+//
+//						for(glm::vec2 p:points){
+//							if(taxicab_dist(p,pos)<taxicab_dist(nearest,pos)){
+//								nearest=p;
+//							}
+//						}
+//
+////						int h=taxicab_dist(pos,nearest);
+//						int h=sqrt(pow(x-C_SIZE/2,2)+pow(z-C_SIZE/2,2));
+//						int h=sn->noise(rx*0.05,0,rz*0.05)*10+20;
+
+//						if(y==h)c->setBlock(x,y,z,blockGrass);
+//						else if(y>h)c->setBlock(x,y,z,blockStone);
+//						else c->setBlock(x,y,z,blockEmpty);
+
+						if(sn->noise(rx*0.01,y*0.03,rz*0.03)<0)c->setBlock(x,y,z,blockGrass);
+						else c->setBlock(x,y,z,blockEmpty);
+
+					}
+				}
+			}
+
+			chunks.push_back(c);
+		}
+	}
+
+	for(Chunk*c:chunks){
+		int x=c->pos.x;
+		int z=c->pos.y;
+		c->updateBuffers(atlas,findChunk(x-1,z),findChunk(x+1,z),findChunk(x,z-1),findChunk(x,z+1));
+	}
 
 	gl::Shader shader;
 	shader.create();
@@ -84,12 +144,18 @@ int main(){
 
 		shader.bind();
 		shader.setMat4("perspectiveMatrix",perspectiveMatrix);
-		shader.setMat4("viewMatrix",viewMatrix);
 
 		shader.setInt("atlasTex",0);
 		atlasTex.bindToUnit(0);
 
-		chunk.render();
+		shader.setVec3("camPos",camPos);
+		shader.setVec3("camDir",camDir);
+
+		for(Chunk*c:chunks){
+			shader.setMat4("modelViewMatrix",viewMatrix*c->getModelMatrix());
+			shader.setVec3("posOffset",c->pos.x*C_SIZE,0,c->pos.y*C_SIZE);
+			c->render();
+		}
 		shader.unbind();
 
 		if(window.isKeyDown('W'))camPos+=speed*camDir;
@@ -117,6 +183,8 @@ int main(){
 
 		if(window.isKeyDown('/')||window.isKeyDown(GLFW_KEY_ESCAPE))window.close();
 		//  ^  Sometimes ESC key doesn't work on touchbar
+
+		printf("%f,%f,%f   %f,%f,%f\n",camPos.x,camPos.y,camPos.z,camDir.x,camDir.y,camDir.z);
 
 		window.updateSize();
 		window.unbind();

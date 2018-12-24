@@ -22,4 +22,8 @@ void Widget::showAll(){
 	gtk_widget_show_all(widget);
 }
 
+void Widget::destroy(){
+	gtk_widget_destroy(widget);
+}
+
 } /* namespace gtk */

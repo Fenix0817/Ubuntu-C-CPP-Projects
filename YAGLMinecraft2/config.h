@@ -10,7 +10,7 @@
 
 
 #define C_SIZE 16
-#define C_HEIGHT 32
+#define C_HEIGHT 100
 
 
 

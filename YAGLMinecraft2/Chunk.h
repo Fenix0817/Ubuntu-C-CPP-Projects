@@ -20,22 +20,33 @@
 #include "BlockFace.h"
 #include "config.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 class Chunk {
 public:
 	Chunk();
 	virtual ~Chunk();
+
+	inline Chunk(int x,int y){
+		pos=glm::ivec2(x,y);
+	}
 
 	gl::VertexArray vao;
 	gl::VertexBuffer vboPos;
 
 	ChunkFace xmi,xpl,ymi,ypl,zmi,zpl;
 
+	glm::ivec2 pos;
+
 	float posData[C_SIZE][C_HEIGHT][C_SIZE][3];
 
 	Block blockData[C_SIZE][C_HEIGHT][C_SIZE];
 
+	glm::mat4 getModelMatrix();
+
 	void createBuffers();
-	void updateBuffers(Atlas*atlas);
+	void updateBuffers(Atlas*atlas,Chunk*cxmi,Chunk*cxpl,Chunk*czmi,Chunk*czpl);
 
 	void render();
 

@@ -20,6 +20,7 @@ public:
 	GtkWidget*widget;
 
 	void showAll();
+	void destroy();
 };
 
 } /* namespace gtk */

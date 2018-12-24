@@ -162,7 +162,14 @@ void ChunkManager::computeLighting(){
 }
 
 void ChunkManager::addLightChange(glm::ivec3 v){
-	if(!contains_ivec3(lightChanges,v))lightChanges.push_back(v);
+	//Only add light change if it actually effects the world
+	if(!contains_ivec3(lightChanges,v)){
+		int x=v.x;
+		int y=v.y;
+		int z=v.z;
+		if(getBlock(x-1,y,z).empty&&getBlock(x+1,y,z).empty&&getBlock(x,y-1,z).empty&&getBlock(x,y+1,z).empty&&getBlock(x,y,z-1).empty&&getBlock(x,y,z+1).empty)return;
+		lightChanges.push_back(v);
+	}
 }
 
 void ChunkManager::updateLightMesh(glm::ivec3 pos,bool sumLighting){
@@ -187,10 +194,12 @@ float ChunkManager::getLight(int x,int y,int z){
 	return f;
 }
 
-void ChunkManager::storeFrameLightChanges(){
-	if(lightChanges.size()>0){
-		updateLightMesh(lightChanges[0],true);
-		lightChanges.erase(lightChanges.begin());
+void ChunkManager::storeFrameLightChanges(int n){
+	for(int i=0;i<n;i++){
+		if(lightChanges.size()>0){
+			updateLightMesh(lightChanges[0],true);
+			lightChanges.erase(lightChanges.begin());
+		}
 	}
 }
 
@@ -198,10 +207,10 @@ void ChunkManager::update(int frames,glm::ivec2 chunkPos){
 	int chunkX=chunkPos.x;
 	int chunkZ=chunkPos.y;
 
-	for(int i=0;i<2;i++){
+	for(int i=0;i<20;i++){
 		computeLighting();
 	}
-	while(lightChanges.size()>0)storeFrameLightChanges();
+	storeFrameLightChanges(20);
 	printf("Light changes.size() = %i\n",(int)lightChanges.size());
 
 	int o=4;

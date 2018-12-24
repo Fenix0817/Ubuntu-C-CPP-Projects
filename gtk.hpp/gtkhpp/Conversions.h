@@ -13,6 +13,7 @@
 #include "Container.h"
 #include "Button.h"
 #include "Entry.h"
+#include "Menu.h"
 
 namespace gtk {
 
@@ -28,6 +29,14 @@ inline Button*button(void*w){
 
 inline Entry*entry(void*w){
 	return static_cast<Entry*>(w);
+}
+
+inline Label*label(void*w){
+	return static_cast<Label*>(w);
+}
+
+inline Menu*menu(void*w){
+	return static_cast<Menu*>(w);
 }
 
 };

@@ -242,7 +242,7 @@ vec3 tracePixel(Ray camRay){
     vec3 accum=vec3(0.0);
     vec3 mask=vec3(1.0);
 
-    for(int i=0;i<6;i++){
+    for(int i=0;i<10;i++){
         float t;
         vec3 normal;
         Material mat;

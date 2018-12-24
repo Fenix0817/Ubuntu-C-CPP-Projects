@@ -30,8 +30,18 @@ void Light::initSpread(ChunkManager*cm){
 }
 void Light::stepSpread(ChunkManager*cm){
 	changes.clear();
-	LightNode*node=open[0];
-	open.erase(open.begin());
+	int index=0;
+	for(unsigned int i=0;i<open.size();i++){
+		int x=open[i]->pos.x;
+		int y=open[i]->pos.y;
+		int z=open[i]->pos.z;
+		if( ( (!cm->getBlock(x-1,y,z).empty)  &&  (!cm->getBlock(x+1,y,z).empty) && (!cm->getBlock(x,y-1,z).empty) && (!cm->getBlock(x,y+1,z).empty) && (!cm->getBlock(x,y,z-1).empty) && (!cm->getBlock(x,y,z+1).empty))){
+			index=i;
+			break;
+		}
+	}
+	LightNode*node=open[index];
+	open.erase(open.begin()+index);
 	if(!contains_lightnode(open,node)&&!contains_lightnode(closed,node)){
 		closed.push_back(node);
 		if(node->val>df){

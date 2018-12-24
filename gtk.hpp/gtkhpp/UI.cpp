@@ -51,6 +51,23 @@ void addChildrenGrid(Grid*to,tinyxml2::XMLNode*node,UI*ui){
 		printf("Next sibling\n");
 	}
 }
+
+void addChildrenMenuBar(MenuBar*bar,tinyxml2::XMLNode*node,UI*ui){
+	using namespace tinyxml2;
+	XMLElement*elem=node->ToElement();
+	XMLNode*n=elem->FirstChild();
+	if(n==NULL)return;
+	elem=n->ToElement();
+	while(elem!=NULL){
+		Widget*w=createWidgetFromXML(elem,ui);
+		bar->addMenu(gtk::menu(w));
+		if(elem->Attribute("name")!=0)ui->addNamedElement(w,std::string(elem->Attribute("name")));
+		XMLNode*newNode=elem->NextSibling();
+		if(newNode==NULL)return;
+		elem=newNode->ToElement();
+	}
+}
+
 Widget* createWidgetFromXML(tinyxml2::XMLNode*n,UI*ui){
 	printf("Creating widget\n");
 	using namespace tinyxml2;
@@ -114,6 +131,26 @@ Widget* createWidgetFromXML(tinyxml2::XMLNode*n,UI*ui){
 		if(elem->Attribute("text")!=0)entry->setText(std::string(elem->Attribute("text")));
 		if(elem->Attribute("name")!=0)ui->addNamedElement(entry,std::string(elem->Attribute("name")));
 		return entry;
+	}
+	if(elemName=="menu-item"){
+		MenuItem*item=new MenuItem();
+		item->create();
+		addChildren(item,n,ui);
+		if(elem->Attribute("name")!=0)ui->addNamedElement(item,std::string(elem->Attribute("name")));
+		return item;
+	}
+	if(elemName=="menu"){
+		Menu*menu=new Menu();
+		menu->create();
+		if(elem->Attribute("name")!=0)ui->addNamedElement(menu,std::string(elem->Attribute("name")));
+		return menu;
+	}
+	if(elemName=="menu-bar"){
+		MenuBar*bar=new MenuBar();
+		bar->create();
+		addChildrenMenuBar(bar,n,ui);
+		if(elem->Attribute("name")!=0)ui->addNamedElement(bar,std::string(elem->Attribute("name")));
+		return bar;
 	}
 //	return NULL;
 	return nullptr;

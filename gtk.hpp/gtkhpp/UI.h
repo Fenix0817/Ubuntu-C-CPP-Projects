@@ -14,6 +14,10 @@
 #include "Button.h"
 #include "Grid.h"
 #include "Entry.h"
+#include "Menu.h"
+#include "MenuBar.h"
+#include "MenuItem.h"
+#include "Conversions.h"
 
 namespace gtk {
 namespace xml {
@@ -21,6 +25,7 @@ namespace xml {
 class UI;
 
 void addChildrenGrid(Grid*to,tinyxml2::XMLNode*node,UI*ui);
+void addChildrenMenuBar(MenuBar*bar,tinyxml2::XMLNode*n,UI*ui);
 void addChildren(Container*to,tinyxml2::XMLNode*node,UI*ui);
 Widget* createWidgetFromXML(tinyxml2::XMLNode*elem,UI*ui);
 

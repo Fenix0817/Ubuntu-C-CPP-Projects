@@ -13,7 +13,7 @@
 
 #define SPRITE_EXTRA 0.3
 
-#define OFFSET_RES 2000.0
+#define OFFSET_RES 1000.0
 
 #define PLAYER_SPEED 200
 #define GHOST_SPEED 200

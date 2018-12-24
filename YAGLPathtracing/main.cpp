@@ -23,11 +23,11 @@
 
 #include "tinyxml2.h"
 
-#define IMG_W 100
-#define IMG_H 100
+#define IMG_W 500
+#define IMG_H 500
 
-#define WINDOW_W 1000
-#define WINDOW_H 1000
+#define WINDOW_W 500
+#define WINDOW_H 500
 
 void setMaterial(gl::Shader shader,Material mat,std::string name){
 	shader.setVec3(string_format("%s.mat.color",name.c_str()),mat.color);
@@ -496,7 +496,7 @@ int main(){
 //		if(window.wasJustPressed('3'))for(int i=0;i<20;i++)computeIteration(window.width,window.height);
 //		if(window.wasJustPressed('4'))for(int i=0;i<100;i++)computeIteration(window.width,window.height);
 //		if(window.wasJustPressed('5'))for(int i=0;i<500;i++)computeIteration(window.width,window.height);
-		if(counter<numIters&&continueCompute)for(int i=0;i<10;i++)computeIteration();
+		if(counter<numIters&&continueCompute)computeIteration();
 
 		if(window.isKeyDown('L')){
 			setLinear();

@@ -11,7 +11,7 @@ player::player(level_ptr l) : entity(l) {
 	gx=lvl->PLAYER_X;
 	gy=lvl->PLAYER_Y;
 	speed=PLAYER_SPEED;
-	anim=new animator(4,  2,"pacman");
+	anim=new animator(6,  2,"pacman");
 }
 
 player::~player() {
@@ -52,7 +52,24 @@ void player::update(ghost*blinky,ghost*pinky,ghost*inky,ghost*clyde){
 	if(canMoveInDir(nextDir)&&offx==0&&offy==0){
 		dir=nextDir;
 	}
-	lvl->dots[gx][gy]=false;
+	if(lvl->dots[gx][gy]){
+		lvl->dots[gx][gy]=false;
+		bool remainingDots=false;
+		for(int x=0;x<lvl->GRID_W;x++){
+			for(int y=0;y<lvl->GRID_H;y++){
+				remainingDots=remainingDots||lvl->dots[x][y];
+			}
+		}
+		if(!remainingDots){
+			die(blinky,pinky,inky,clyde);
+			for(int x=0;x<lvl->GRID_W;x++){
+				for(int y=0;y<lvl->GRID_H;y++){
+					lvl->dots[x][y]=(lvl->tiles[x][y]==DOT);
+					lvl->power_dots[x][y]=(lvl->tiles[x][y]==POWER_DOT);
+				}
+			}
+		}
+	}
 	if(lvl->power_dots[gx][gy]){
 		lvl->power_dots[gx][gy]=false;
 		bonusAmount=200;

@@ -1,0 +1,59 @@
+	
+	<!-- 
+	
+	0   1  2 cos +
+	3   4  5 sin -
+	6   7  8 tan *
+	9 ^-1 ^x     /
+	 -->
+	
+
+<ui_document>
+
+<ui name="calculator">
+
+<box orientation="vertical" spacing="10">
+
+	<box orientation="vertical">
+		<label name="lbl">0</label>
+		<entry name="txt"></entry>
+	</box>
+	
+	<grid>
+
+		<button-with-label name="0" gridx="0" gridy="0" gridw="1" gridh="1">0</button-with-label>
+		<button-with-label name="1" gridx="1" gridy="0" gridw="1" gridh="1">1</button-with-label>
+		<button-with-label name="2" gridx="2" gridy="0" gridw="1" gridh="1">2</button-with-label>
+		<button-with-label name="cos" gridx="3" gridy="0" gridw="1" gridh="1">cos</button-with-label>
+		<button-with-label name="+" gridx="4" gridy="0" gridw="1" gridh="1">+</button-with-label>
+	
+	
+		<button-with-label name="3" gridx="0" gridy="1" gridw="1" gridh="1">3</button-with-label>
+		<button-with-label name="4" gridx="1" gridy="1" gridw="1" gridh="1">4</button-with-label>
+		<button-with-label name="5" gridx="2" gridy="1" gridw="1" gridh="1">5</button-with-label>
+		<button-with-label name="sin" gridx="3" gridy="1" gridw="1" gridh="1">sin</button-with-label>
+		<button-with-label name="-" gridx="4" gridy="1" gridw="1" gridh="1">-</button-with-label>
+	
+	
+		<button-with-label name="6" gridx="0" gridy="2" gridw="1" gridh="1">6</button-with-label>
+		<button-with-label name="7" gridx="1" gridy="2" gridw="1" gridh="1">7</button-with-label>
+		<button-with-label name="8" gridx="2" gridy="2" gridw="1" gridh="1">8</button-with-label>
+		<button-with-label name="tan" gridx="3" gridy="2" gridw="1" gridh="1">tan</button-with-label>
+		<button-with-label name="*" gridx="4" gridy="2" gridw="1" gridh="1">*</button-with-label>
+	
+	
+		<button-with-label name="9" gridx="0" gridy="3" gridw="1" gridh="1">9</button-with-label>
+		<button-with-label name="^-1" gridx="1" gridy="3" gridw="1" gridh="1">^-1</button-with-label>
+		<button-with-label name="^z" gridx="2" gridy="3" gridw="1" gridh="1">^x</button-with-label>
+		<button-with-label name="." gridx="3" gridy="3" gridw="1" gridh="1">.</button-with-label>
+		<button-with-label name="/" gridx="4" gridy="3" gridw="1" gridh="1">/</button-with-label>
+		
+		<button-with-label name="enter" gridx="0" gridy="4" gridw="5" gridh="1">ENTER</button-with-label>
+	
+	</grid>
+	
+</box>
+
+</ui>
+
+</ui_document>

@@ -34,8 +34,8 @@ Vector3 camPos=Vector3(1,0,0);
 Vector3 lookAt=Vector3(0,0,0);
 float zoom=1;
 
-const int W=1000;
-const int H=1000;
+const int W=200;
+const int H=200;
 
 Tracer*tracer;
 Object*sizedBox(Vector3 a,Vector3 b){
@@ -54,11 +54,11 @@ World*buildBasicWorld(){
 	zoom=1;
 
 	World*world=new World();
-	world->setBackground(Colors::black);//TODO: Fix this
+	world->setBackground(Colors::white);//TODO: Fix this
 
 
 	MaterialMatte*matteWhite=new MaterialMatte();
-	matteWhite->setDiffuse(1,Colors::white);
+	matteWhite->setDiffuse(1,Colors::white*0.8f+Colors::blue*0.2f);
 
 
 	MaterialEmmisive*emmisive=new MaterialEmmisive(50,Colors::white);
@@ -161,7 +161,7 @@ int main(){
 	//TODO: 	- std::vector<Object*>objects;
 	//TODO:		- std::vector<ObjectLight*>lights;
 
-	const int numSamples=5000;
+	const int numSamples=50;
 	const float numSamplesf=numSamples;
 
 	int num=0;
@@ -196,7 +196,7 @@ int main(){
 	printf("Computed\n");
 
 	img.clamp();
-	img.save("pathtracing-11.ppm");
+	img.save("pathtracing-12.ppm");
 	img.dealloc();
 
 	printf("Saved\n");

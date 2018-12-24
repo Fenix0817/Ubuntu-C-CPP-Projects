@@ -26,6 +26,7 @@ RGBColor BRDFGlossySpecular::f(ShadeInfo&si,Vector3&wi,Vector3&wo){
 RGBColor BRDFGlossySpecular::sampleF(ShadeInfo&si,Vector3&wi,Vector3&wo,float&pdf){
 	float ndotwo=dotVectors(si.normal,wo);
 	wi=-wo+2.0f*si.normal*ndotwo;
+	pdf=1;
 	return intensity*color/dotVectors(si.normal,wi);
 }
 RGBColor BRDFGlossySpecular::rho(ShadeInfo&si,Vector3&wo){

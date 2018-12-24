@@ -56,7 +56,7 @@ template<typename T>inline int sign(T x){
 	return (T(0)<x)-(x<T(0));
 }
 
-//struct LightChangeChunk{
+//struct LightChangeWithChunk{
 //	glm::ivec3 p;
 //	glm::ivec2 c;
 //};
@@ -90,7 +90,7 @@ public:
 
 	void initLighting();
 	void computeLighting();
-	void storeFrameLightChanges();
+	void storeFrameLightChanges(int n);
 	void updateLightMesh(glm::ivec3 v,bool sumLighting);
 
 	void addLight(int x,int y,int z,float f);

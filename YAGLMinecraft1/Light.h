@@ -20,7 +20,7 @@ public:
 	Light();
 	virtual ~Light();
 
-	float df=0.2;
+	float df=0.1;
 
 	glm::ivec3 pos;
 	float val;

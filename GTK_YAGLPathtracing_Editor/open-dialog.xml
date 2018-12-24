@@ -1,0 +1,30 @@
+<ui_document>
+
+<ui name="open-dialog">
+
+<box orientation="vertical">
+
+	<menu-bar>
+		<menu-item>
+			<label>File</label>
+		</menu-item>
+		<menu-item>
+			<label>Edit</label>
+		</menu-item>
+	</menu-bar>
+
+	<box orientation="horizontal">
+		<label>Filename:</label>
+		<entry name="text-field"></entry>
+	</box>
+	
+	<box orientation="horizontal">
+		<button-with-label name="open">Open</button-with-label>
+		<button-with-label name="close">Cancel</button-with-label>
+	</box>
+
+</box>
+
+</ui>
+
+</ui_document>

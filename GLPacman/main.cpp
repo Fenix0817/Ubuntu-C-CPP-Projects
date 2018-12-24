@@ -41,10 +41,10 @@ Dir nextDir=DIR_NONE;
 
 void key_callback(GLFWwindow*w,int k,int s,int a,int m){
 	if(a==GLFW_PRESS){
-		if(k==GLFW_KEY_A)nextDir=DIR_L;
-		if(k==GLFW_KEY_D)nextDir=DIR_R;
-		if(k==GLFW_KEY_W)nextDir=DIR_U;
-		if(k==GLFW_KEY_S)nextDir=DIR_D;
+		if(k==GLFW_KEY_LEFT||k==GLFW_KEY_A)nextDir=DIR_L;
+		if(k==GLFW_KEY_RIGHT||k==GLFW_KEY_D)nextDir=DIR_R;
+		if(k==GLFW_KEY_UP||k==GLFW_KEY_W)nextDir=DIR_U;
+		if(k==GLFW_KEY_DOWN||k==GLFW_KEY_S)nextDir=DIR_D;
 	}
 }
 
