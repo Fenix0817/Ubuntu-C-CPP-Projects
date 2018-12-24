@@ -98,6 +98,8 @@ void ghost::update(player*pacman,ghost*blinky){
 	}else if(enterTime==0){
 		gx=lvl->GHOST_EXIT_X;
 		gy=lvl->GHOST_EXIT_Y;
+		offx=0;
+		offy=0;
 	}
 
 	resetOff();

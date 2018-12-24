@@ -11,6 +11,7 @@
 #include "entity.h"
 #include "ghost.h"
 #include "animator.h"
+#include "bonus.h"
 
 class player : public entity {
 public:
@@ -19,10 +20,14 @@ public:
 
 	animator*anim;
 
+	std::vector<bonus*>bonuses;
+	int bonusAmount=200;
+
 	void render();
 	void update(ghost*blinky,ghost*pinky,ghost*inky,ghost*clyde);
 	bool hasHit(ghost*g);
 	void die(ghost*blinky,ghost*pinky,ghost*inky,ghost*clyde);
+	void newBonus();
 };
 
 #endif /* PLAYER_H_ */
