@@ -76,7 +76,7 @@ int main(){
 	ghost_inky*inky=new ghost_inky(lvl);
 	ghost_clyde*clyde=new ghost_clyde(lvl);
 
-	window.setSize(lvl->GRID_W*30,lvl->GRID_H*30);
+	window.setSize(lvl->GRID_W*20,lvl->GRID_H*20);
 
 	square_shader colorShader("color.frag");
 	square_shader texturedShader("textured.frag");

@@ -23,9 +23,9 @@ Boid::~Boid() {
 void Boid::update(Boid*boids,int n,int selfI){
 	float viewDist=0.1;
 	float maxVel=0.005;
-	float sepDist=0.025;
-	float bounds=0.8;
-	float bDamp=20;
+	float sepDist=0.04;
+	float bounds=0.75;
+	float bDamp=0.1;
 
 	glm::vec2 com(0,0);
 	int com_n=0;
@@ -51,7 +51,7 @@ void Boid::update(Boid*boids,int n,int selfI){
 	}
 	if(sep_n!=0)sep/=sep_n;
 
-	glm::vec2 rule2=sep*0.05f;
+	glm::vec2 rule2=sep*0.02f;
 
 	glm::vec2 cov(0,0);
 	int cov_n=0;
@@ -73,8 +73,8 @@ void Boid::update(Boid*boids,int n,int selfI){
 	pos+=vel;
 
 	//add boundary conditions
-	if(pos.x<-bounds)vel.x= abs(vel.x)*bDamp;
-	if(pos.y<-bounds)vel.y= abs(vel.y)*bDamp;
-	if(pos.x> bounds)vel.x=-abs(vel.x)*bDamp;
-	if(pos.y> bounds)vel.y=-abs(vel.y)*bDamp;
+	if(pos.x<-bounds)vel.x += abs(vel.x)*bDamp;
+	if(pos.y<-bounds)vel.y += abs(vel.y)*bDamp;
+	if(pos.x> bounds)vel.x +=-abs(vel.x)*bDamp;
+	if(pos.y> bounds)vel.y +=-abs(vel.y)*bDamp;
 }

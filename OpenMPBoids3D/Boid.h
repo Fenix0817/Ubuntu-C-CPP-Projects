@@ -24,7 +24,8 @@ public:
 
 	glm::vec3 pos;
 	glm::vec3 vel;
-	glm::vec3 acc;
+
+	glm::vec3 lastPos;
 
 	void update(Boid*boids,int n,int selfI);
 };

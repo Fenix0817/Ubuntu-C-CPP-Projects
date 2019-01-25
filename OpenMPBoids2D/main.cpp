@@ -38,7 +38,7 @@ int main(){
 	shader.attachFile("Shaders/boid.geom",gl::ShaderType::Geometry);
 	shader.link();
 
-	int n=600;
+	int n=500;
 	float pos[n*2];
 	for(int i=0;i<n;i++){
 		pos[i*2+0]=2*((float)rand())/((float)RAND_MAX)-1;
@@ -53,7 +53,7 @@ int main(){
 	float size[n];
 	for(int i=0;i<n;i++){
 //		size[i]=0.05+0.1*((float)rand())/((float)RAND_MAX);
-		size[i]=0.03;
+		size[i]=0.04;
 	}
 	float dir[n*2];
 	for(int i=0;i<n;i++){

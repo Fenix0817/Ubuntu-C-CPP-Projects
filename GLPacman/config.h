@@ -9,7 +9,7 @@
 #define CONFIG_H_
 
 #define DOT_SIZE 0.1
-#define POWER_DOT_SIZE 0.3
+#define POWER_DOT_SIZE (0.4+0.1*cos(glfwGetTime()))
 
 #define SPRITE_EXTRA 0.3
 

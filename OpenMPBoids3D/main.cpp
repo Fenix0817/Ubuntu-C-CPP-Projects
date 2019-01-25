@@ -13,6 +13,15 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "Boid.h"
+#include <cmath>
+
+inline glm::vec3 lerp(float t,glm::vec3 a,glm::vec3 b){
+	return a+(b-a)*t;
+}
+
+inline bool isnan3(glm::vec3 v){
+	return __builtin_isnan(v.x)||__builtin_isnan(v.y)||__builtin_isnan(v.z);
+}
 
 int main(){
 	//TODO:  Add shading
@@ -45,7 +54,7 @@ int main(){
 	shaderBoids.attachFile("Shaders/boid.geom",gl::ShaderType::Geometry);
 	shaderBoids.link();
 
-	int n=300;
+	int n=700;
 	Boid boids[n];
 
 	gl::VertexArray vao;
@@ -140,20 +149,41 @@ int main(){
 	eboBounds.setData(sizeof(triBounds),triBounds);
 	eboBounds.unbind();
 
+//	glm::vec3 camPos(2,1,2);
+//	glm::vec3 camLook(0,0,0);
+//	float lerpSpeed=0.00000001;
+
+	glm::vec3 positions[n];
+	for(int i=0;i<n;i++){
+		positions[i]=boids[i].pos;
+	}
+
 	while(window.isOpen()){
 		window.bind();
+		window.updateSize();
 
-		gl::setClearColor(1);
+		gl::setClearColor(0.3f);
 		gl::clearScreen();
 		gl::defaultViewport(window);
 		gl::setDepth(true);
 
 		glCullFace(GL_NONE);
 
-		glm::mat4 perspective=glm::perspective(glm::radians(80.0f),1.0f,0.01f,200.0f);
+		glm::mat4 perspective=glm::perspective(glm::radians(80.0f),((float)window.width)/((float)window.height),0.01f,200.0f);
 //		float rot=0;
-		float rot=gl::time();
-		glm::mat4 view=glm::lookAt(glm::vec3(80*cos(rot),8,80*sin(rot)),glm::vec3(0,0,0),glm::vec3(0,1,0));
+//		float rot=gl::time();
+		glm::mat4 view=glm::lookAt(glm::vec3(1,0.5,1),glm::vec3(0,0,0),glm::vec3(0,1,0));
+//		Boid boid=boids[0];
+//		glm::vec3 dir=glm::normalize(boid.vel);
+//		glm::vec3 targetPos=boid.pos-dir*0.2f;
+//		glm::vec3 targetLook=boid.pos+dir;
+////		camPos=lerp(lerpSpeed,camPos,targetPos);
+////		camLook=lerp(lerpSpeed,camLook,targetLook);
+//		if(!__builtin_isnan(targetPos.x)&&!__builtin_isnan(targetPos.y)&&!__builtin_isnan(targetPos.z)&&!__builtin_isnan(targetLook.x)&&!__builtin_isnan(targetLook.y)&&!__builtin_isnan(targetLook.z)){
+//			camPos+=(targetPos-camPos)*lerpSpeed;
+//			camLook+=(targetLook-camLook)*lerpSpeed;
+//		}
+//		glm::mat4 view=glm::lookAt( targetPos,targetLook,glm::vec3(0,1,0)  );
 
 		shaderBoids.bind();
 		shaderBoids.setMat4("perspective",perspective);
@@ -163,9 +193,10 @@ int main(){
 		vboPos.bind();
 		float*ptrPos=(float*)glMapBuffer(GL_ARRAY_BUFFER,GL_WRITE_ONLY);
 		for(int i=0;i<n;i++){
-			ptrPos[i*3+0]=boids[i].pos.x;
-			ptrPos[i*3+1]=boids[i].pos.y;
-			ptrPos[i*3+2]=boids[i].pos.z;
+			ptrPos[i*3+0]=positions[i].x;
+			ptrPos[i*3+1]=positions[i].y;
+			ptrPos[i*3+2]=positions[i].z;
+			if(!isnan3(boids[i].pos))positions[i]=boids[i].pos;
 		}
 		glUnmapBuffer(GL_ARRAY_BUFFER);
 		vboPos.unbind();
@@ -183,7 +214,7 @@ int main(){
 		vboSize.bind();
 		float*ptrSize=(float*)glMapBuffer(GL_ARRAY_BUFFER,GL_WRITE_ONLY);
 		for(int i=0;i<n;i++){
-			ptrSize[i]=0.5;
+			ptrSize[i]=0.02;
 		}
 		glUnmapBuffer(GL_ARRAY_BUFFER);
 		vboSize.unbind();
@@ -203,11 +234,9 @@ int main(){
 //		vaoBounds.unbind();
 //		shaderBounds.unbind();
 
-#ifdef USE_OMP
 #pragma omp parallel for
-#endif
 		for(int i=0;i<n;i++){
-			boids[i].update(boids,i,n);
+			boids[i].update(boids,n,i);
 		}
 
 		window.unbind();
