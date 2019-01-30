@@ -23,6 +23,7 @@ float align(float f){
 }
 
 bool verifyMovement(ChunkManager*cm,glm::vec3 pos,glm::vec3 dir){
+	pos.y-=1;
 //	Intersection inters = cm->intersectWorld(pos,dir,5);
 //	if(!inters.hit)return false;
 //	float dist=glm::length(glm::vec3(inters.absPos())-pos);
@@ -59,6 +60,10 @@ void Camera::jump(ChunkManager*cm){
 	velocity+=10.5;
 }
 void Camera::applyGravity(ChunkManager*cm){
+	//Fix jumping
+	//The issue is verifyMovement(up) returns false
+	//Why?
+	//Is it a "non-intersection returns false" issue?
 	int sign=-1;
 	if(velocity>0)sign=1;
 	if(verifyMovement(cm,camPos,glm::vec3(0,sign,0))){
@@ -67,7 +72,7 @@ void Camera::applyGravity(ChunkManager*cm){
 
 	printf("%f\n",velocity);
 	if(verifyMovement(cm,camPos,glm::vec3(0,-1,0))){
-		velocity-=0.0025;
+		velocity-=0.005;
 	}else{
 		velocity=0;
 	}
