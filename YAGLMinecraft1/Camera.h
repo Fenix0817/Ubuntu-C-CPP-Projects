@@ -37,7 +37,9 @@ public:
 	float forwardSpeed;
 	float sideSpeed;
 	float backSpeed;
-	float velocity=0;
+	float gravityVelocity=0;
+	float jumpVelocity=0;
+	float getVelocity();
 
 	void moveForward(ChunkManager*cm);
 	void moveLeft(ChunkManager*cm);

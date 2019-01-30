@@ -22,13 +22,19 @@ float align(float f){
 	return floor(f);
 }
 
+glm::vec3 align(glm::vec3 v){
+	return glm::vec3(align(v.x),align(v.y),align(v.z));
+}
+
 bool verifyMovement(ChunkManager*cm,glm::vec3 pos,glm::vec3 dir){
 	pos.y-=1;
 //	Intersection inters = cm->intersectWorld(pos,dir,5);
 //	if(!inters.hit)return false;
 //	float dist=glm::length(glm::vec3(inters.absPos())-pos);
 //	return dist>0;
-	return cm->intersectWorld(pos,dir,5).dist>1;
+	Intersection inters= cm->intersectWorld(pos,align(dir),5);
+	if(!inters.hit)return true;
+	return inters.dist>1;
 //	dir=glm::normalize(dir);
 //	if(dir.y<0)dir.y=-1;
 //	glm::vec3 ipos=pos+dir;
@@ -57,7 +63,10 @@ void Camera::moveUp(ChunkManager*cm){
 	if(verifyMovement(cm,camPos,glm::vec3(0,1,0)))camPos.y+=0.3;
 }
 void Camera::jump(ChunkManager*cm){
-	velocity+=10.5;
+	if(!verifyMovement(cm,camPos,glm::vec3(0,-1,0)))jumpVelocity+=.3;
+}
+float Camera::getVelocity(){
+	return jumpVelocity+gravityVelocity;
 }
 void Camera::applyGravity(ChunkManager*cm){
 	//Fix jumping
@@ -65,16 +74,16 @@ void Camera::applyGravity(ChunkManager*cm){
 	//Why?
 	//Is it a "non-intersection returns false" issue?
 	int sign=-1;
-	if(velocity>0)sign=1;
+	if(getVelocity()>0)sign=1;
 	if(verifyMovement(cm,camPos,glm::vec3(0,sign,0))){
-		camPos.y+=velocity;
+		camPos.y+=getVelocity();
 	}
 
-	printf("%f\n",velocity);
 	if(verifyMovement(cm,camPos,glm::vec3(0,-1,0))){
-		velocity-=0.005;
-	}else{
-		velocity=0;
+		gravityVelocity-=0.005;
+	}else{//grounded
+		jumpVelocity=0;
+		gravityVelocity=0;
 	}
 //	if(verifyMovement(cm,camPos,glm::vec3(0,sign,0))){
 //		camPos.y+=velocity;
