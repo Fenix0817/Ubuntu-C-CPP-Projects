@@ -9,6 +9,7 @@
 #define CROSSHAIR_H_
 
 #include <YAGL.h>
+#include "utils.h"
 
 class Crosshair {
 public:

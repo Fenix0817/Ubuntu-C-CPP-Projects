@@ -50,6 +50,13 @@ void Camera::updateDirection(glm::vec2 newMouse){
 	camDir=glm::vec3(0,0,1);
 	camDir=glm::rotateX(camDir,rotX);
 	camDir=glm::rotateY(camDir,rotY);
+
+	printf("mouse rotX,rotY=%f,%f  dx,dy=%f,%f\n",rotX,rotY,dx,dy);
+
+	if(isnanf(rotX))rotX=0;
+	if(isnanf(rotY))rotY=0;
+
+	if(isnanf(camDir.x)||isnanf(camDir.y)||isnanf(camDir.z))camDir=glm::vec3(1,0,0);
 }
 
 glm::vec3 Camera::getForward(){

@@ -82,7 +82,8 @@ float cnoise(glm::vec3 P){
   return 2.2 * n_xyz;
 }
 
-float getAO(bool xmi,bool xpl,bool ymi,bool ypl,bool zmi,bool zpl){
+float getAO(float xmi,float xpl,float ymi,float ypl,float zmi,float zpl){
+	return ypl;
 //	return (xmi+xpl+ymi+ypl+zmi+zpl)/6.0f;
 //	return ( (xmi||xpl)+(ymi||ypl)+(zmi||zpl)  )/3.0f;
 //	return (xmi+xpl+zmi+zpl)/4.0f;
@@ -99,7 +100,9 @@ float getAO(bool xmi,bool xpl,bool ymi,bool ypl,bool zmi,bool zpl){
 //	return 3-s1-s2-c;
 //	return cnoise(glm::vec3(x*0.5,y*0.5,z*0.5));
 //	return ((float)rand())/((float)RAND_MAX);
-	return 1;
+//	return 1;
+//	return (xmi+xpl+ymi+ypl+zmi+zpl)/6.0f;
+//	return
 }
 
 //Get chunk position
@@ -185,30 +188,33 @@ void Chunk::addUV(TexturePos tp,bool flip){
 	}
 	addUV(tp._11);
 }
-void Chunk::addLight(int x,int y,int z){
-	float val;
-	if(x<0)val=cXMI->lightData[CHUNK_SIZE+x][y][z];
-	else if(z<0)val=cZMI->lightData[x][y][CHUNK_SIZE+z];
-	else if(x>CHUNK_SIZE-1)val=cXPL->lightData[x-CHUNK_SIZE][y][z];
-	else if(z>CHUNK_SIZE-1)val=cZPL->lightData[x][y][z-CHUNK_SIZE];
-	else val=lightData[x][y][z];
-	lightMeshData.push_back(val);
-}
 float Chunk::getChunkAO(int x,int y,int z){
-	bool xmi=getLocalBlock(x-1,y,z).empty;
-	bool xpl=getLocalBlock(x+1,y,z).empty;
-	bool ymi=getLocalBlock(x,y-1,z).empty;
-	bool ypl=getLocalBlock(x,y+1,z).empty;
-	bool zmi=getLocalBlock(x,y,z-1).empty;
-	bool zpl=getLocalBlock(x,y,z+1).empty;
-	return getAO(xmi,xpl,ymi,ypl,zmi,zpl);
+//	return 1;
+//	bool side1=isEmpty(x-1,y,z-1)||isEmpty(x-1,y,z);
+//	bool side2=isEmpty(x,y,z-1)||isEmpty(x,y,z);
+//	bool corner=isEmpty(x,y,z);
+//	if(side1&&side2)return 1;
+//	return 1-(3-(side1+side2+corner));
+	return (isEmpty(x-1,y,z-1)+isEmpty(x-1,y,z)+isEmpty(x,y,z-1)+isEmpty(x,y,z))/4.0f;
+//	float xmi=(isEmpty(x,y,z)+isEmpty(x,y+1,z)+isEmpty(x,y,z+1)+isEmpty(x,y+1,z+1))/4.0f;
+//	float xpl=(isEmpty(x+1,y,z)+isEmpty(x+1,y+1,z)+isEmpty(x+1,y,z+1)+isEmpty(x+1,y+1,z+1))/4.0f;
+//	float ymi=(isEmpty(x,y,z)+isEmpty(x+1,y,z)+isEmpty(x,y,z+1)+isEmpty(x+1,y,z+1))/4.0f;
+//	float ypl=(isEmpty(x,y+1,z)+isEmpty(x+1,y+1,z)+isEmpty(x,y+1,z+1)+isEmpty(x+1,y+1,z+1))/4.0f;
+//	float zmi=(isEmpty(x,y,z)+isEmpty(x+1,y,z)+isEmpty(x,y+1,z)+isEmpty(x+1,y+1,z))/4.0f;
+//	float zpl=(isEmpty(x,y,z+1)+isEmpty(x+1,y,z+1)+isEmpty(x,y+1,z+1)+isEmpty(x+1,y+1,z+1))/4.0f;
+//	return getAO(xmi,xpl,ymi,ypl,zmi,zpl);
 }
 void Chunk::addAO(int x,int y,int z){
 	aoMeshData.push_back(getChunkAO(x,y,z));
 }
-void Chunk::addTriangleFace(){
-	addTriangle(0,1,2);
-	addTriangle(1,2,3);
+void Chunk::addTriangleFace(bool flip){
+	if(flip){
+		addTriangle(0,1,3);
+		addTriangle(0,2,3);
+	}else{
+		addTriangle(0,1,2);
+		addTriangle(1,2,3);
+	}
 }
 
 bool Chunk::isEmpty(int x,int y,int z){
@@ -263,9 +269,12 @@ void Chunk::createChunkData(FastNoisePtr fn){
 		for(int z=0;z<CHUNK_SIZE;z++){
 			float zoom=1;
 			fn->SetFractalOctaves(10);
-			fn->SetFractalLacunarity(2);
+			fn->SetFractalLacunarity(10);
+			fn->SetFractalGain(0.1f);
 			fn->SetFractalType(FractalTypeFBM);
-			float fh=CHUNK_HEIGHT/2+20*fn->GetSimplexFractal( zoom*(chunkPos.x*CHUNK_SIZE+x),zoom*(chunkPos.y*CHUNK_SIZE+z));
+			float rx=chunkPos.x*CHUNK_SIZE+x;
+			float rz=chunkPos.y*CHUNK_SIZE+z;
+			float fh=CHUNK_HEIGHT/2+20*fn->GetSimplexFractal( zoom*rx,zoom*rz);
 			int h=(int)fh;
 #pragma omp parallel for
 			for(int y=0;y<CHUNK_HEIGHT;y++){
@@ -275,30 +284,32 @@ void Chunk::createChunkData(FastNoisePtr fn){
 					blockData[x][y][z]=blockGrass;
 				}
 				else blockData[x][y][z]=blockEmpty;
+
+//				if(fn->GetSimplexFractal(rx*10,y*50,rz*10)<0.0f){
+//					blockData[x][y][z]=blockEmpty;
+//				}
+
 			}
 		}
 	}
 }
 
 void Chunk::computeAO(){
-//	for(int x=0;x<CHUNK_SIZE;x++){
-//		for(int y=0;y<CHUNK_HEIGHT;y++){
-//			for(int z=0;z<CHUNK_SIZE;z++){
-//				aoData[x][y][z]=getChunkAO(x,y,z);
-//			}
-//		}
-//	}
+	for(int x=0;x<CHUNK_SIZE;x++){
+		for(int y=0;y<CHUNK_HEIGHT;y++){
+			for(int z=0;z<CHUNK_SIZE;z++){
+				aoData[x][y][z]=getChunkAO(x,y,z);
+			}
+		}
+	}
 }
 
-void Chunk::prepareMesh(Atlas*atlas,bool onlyLighting){
-	lightMeshData.clear();
-	if(!onlyLighting){
-		posData.clear();
-		uvData.clear();
-		triData.clear();
-		aoMeshData.clear();
-		computeAO();
-	}
+void Chunk::prepareMesh(Atlas*atlas){
+	posData.clear();
+	uvData.clear();
+	triData.clear();
+	aoMeshData.clear();
+	computeAO();
 	for(int x=0;x<CHUNK_SIZE;x++){
 		for(int y=0;y<CHUNK_HEIGHT;y++){
 			for(int z=0;z<CHUNK_SIZE;z++){
@@ -315,99 +326,105 @@ void Chunk::prepareMesh(Atlas*atlas,bool onlyLighting){
 				TexturePos zplTP=atlas->getTexturePos(b.zpl);
 
 				if(isEmpty(x-1,y,z)){//xmi
-					if(!onlyLighting){
-						addTriangleFace();
-						addPos(x,y,z);
-						addPos(x,y+1,z);
-						addPos(x,y,z+1);
-						addPos(x,y+1,z+1);
-						addUV(xmiTP);
-						addAO(x,y,z);
-						addAO(x,y+1,z);
-						addAO(x,y,z+1);
-						addAO(x,y+1,z+1);
-					}
-					for(int i=0;i<4;i++)addLight(x-1,y,z);
+					float a00=getChunkAO(x,y,z);
+					float a01=getChunkAO(x,y,z+1);
+					float a11=getChunkAO(x,y+1,z+1);
+					float a10=getChunkAO(x,y+1,z);
+					addTriangleFace(a00+a11>a01+a10);
+					addPos(x,y,z);
+					addPos(x,y+1,z);
+					addPos(x,y,z+1);
+					addPos(x,y+1,z+1);
+					addUV(xmiTP);
+					addAO(x,y,z);
+					addAO(x,y+1,z);
+					addAO(x,y,z+1);
+					addAO(x,y+1,z+1);
 				}
 
 				if(isEmpty(x+1,y,z)){//xpl
-					if(!onlyLighting){
-						addTriangleFace();
-						addPos(x+1,y,z);
-						addPos(x+1,y+1,z);
-						addPos(x+1,y,z+1);
-						addPos(x+1,y+1,z+1);
-						addAO(x+1,y,z);
-						addAO(x+1,y+1,z);
-						addAO(x+1,y,z+1);
-						addAO(x+1,y+1,z+1);
-						addUV(xplTP);
-					}
-					for(int i=0;i<4;i++)addLight(x+1,y,z);
+					float a00=getChunkAO(x+1,y,z);
+					float a01=getChunkAO(x+1,y,z+1);
+					float a11=getChunkAO(x+1,y+1,z+1);
+					float a10=getChunkAO(x+1,y+1,z);
+					addTriangleFace(a00+a11>a01+a10);
+					addPos(x+1,y,z);
+					addPos(x+1,y+1,z);
+					addPos(x+1,y,z+1);
+					addPos(x+1,y+1,z+1);
+					addAO(x+1,y,z);
+					addAO(x+1,y+1,z);
+					addAO(x+1,y,z+1);
+					addAO(x+1,y+1,z+1);
+					addUV(xplTP);
 				}
 
 				if(isEmpty(x,y-1,z)){//ymi
-					if(!onlyLighting){
-						addTriangleFace();
-						addPos(x,y,z);
-						addPos(x+1,y,z);
-						addPos(x,y,z+1);
-						addPos(x+1,y,z+1);
-						addAO(x,y,z);
-						addAO(x+1,y,z);
-						addAO(x,y,z+1);
-						addAO(x+1,y,z+1);
-						addUV(ymiTP);
-					}
-					for(int i=0;i<4;i++)addLight(x,y-1,z);
+					float a00=getChunkAO(x,y,z);
+					float a01=getChunkAO(x,y,z+1);
+					float a11=getChunkAO(x+1,y,z+1);
+					float a10=getChunkAO(x+1,y,z);
+					addTriangleFace(a00+a11>a01+a10);
+					addPos(x,y,z);
+					addPos(x+1,y,z);
+					addPos(x,y,z+1);
+					addPos(x+1,y,z+1);
+					addAO(x,y,z);
+					addAO(x+1,y,z);
+					addAO(x,y,z+1);
+					addAO(x+1,y,z+1);
+					addUV(ymiTP);
 				}
 
 				if(isEmpty(x,y+1,z)){//ypl
-					if(!onlyLighting){
-						addTriangleFace();
-						addPos(x,y+1,z);
-						addPos(x+1,y+1,z);
-						addPos(x,y+1,z+1);
-						addPos(x+1,y+1,z+1);
-						addAO(x,y+1,z);
-						addAO(x+1,y+1,z);
-						addAO(x,y+1,z+1);
-						addAO(x+1,y+1,z+1);
-						addUV(yplTP);
-					}
-					for(int i=0;i<4;i++)addLight(x,y+1,z);
+					float a00=getChunkAO(x,y+1,z);
+					float a01=getChunkAO(x,y+1,z+1);
+					float a11=getChunkAO(x+1,y+1,z+1);
+					float a10=getChunkAO(x+1,y+1,z);
+					addTriangleFace(a00+a11>a01+a10);
+					addPos(x,y+1,z);
+					addPos(x+1,y+1,z);
+					addPos(x,y+1,z+1);
+					addPos(x+1,y+1,z+1);
+					addAO(x,y+1,z);
+					addAO(x+1,y+1,z);
+					addAO(x,y+1,z+1);
+					addAO(x+1,y+1,z+1);
+					addUV(yplTP);
 				}
 
 				if(isEmpty(x,y,z-1)){//zmi
-					if(!onlyLighting){
-						addTriangleFace();
-						addPos(x,y,z);
-						addPos(x,y+1,z);
-						addPos(x+1,y,z);
-						addPos(x+1,y+1,z);
-						addAO(x,y,z);
-						addAO(x,y+1,z);
-						addAO(x+1,y,z);
-						addAO(x+1,y+1,z);
-						addUV(zmiTP);
-					}
-					for(int i=0;i<4;i++)addLight(x,y,z-1);
+					float a00=getChunkAO(x,y,z);
+					float a01=getChunkAO(x,y+1,z);
+					float a11=getChunkAO(x+1,y+1,z);
+					float a10=getChunkAO(x+1,y,z);
+					addTriangleFace(a00+a11>a01+a10);
+					addPos(x,y,z);
+					addPos(x,y+1,z);
+					addPos(x+1,y,z);
+					addPos(x+1,y+1,z);
+					addAO(x,y,z);
+					addAO(x,y+1,z);
+					addAO(x+1,y,z);
+					addAO(x+1,y+1,z);
+					addUV(zmiTP);
 				}
 
 				if(isEmpty(x,y,z+1)){//zpl
-					if(!onlyLighting){
-						addTriangleFace();
-						addPos(x,y,z+1);
-						addPos(x,y+1,z+1);
-						addPos(x+1,y,z+1);
-						addPos(x+1,y+1,z+1);
-						addAO(x,y,z+1);
-						addAO(x,y+1,z+1);
-						addAO(x+1,y,z+1);
-						addAO(x+1,y+1,z+1);
-						addUV(zplTP);
-					}
-					for(int i=0;i<4;i++)addLight(x,y,z+1);
+					float a00=getChunkAO(x,y,z+1);
+					float a01=getChunkAO(x,y+1,z+1);
+					float a11=getChunkAO(x+1,y+1,z+1);
+					float a10=getChunkAO(x+1,y,z+1);
+					addTriangleFace(a00+a11>a01+a10);
+					addPos(x,y,z+1);
+					addPos(x,y+1,z+1);
+					addPos(x+1,y,z+1);
+					addPos(x+1,y+1,z+1);
+					addAO(x,y,z+1);
+					addAO(x,y+1,z+1);
+					addAO(x+1,y,z+1);
+					addAO(x+1,y+1,z+1);
+					addUV(zplTP);
 				}
 
 			}
@@ -426,10 +443,6 @@ void Chunk::prepareGL(){
 		vboUV.bind();
 		vboUV.setData(sizeof(float)*uvData.size(),uvData.data());
 		vboUV.unbind();
-
-		vboLight.bind();
-		vboLight.setData(sizeof(float)*lightMeshData.size(),lightMeshData.data());
-		vboLight.unbind();
 
 		vboAO.bind();
 		vboAO.setData(sizeof(float)*aoMeshData.size(),aoMeshData.data());
@@ -459,13 +472,6 @@ void Chunk::prepareGL(){
 	vboUV.setData(sizeof(float)*uvData.size(),uvData.data());
 	vboUV.addVertexAttrib(1,2,false,2,0);
 	vboUV.unbind();
-
-	vboLight=gl::VertexBuffer(gl::VertexBufferTarget::Array,gl::VertexBufferUsage::StaticDraw,gl::Type::Float);
-	vboLight.create();
-	vboLight.bind();
-	vboLight.setData(sizeof(float)*lightMeshData.size(),lightMeshData.data());
-	vboLight.addVertexAttrib(2,1,false,1,0);
-	vboLight.unbind();
 
 	vboAO=gl::VertexBuffer(gl::VertexBufferTarget::Array,gl::VertexBufferUsage::StaticDraw,gl::Type::Float);
 	vboAO.create();

@@ -45,7 +45,6 @@ class Chunk {
 private:
 	std::vector<float>posData;
 	std::vector<float>uvData;
-	std::vector<float>lightMeshData;
 	std::vector<float>aoMeshData;
 	std::vector<unsigned int>triData;
 
@@ -54,9 +53,8 @@ private:
 	void addUV(float u,float v);
 	void addUV(glm::vec2 v);
 	void addUV(TexturePos tp,bool flip=false);
-	void addLight(int x,int y,int z);
 	void addAO(int x,int y,int z);
-	void addTriangleFace();
+	void addTriangleFace(bool flip);
 
 	Block getLocalBlock(int x,int y,int z);
 	float getChunkAO(int x,int y,int z);
@@ -79,13 +77,11 @@ public:
 	Chunk *cZPL;
 
 	Block blockData[CHUNK_SIZE][CHUNK_HEIGHT][CHUNK_SIZE];
-	float lightData[CHUNK_SIZE][CHUNK_HEIGHT][CHUNK_SIZE];
 	float 	 aoData[CHUNK_SIZE][CHUNK_HEIGHT][CHUNK_SIZE];
 
 	gl::VertexArray vao;
 	gl::VertexBuffer vboPos;
 	gl::VertexBuffer vboUV;
-	gl::VertexBuffer vboLight;
 	gl::VertexBuffer vboAO;
 	gl::VertexBuffer ebo;
 
@@ -93,7 +89,7 @@ public:
 	bool meshCreated=false;
 
 	void createChunkData(FastNoise*fn);
-	void prepareMesh(Atlas*atlas,bool onlyLighting);
+	void prepareMesh(Atlas*atlas);
 	void computeAO();
 	void prepareGL();
 

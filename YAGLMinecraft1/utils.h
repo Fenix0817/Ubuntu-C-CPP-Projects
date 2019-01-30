@@ -39,6 +39,8 @@ inline bool printError(){
 	return false;
 }
 
+void debugGL();
+
 namespace glm {
 
 //typedef glm::vec<2,int,glm::qualifier::defaultp> vec2i;

@@ -25,11 +25,6 @@ bool contains_ivec3(std::vector<glm::ivec3> list,glm::ivec3 v){
 	return false;
 }
 
-bool contains_lightnode(std::vector<LightNode*>list,LightNode*n){
-	for(unsigned int i=0;i<list.size();i++)if(list[i]->pos==n->pos&&list[i]->val==n->val)return true;
-	return false;
-}
-
 ChunkPtr ChunkManager::getChunk(int x,int z,bool instantiateChunk){
 	bool foundChunk=false;
 	ChunkPtr c=nullptr;
@@ -68,7 +63,7 @@ ChunkPtr ChunkManager::getChunk(int x,int z,bool instantiateChunk){
 		c->cZMI=zmi;
 		c->cZPL=zpl;
 //		setLighting(c);
-		c->prepareMesh(atlas,false);
+		c->prepareMesh(atlas);
 		c->prepareGL();
 #ifdef DEBUG_CHUNKMANAGER
 		printf("Finished instantiating %i,%i:  %i,%i,%i,%i\n",x,z,c->vao.id,c->vboPos.id,c->vboUV.id,c->ebo.id);
@@ -93,14 +88,6 @@ void ChunkManager::setBlock(int x,int y,int z,Block b){
 	chunk->blockData[pos.x][y][pos.y]=b;
 }
 
-void ChunkManager::addLight(int x,int y,int z,float f){
-	Light*s=new Light();
-	s->pos=glm::ivec3(x,y,z);
-	s->val=f;
-	s->initSpread(this);
-	lights.push_back(s);
-}
-
 void ChunkManager::remeshChunk(int x,int z){
 	ChunkPtr chunk=getChunk(x,z,false);
 	ChunkPtr xmi=getChunk(x-1,z,false);
@@ -112,7 +99,7 @@ void ChunkManager::remeshChunk(int x,int z){
 	chunk->cZMI=zmi;
 	chunk->cZPL=zpl;
 //	setLighting(chunk);
-	chunk->prepareMesh(atlas,false);
+	chunk->prepareMesh(atlas);
 	chunk->prepareGL();
 }
 
@@ -121,7 +108,14 @@ void ChunkManager::render(gl::Shader shader,glm::mat4 vp){
 	for(unsigned int i=0;i<chunks.size();i++){
 		ChunkPtr c=chunks[i];
 		if(c->instantiated){
-			shader.setMat4("MVP",vp*c->getModelMatrix());
+			glGetError();
+			glm::mat4 m=vp*c->getModelMatrix();
+			if(i==0){
+//				printf("%f,%f,%f,%f %f,%f,%f,%f %f,%f,%f,%f %f,%f,%f,%f\n",m[0][0],m[0][1],m[0][2],m[0][3],m[1][0],m[1][1],m[1][2],m[1][3],m[2][0],m[2][1],m[2][2],m[2][3],m[3][0],m[3][1],m[3][2],m[3][3]);
+//				printf("%i\n",shader.getUniformLocation("MVP"));
+			}
+			shader.setMat4("MVP",m);
+//			printError();
 			c->render();
 		}
 	}
@@ -139,79 +133,9 @@ int ChunkManager::getNumChunksRendered(){
 	return i;
 }
 
-void ChunkManager::initLighting(){
-	for(Light*l:lights){
-		for(LightNode*n:l->closed){
-			glm::ivec2 xz=glm::ivec2(n->pos.x,n->pos.z);
-			glm::ivec2 c=getChunkCoord(xz);
-			glm::ivec2 p=getPosInChunk(xz);
-			getChunk(c.x,c.y,false)->lightData[p.x][n->pos.y][p.y]=0;
-			addLightChange(n->pos);
-//			updateLightMesh(n->pos,false);
-		}
-		l->initSpread(this);
-	}
-}
-
-void ChunkManager::computeLighting(){
-	for(Light*l:lights){
-		if(!l->isDone()){
-			l->stepSpread(this);
-		}
-	}
-}
-
-void ChunkManager::addLightChange(glm::ivec3 v){
-	//Only add light change if it actually effects the world
-	if(!contains_ivec3(lightChanges,v)){
-		int x=v.x;
-		int y=v.y;
-		int z=v.z;
-		if(getBlock(x-1,y,z).empty&&getBlock(x+1,y,z).empty&&getBlock(x,y-1,z).empty&&getBlock(x,y+1,z).empty&&getBlock(x,y,z-1).empty&&getBlock(x,y,z+1).empty)return;
-		lightChanges.push_back(v);
-	}
-}
-
-void ChunkManager::updateLightMesh(glm::ivec3 pos,bool sumLighting){
-	glm::ivec2 v=getChunkCoord(glm::ivec2(pos.x,pos.z));
-	glm::ivec2 p=getPosInChunk(glm::ivec2(pos.x,pos.z));
-	ChunkPtr c=getChunk(v.x,v.y,false);
-	if(c->instantiated){
-//		printf("Re-setting light for chunk %i,%i\n",v.x,v.y);
-		if(sumLighting)
-			c->lightData[p.x][pos.y][p.y]=getLight(pos.x,pos.y,pos.z);
-		c->prepareMesh(atlas,true);//Recreate mesh, only lighting
-//		c->setLighting(this);
-		c->prepareGL();
-	}
-}
-
-float ChunkManager::getLight(int x,int y,int z){
-	float f=0;
-	for(Light*l:lights){
-		f+=l->getValue(x,y,z);
-	}
-	return f;
-}
-
-void ChunkManager::storeFrameLightChanges(int n){
-	for(int i=0;i<n;i++){
-		if(lightChanges.size()>0){
-			updateLightMesh(lightChanges[0],true);
-			lightChanges.erase(lightChanges.begin());
-		}
-	}
-}
-
 void ChunkManager::update(int frames,glm::ivec2 chunkPos){
 	int chunkX=chunkPos.x;
 	int chunkZ=chunkPos.y;
-
-	for(int i=0;i<20;i++){
-		computeLighting();
-	}
-	storeFrameLightChanges(20);
-	printf("Light changes.size() = %i\n",(int)lightChanges.size());
 
 	int o=4;
 	for(int x=-o;x<=o;x++){

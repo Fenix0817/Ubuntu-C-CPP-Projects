@@ -22,7 +22,9 @@ void Game::init() {
 //	txtRenderer.atlas = textAtlas;
 //	txtRenderer.init();
 
-	atlas = new AtlasNormal();
+//	atlas = new AtlasNormal();
+//	atlas = new AtlasFogleman();
+	atlas = new AtlasHD();
 
 	noise = new FastNoise();
 
@@ -33,6 +35,8 @@ void Game::init() {
 	shader.attachFile("Shaders/chunk.vert", gl::ShaderType::Vertex);
 	shader.attachFile("Shaders/chunk.frag", gl::ShaderType::Fragment);
 	shader.link();
+
+	printf("%i\n",shader.id);
 
 	texture = gl::loadTexture(atlas->getFileName());
 	texture.bind();
@@ -54,6 +58,12 @@ void Game::init() {
 
 }
 void Game::loop(gl::Window window) {
+
+	printf("------------------------------------------------------------\n");
+	printf("num chunks rendered: %i\n",chunkManager.getNumChunksRendered());
+	printf("num chunks in memory: %i\n",chunkManager.getNumChunksInMemory());
+	printf("cam position %f,%f,%f\n",camera.camPos.x,camera.camPos.y,camera.camPos.z);
+	printf("cam dir at %f,%f,%f\n",camera.camDir.x,camera.camDir.y,camera.camDir.z);
 	frames++;
 
 	prevTime=time;
@@ -92,11 +102,6 @@ void Game::loop(gl::Window window) {
 		selectedBlock.render(s.x,s.y,s.z,camera);
 	}
 
-	if(selectedIntersection.hit&&window.wasJustPressed('L')){
-		glm::ivec3 s=selectedIntersection.prev;
-		chunkManager.addLight(s.x,s.y,s.z,1);
-	}
-
 	crosshair.render();
 
 //	txtRenderer.setText("YAGLMinecraft1\nCamera position : "+std::to_string(camera.camPos.x)+","+std::to_string(camera.camPos.y)+","+std::to_string(camera.camPos.z)
@@ -128,7 +133,6 @@ void Game::loop(gl::Window window) {
 	if(window.mouseLeftJustPressed&&selectedIntersection.hit){
 		glm::ivec3 pos=selectedIntersection.abs;
 		chunkManager.setBlock(pos.x,pos.y,pos.z,blockEmpty);
-		chunkManager.initLighting();
 
 		glm::ivec2 c=getChunkCoord(glm::ivec2(pos.x,pos.z));
 		chunkManager.remeshChunk(c.x,c.y);
@@ -141,8 +145,7 @@ void Game::loop(gl::Window window) {
 
 	if(window.mouseRightJustPressed&&selectedIntersection.hit){
 		glm::ivec3 pos=selectedIntersection.prev;
-		chunkManager.setBlock(pos.x,pos.y,pos.z,blockSnow);
-		chunkManager.initLighting();
+		chunkManager.setBlock(pos.x,pos.y,pos.z,blockStone);
 
 		glm::ivec2 c=getChunkCoord(glm::ivec2(pos.x,pos.z));
 		chunkManager.remeshChunk(c.x,c.y);
@@ -162,7 +165,7 @@ void Game::loop(gl::Window window) {
 		int posX=(int)pos.x;
 		int posY=(int)pos.y;
 		int posZ=(int)pos.z;
-		int a=10;
+		int a=1;
 		printf("start %f\n",camera.camPos.y);
 		std::vector<glm::ivec2>changes;
 		for(int x=-a;x<=a;x++){
@@ -181,9 +184,7 @@ void Game::loop(gl::Window window) {
 				}
 			}
 		}
-		chunkManager.initLighting();
 		for(int i=0;i<changes.size();i++){
-			printf("\t%i\n",i);
 			chunkManager.remeshChunk(changes[i].x,changes[i].y);
 		}
 	}
