@@ -16,18 +16,66 @@ Camera::~Camera() {
 	// TODO Auto-generated destructor stub
 }
 
+float align(float f){
+	if(f<0)return ceil(f);
+	if(f==0)return 0;
+	return floor(f);
+}
 
-void Camera::moveForward(){
-	camPos+=forwardSpeed*getForwardMovement();
+bool verifyMovement(ChunkManager*cm,glm::vec3 pos,glm::vec3 dir){
+//	Intersection inters = cm->intersectWorld(pos,dir,5);
+//	if(!inters.hit)return false;
+//	float dist=glm::length(glm::vec3(inters.absPos())-pos);
+//	return dist>0;
+	return cm->intersectWorld(pos,dir,5).dist>1;
+//	dir=glm::normalize(dir);
+//	if(dir.y<0)dir.y=-1;
+//	glm::vec3 ipos=pos+dir;
+//	ipos.x=align(ipos.x);
+//	ipos.y=align(ipos.y);
+//	ipos.z=align(ipos.z);
+//	return cm->getBlock(glm::ivec3(ipos)).empty;
 }
-void Camera::moveLeft(){
-	camPos-=sideSpeed*getRightMovement();
+
+void Camera::moveForward(ChunkManager*cm){
+	if(verifyMovement(cm,camPos,getForwardMovement()))camPos+=forwardSpeed*getForwardMovement();
 }
-void Camera::moveRight(){
-	camPos+=sideSpeed*getRightMovement();
+void Camera::moveLeft(ChunkManager*cm){
+	if(verifyMovement(cm,camPos,-getRightMovement()))camPos-=sideSpeed*getRightMovement();
 }
-void Camera::moveBack(){
-	camPos-=backSpeed*getForwardMovement();
+void Camera::moveRight(ChunkManager*cm){
+	if(verifyMovement(cm,camPos,getRightMovement()))camPos+=sideSpeed*getRightMovement();
+}
+void Camera::moveBack(ChunkManager*cm){
+	if(verifyMovement(cm,camPos,-getForwardMovement()))camPos-=backSpeed*getForwardMovement();
+}
+void Camera::moveDown(ChunkManager*cm){
+	if(verifyMovement(cm,camPos,glm::vec3(0,-1,0)))camPos.y-=0.1;
+}
+void Camera::moveUp(ChunkManager*cm){
+	if(verifyMovement(cm,camPos,glm::vec3(0,1,0)))camPos.y+=0.3;
+}
+void Camera::jump(ChunkManager*cm){
+	velocity+=10.5;
+}
+void Camera::applyGravity(ChunkManager*cm){
+	int sign=-1;
+	if(velocity>0)sign=1;
+	if(verifyMovement(cm,camPos,glm::vec3(0,sign,0))){
+		camPos.y+=velocity;
+	}
+
+	printf("%f\n",velocity);
+	if(verifyMovement(cm,camPos,glm::vec3(0,-1,0))){
+		velocity-=0.0025;
+	}else{
+		velocity=0;
+	}
+//	if(verifyMovement(cm,camPos,glm::vec3(0,sign,0))){
+//		camPos.y+=velocity;
+//		velocity-=0.0025;
+//	}
+//	else velocity=0;
 }
 
 void Camera::updateDirection(glm::vec2 newMouse){

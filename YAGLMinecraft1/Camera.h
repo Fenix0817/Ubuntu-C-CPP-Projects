@@ -15,6 +15,7 @@
 #include <glm/gtx/rotate_vector.hpp>
 
 #include "utils.h"
+#include "ChunkManager.h"
 
 class Camera {
 public:
@@ -36,11 +37,16 @@ public:
 	float forwardSpeed;
 	float sideSpeed;
 	float backSpeed;
+	float velocity=0;
 
-	void moveForward();
-	void moveLeft();
-	void moveRight();
-	void moveBack();
+	void moveForward(ChunkManager*cm);
+	void moveLeft(ChunkManager*cm);
+	void moveRight(ChunkManager*cm);
+	void moveBack(ChunkManager*cm);
+	void moveUp(ChunkManager*cm);
+	void moveDown(ChunkManager*cm);
+	void applyGravity(ChunkManager*cm);
+	void jump(ChunkManager*cm);
 
 	void updateDirection(glm::vec2 newMouse);
 

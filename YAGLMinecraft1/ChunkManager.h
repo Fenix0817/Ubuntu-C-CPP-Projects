@@ -22,6 +22,7 @@ struct Intersection{
 	glm::ivec3 abs;
 	glm::ivec3 prev;
 	bool hit;
+	float dist;
 //	glm::ivec2 chunkCoord(){
 //		glm::ivec2 pos(abs.x,abs.z);
 //		return getChunkCoord(pos);

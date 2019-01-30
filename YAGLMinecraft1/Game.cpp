@@ -120,14 +120,16 @@ void Game::loop(gl::Window window) {
 	mouse=window.getMouse();
 	camera.mouse=mouse;
 
-	if(window.isKeyDown('W'))camera.moveForward();
-	if(window.isKeyDown('S'))camera.moveBack();
-	if(window.isKeyDown('A'))camera.moveLeft();
-	if(window.isKeyDown('D'))camera.moveRight();
+	if(window.isKeyDown('W'))camera.moveForward(&chunkManager);
+	if(window.isKeyDown('S'))camera.moveBack(&chunkManager);
+	if(window.isKeyDown('A'))camera.moveLeft(&chunkManager);
+	if(window.isKeyDown('D'))camera.moveRight(&chunkManager);
+//	if(window.wasJustPressed(' '))camera.jump(&chunkManager);
 
-	if(window.isKeyDown(' '))camera.camPos.y+=0.1;
-	if(window.isKeyDown(GLFW_KEY_LEFT_SHIFT))camera.camPos.y-=0.1;
+//	if(window.isKeyDown(' '))camera.moveUp(&chunkManager);
+//	if(window.isKeyDown(GLFW_KEY_LEFT_SHIFT))camera.moveDown(&chunkManager);
 	if(window.isKeyDown(GLFW_KEY_ESCAPE)||window.isKeyDown('/'))window.close();
+	camera.applyGravity(&chunkManager);
 	// ABOVE - '/' is a exit key because touchbar ESCAPE sometimes doesn't work
 
 	if(window.mouseLeftJustPressed&&selectedIntersection.hit){
@@ -143,7 +145,7 @@ void Game::loop(gl::Window window) {
 		if(p.y==CHUNK_SIZE-1)chunkManager.remeshChunk(c.x,c.y+1);
 	}
 
-	if(window.mouseRightJustPressed&&selectedIntersection.hit){
+	if((window.mouseRightJustPressed||window.wasJustPressed('R'))&&selectedIntersection.hit){
 		glm::ivec3 pos=selectedIntersection.prev;
 		chunkManager.setBlock(pos.x,pos.y,pos.z,blockStone);
 

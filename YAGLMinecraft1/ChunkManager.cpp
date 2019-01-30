@@ -249,7 +249,9 @@ Intersection ChunkManager::intersectWorld(glm::vec3 start,glm::vec3 dir,float ra
 	for(unsigned int i=1;i<list.size();i++){//Start at 1, so that when retrieving previous block list[i-1] we stay inside the array
 		if(!getBlock(list[i]).empty){
 //			printf("Intersection at %i,%i,%i   ",list[i].x,list[i].y,list[i].z);
-			return Intersection(list[i],list[i-1]);
+			Intersection inters(list[i],list[i-1]);
+			inters.dist=i;
+			return inters;
 		}
 	}
 //	Block camBlock=getBlock(start);
@@ -308,5 +310,7 @@ Intersection ChunkManager::intersectWorld(glm::vec3 start,glm::vec3 dir,float ra
 //		if(!getBlock(p).empty)return Intersection(p);
 //	}
 
-	return Intersection(false);
+	Intersection inters(false);
+	inters.dist=range;
+	return inters;
 }
