@@ -218,6 +218,7 @@ Intersection ChunkManager::intersectWorld(glm::vec3 start,glm::vec3 dir,float ra
 	float tz=((z1>z2)?(z1-minz):(maxz-z1))*deltaz;
 
 	std::vector<glm::ivec3>list;
+	glm::vec3 normal(0,0,0);
 
 	for(int num=0;num<range;num++){
 		if(j<0||j>=CHUNK_HEIGHT)break;
@@ -226,6 +227,7 @@ Intersection ChunkManager::intersectWorld(glm::vec3 start,glm::vec3 dir,float ra
 			//if(i==iend)break;
 			tx+=deltax;
 			i+=di;
+			normal=glm::vec3(deltax,0,0);
 
 			//if(di==1)sampler.movePositiveX();
 			//if(di==-1)sampler.moveNegativeX();
@@ -233,6 +235,7 @@ Intersection ChunkManager::intersectWorld(glm::vec3 start,glm::vec3 dir,float ra
 			//if(j==jend)break;
 			ty+=deltay;
 			j+=dj;
+			normal=glm::vec3(0,deltay,0);
 
 			//if(dj==1)sampler.movePositiveY();
 			//if(dj==-1)sampler.moveNegativeY();
@@ -240,6 +243,7 @@ Intersection ChunkManager::intersectWorld(glm::vec3 start,glm::vec3 dir,float ra
 			//if(k==kend)break;
 			tz+=deltaz;
 			k+=dk;
+			normal=glm::vec3(0,0,deltaz);
 
 			//if(dk==1)sampler.movePositiveZ();
 			//if(dk==-1)sampler.moveNegativeZ();
@@ -249,7 +253,7 @@ Intersection ChunkManager::intersectWorld(glm::vec3 start,glm::vec3 dir,float ra
 	for(unsigned int i=1;i<list.size();i++){//Start at 1, so that when retrieving previous block list[i-1] we stay inside the array
 		if(!getBlock(list[i]).empty){
 //			printf("Intersection at %i,%i,%i   ",list[i].x,list[i].y,list[i].z);
-			Intersection inters(list[i],list[i-1]);
+			Intersection inters(list[i],list[i-1],normal);
 			inters.dist=i;
 			return inters;
 		}

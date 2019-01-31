@@ -268,7 +268,7 @@ void Chunk::createChunkData(FastNoisePtr fn){
 #pragma omp parallel for
 		for(int z=0;z<CHUNK_SIZE;z++){
 			float zoom=1;
-			fn->SetFractalOctaves(10);
+			fn->SetFractalOctaves(1);
 			fn->SetFractalLacunarity(10);
 			fn->SetFractalGain(0.1f);
 			fn->SetFractalType(FractalTypeFBM);

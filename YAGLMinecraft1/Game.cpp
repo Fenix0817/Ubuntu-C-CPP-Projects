@@ -124,7 +124,7 @@ void Game::loop(gl::Window window) {
 	if(window.isKeyDown('S'))camera.moveBack(&chunkManager);
 	if(window.isKeyDown('A'))camera.moveLeft(&chunkManager);
 	if(window.isKeyDown('D'))camera.moveRight(&chunkManager);
-	if(window.wasJustPressed(' '))camera.jump(&chunkManager);
+	if(window.isKeyDown(' '))camera.jump(&chunkManager);
 
 //	if(window.isKeyDown(' '))camera.moveUp(&chunkManager);
 //	if(window.isKeyDown(GLFW_KEY_LEFT_SHIFT))camera.moveDown(&chunkManager);
