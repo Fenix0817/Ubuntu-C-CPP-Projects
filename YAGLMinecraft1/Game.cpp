@@ -31,6 +31,8 @@ void Game::init() {
 
 	chunkManager.noise = noise;
 	chunkManager.atlas = atlas;
+	chunkManager.worldGen = new WorldGeneratorBasic();
+	chunkManager.worldGen->init();
 
 	shader.create();
 	shader.attachFile("Shaders/chunk.vert", gl::ShaderType::Vertex);

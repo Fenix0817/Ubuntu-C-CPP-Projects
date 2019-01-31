@@ -14,6 +14,8 @@
 #include "Block.h"
 #include "TexturePos.h"
 #include "Atlas.h"
+#include "WorldGenerator.h"
+#include "ChunkConfig.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -25,8 +27,6 @@
 
 #include <vector>
 
-const int CHUNK_SIZE=16;
-const int CHUNK_HEIGHT=50;
 
 class Chunk;
 
@@ -93,7 +93,7 @@ public:
 	bool instantiated=false;
 	bool meshCreated=false;
 
-	void createChunkData(FastNoise*fn);
+	void createChunkData(FastNoise*fn,WorldGenerator*wg);
 	void prepareMesh(Atlas*atlas);
 	void computeAO();
 	void prepareGL();

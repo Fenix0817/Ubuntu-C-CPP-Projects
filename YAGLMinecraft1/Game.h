@@ -28,6 +28,8 @@
 #include "Chunk.h"
 #include "ChunkManager.h"
 #include "SelectedBlock.h"
+#include "WorldGenerator.h"
+#include "WorldGeneratorBasic.h"
 //#include "TextAtlas.h"
 //#include "TextAtlasMonospaced.h"
 //#include "TextRenderer.h"

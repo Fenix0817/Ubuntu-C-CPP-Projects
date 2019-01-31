@@ -14,6 +14,7 @@
 #include "utils.h"
 #include "Shader.h"
 #include <algorithm>
+#include "WorldGenerator.h"
 
 bool contains_ivec2(std::vector<glm::ivec2>list,glm::ivec2 v);
 bool contains_ivec3(std::vector<glm::ivec3>list,glm::ivec3 v);
@@ -67,6 +68,7 @@ public:
 	std::vector<ChunkPtr> chunks;
 
 	FastNoisePtr noise;
+	WorldGenerator* worldGen;
 	AtlasPtr atlas;
 
 	void render(gl::Shader shader,glm::mat4 vp);

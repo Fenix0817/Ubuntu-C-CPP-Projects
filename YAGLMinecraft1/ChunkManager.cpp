@@ -40,7 +40,7 @@ ChunkPtr ChunkManager::getChunk(int x,int z,bool instantiateChunk){
 #endif
 		c=new Chunk();
 		c->chunkPos=glm::ivec2(x,z);
-		c->createChunkData(noise);
+		c->createChunkData(noise,worldGen);
 		chunks.push_back(c);
 #ifdef DEBUG_CHUNKMANAGER
 		printf("\tFinished creating data for %i,%i\n",x,z);
