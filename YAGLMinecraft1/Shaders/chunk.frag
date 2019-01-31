@@ -11,7 +11,7 @@ uniform vec4 fogColor;
 
 void main(){
 	fragColor=texture(tex,uv);
-	float fogFactor=clamp(0.02*gl_FragCoord.z/gl_FragCoord.w,0.0,1.0);
+	float fogFactor=clamp(0.01*gl_FragCoord.z/gl_FragCoord.w,0.0,1.0);
 	fragColor*=clamp(ao,0.5,1.0);
 //	fragColor*=ao;
 	fragColor=mix(fragColor,fogColor,fogFactor);

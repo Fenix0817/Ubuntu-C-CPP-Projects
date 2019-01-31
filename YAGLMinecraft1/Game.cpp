@@ -24,7 +24,8 @@ void Game::init() {
 
 //	atlas = new AtlasNormal();
 //	atlas = new AtlasFogleman();
-	atlas = new AtlasHD();
+//	atlas = new AtlasHD();
+	atlas = new AtlasMCSimple();
 
 	noise = new FastNoise();
 

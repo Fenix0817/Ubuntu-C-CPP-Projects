@@ -137,7 +137,7 @@ void ChunkManager::update(int frames,glm::ivec2 chunkPos){
 	int chunkX=chunkPos.x;
 	int chunkZ=chunkPos.y;
 
-	int o=4;
+	int o=7;
 	for(int x=-o;x<=o;x++){
 		for(int z=-o;z<=o;z++){
 			if(!contains_ivec2(chunksToAdd,glm::ivec2(x+chunkX,z+chunkZ))){
