@@ -53,6 +53,7 @@ public:
 	Game();
 	virtual ~Game();
 
+	float lastJumpTime=0;
 
 	FastNoisePtr noise;
 

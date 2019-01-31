@@ -16,69 +16,64 @@ Camera::~Camera() {
 	// TODO Auto-generated destructor stub
 }
 
-float align(float f){
-//	if(f<0)return ceil(f);
-//	if(f==0)return 0;
-	return round(f);
+
+int align(float p,float d){
+	return floor(p);
 }
 
-glm::vec3 align(glm::vec3 v){
-	return glm::vec3(align(v.x),align(v.y),align(v.z));
+glm::ivec3 align(glm::vec3 pos,glm::vec3 dir){
+	return glm::vec3(align(pos.x,dir.x),align(pos.y,dir.y),align(pos.z,dir.z));
 }
 
-bool basicVerify(ChunkManager*cm,glm::ivec3 p){
-	return cm->getBlock(p.x,p.y,p.z).empty;
+int norm(float f){
+	if(f>0)return 1;
+	if(f<0)return -1;
+	return 0;
+}
+
+glm::ivec3 norm(glm::vec3 d){
+	return glm::ivec3(norm(d.x),norm(d.y),norm(d.z));
+}
+
+bool basicVerify(ChunkManager*cm,glm::vec3 p){
+//	return cm->getBlock(p.x,p.y,p.z).empty;
+	glm::ivec3 mi=glm::floor(p);
+	glm::ivec3 ma=glm::floor(p+glm::vec3(0,CAM_ELEV,0));
+//	ma.y=ceil(p.y+1);
+	for(int x=mi.x;x<=ma.x;x++){
+		for(int y=mi.y;y<=ma.y;y++){
+			for(int z=mi.z;z<=ma.z;z++){
+				if(!cm->getBlock(x,y,z).empty)return false;
+			}
+		}
+	}
+	return true;
+}
+
+glm::vec3 verifyMovementBasic(ChunkManager*cm,glm::vec3 pos,glm::vec3 dir){
+//	glm::ivec3 i=align(pos,dir);
+
+	if(dir==glm::vec3(0,0,0))return dir;
+	glm::vec3 res=dir;
+
+	glm::ivec3 normDir=norm(dir);
+
+	if(!basicVerify(cm,pos+glm::vec3(dir.x,0,0)))res.x=0;
+	if(!basicVerify(cm,pos+glm::vec3(0,dir.y,0)))res.y=0;
+	if(!basicVerify(cm,pos+glm::vec3(0,0,dir.z)))res.z=0;
+	if(!basicVerify(cm,pos))res=glm::vec3(0,0,0);
+
+
+	return res;
 }
 
 glm::vec3 verifyMovement(ChunkManager*cm,glm::vec3 pos,glm::vec3 dir){
-	pos.y-=1;
-//	Intersection inters = cm->intersectWorld(pos,dir,5);
-//	if(!inters.hit)return false;
-//	float dist=glm::length(glm::vec3(inters.absPos())-pos);
-//	return dist>0;
-	glm::vec3 res=dir;
-
-	/*
-	 * TODO
-	 * fix bug
-	   cam position -1.943915,33.989986,37.014339
-	   cam dir at -0.649753,-0.689114,-0.320847
-	 * where it just lets you walk through
-	 * only a problem at that y-level; same direction but lower works fine
-	 */
-
-	glm::vec3 dx=dir; dx.z=0;
-	if(!basicVerify(cm,pos+dx))res.x=0;
-
-	glm::vec3 dz=dir; dz.x=0;
-	if(!basicVerify(cm,pos+dz))res.z=0;
-
-	if(!basicVerify(cm,pos+glm::vec3(0,res.y,0)))res.y=0;
-
-	return res;
-//	pos+=dir;
-//	glm::ivec3 p=glm::floor(pos);
-//	for(int x=-1;x<=1;x++){
-//		for(int y=-1;y<=1;y++){
-//			for(int z=-1;z<=1;z++){
-//				if(!cm->getBlock(x+p.x,y+p.y,z+p.z).empty){
-//					return false;
-//				}
-//			}
-//		}
-//	}
-//	return true;
-//	return cm->getBlock(p.x,p.y,p.z).empty;
-//	Intersection inters= cm->intersectWorld(align(pos),align(dir),5);
-//	if(!inters.hit)return true;
-//	return inters.dist>1;
-//	dir=glm::normalize(dir);
-//	if(dir.y<0)dir.y=-1;
-//	glm::vec3 ipos=pos+dir;
-//	ipos.x=align(ipos.x);
-//	ipos.y=align(ipos.y);
-//	ipos.z=align(ipos.z);
-//	return cm->getBlock(glm::ivec3(ipos)).empty;
+	glm::vec3 v0 = verifyMovementBasic(cm,pos-glm::vec3(0,0,0),dir);
+	glm::vec3 v1 = verifyMovementBasic(cm,pos-glm::vec3(0,CAM_ELEV,0),dir);
+	if(v1.x==0)v0.x=0;
+	if(v1.y==0)v0.y=0;
+	if(v1.z==0)v0.z=0;
+	return v0;
 }
 
 void Camera::moveForward(ChunkManager*cm){
@@ -154,8 +149,6 @@ void Camera::updateDirection(glm::vec2 newMouse){
 	camDir=glm::rotateX(camDir,rotX);
 	camDir=glm::rotateY(camDir,rotY);
 
-	printf("mouse rotX,rotY=%f,%f  dx,dy=%f,%f\n",rotX,rotY,dx,dy);
-
 	if(isnanf(rotX))rotX=0;
 	if(isnanf(rotY))rotY=0;
 
@@ -173,7 +166,7 @@ glm::vec3 Camera::getRightMovement(){
 }
 
 glm::mat4 Camera::getPerspectiveMatrix(){
-	return glm::perspective(glm::radians(fovy),1.0f*windowW/windowH,0.01f,1000.0f);
+	return glm::perspective(glm::radians(fovy),1.0f*windowW/windowH,0.001f,1000.0f);
 }
 glm::mat4 Camera::getViewMatrix(){
 	return glm::lookAt(camPos,camPos+camDir,glm::vec3(0,1,0));

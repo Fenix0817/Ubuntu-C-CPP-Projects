@@ -17,6 +17,8 @@
 #include "utils.h"
 #include "ChunkManager.h"
 
+#define CAM_ELEV 0.5f
+
 class Camera {
 public:
 	Camera();

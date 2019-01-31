@@ -41,6 +41,11 @@ typedef ChunkManager* ChunkManagerPtr;
 
 float getAO(bool xmi,bool xpl,bool ymi,bool ypl,bool zmi,bool zpl);
 
+
+#define PRISON
+//#define TERRAIN
+//#define CAVES
+
 class Chunk {
 private:
 	std::vector<float>posData;
