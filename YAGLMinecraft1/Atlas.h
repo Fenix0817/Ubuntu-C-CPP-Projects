@@ -8,6 +8,7 @@
 #ifndef ATLAS_H_
 #define ATLAS_H_
 
+//#include "AtlasPos.h"
 #include "AtlasPos.h"
 #include "TexturePos.h"
 #include <string>

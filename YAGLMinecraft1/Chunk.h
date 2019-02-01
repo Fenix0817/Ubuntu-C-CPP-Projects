@@ -52,6 +52,7 @@ private:
 	std::vector<float>uvData;
 	std::vector<float>aoMeshData;
 	std::vector<unsigned int>triData;
+	std::vector<float>torchlightMeshData;
 
 	void addTriangle(unsigned int a,unsigned int b,unsigned int c);
 	void addPos(float x,float y,float z);
@@ -81,14 +82,16 @@ public:
 	Chunk *cZMI;
 	Chunk *cZPL;
 
-	Block blockData[CHUNK_SIZE][CHUNK_HEIGHT][CHUNK_SIZE];
-	float 	 aoData[CHUNK_SIZE][CHUNK_HEIGHT][CHUNK_SIZE];
+	Block      blockData[CHUNK_SIZE][CHUNK_HEIGHT][CHUNK_SIZE];
+	float 	      aoData[CHUNK_SIZE][CHUNK_HEIGHT][CHUNK_SIZE];
+	float torchlightData[CHUNK_SIZE][CHUNK_HEIGHT][CHUNK_SIZE];
 
 	gl::VertexArray vao;
 	gl::VertexBuffer vboPos;
 	gl::VertexBuffer vboUV;
 	gl::VertexBuffer vboAO;
 	gl::VertexBuffer ebo;
+	gl::VertexBuffer vboTorchlight;
 
 	bool instantiated=false;
 	bool meshCreated=false;
@@ -97,6 +100,8 @@ public:
 	void prepareMesh(Atlas*atlas);
 	void computeAO();
 	void prepareGL();
+
+//	void computeTorchlightData();
 
 	bool isEmptyReal(int x,int y,int z);
 

@@ -48,7 +48,7 @@ void Game::init() {
 	camera.camPos = glm::vec3(CHUNK_SIZE / 2, 40, CHUNK_SIZE / 2);
 	camera.camDir = glm::vec3(1, 0, 0);
 
-	camera.forwardSpeed = 0.1;
+	camera.forwardSpeed = 0.2;
 	camera.sideSpeed = 0.1;
 	camera.backSpeed = 0.1;
 

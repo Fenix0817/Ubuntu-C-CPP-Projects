@@ -189,20 +189,12 @@ void Chunk::addUV(TexturePos tp,bool flip){
 	addUV(tp._11);
 }
 float Chunk::getChunkAO(int x,int y,int z){
-//	return 1;
-//	bool side1=isEmpty(x-1,y,z-1)||isEmpty(x-1,y,z);
-//	bool side2=isEmpty(x,y,z-1)||isEmpty(x,y,z);
-//	bool corner=isEmpty(x,y,z);
-//	if(side1&&side2)return 1;
-//	return 1-(3-(side1+side2+corner));
-	return (isEmpty(x-1,y,z-1)+isEmpty(x-1,y,z)+isEmpty(x,y,z-1)+isEmpty(x,y,z))/4.0f;
-//	float xmi=(isEmpty(x,y,z)+isEmpty(x,y+1,z)+isEmpty(x,y,z+1)+isEmpty(x,y+1,z+1))/4.0f;
-//	float xpl=(isEmpty(x+1,y,z)+isEmpty(x+1,y+1,z)+isEmpty(x+1,y,z+1)+isEmpty(x+1,y+1,z+1))/4.0f;
-//	float ymi=(isEmpty(x,y,z)+isEmpty(x+1,y,z)+isEmpty(x,y,z+1)+isEmpty(x+1,y,z+1))/4.0f;
-//	float ypl=(isEmpty(x,y+1,z)+isEmpty(x+1,y+1,z)+isEmpty(x,y+1,z+1)+isEmpty(x+1,y+1,z+1))/4.0f;
-//	float zmi=(isEmpty(x,y,z)+isEmpty(x+1,y,z)+isEmpty(x,y+1,z)+isEmpty(x+1,y+1,z))/4.0f;
-//	float zpl=(isEmpty(x,y,z+1)+isEmpty(x+1,y,z+1)+isEmpty(x,y+1,z+1)+isEmpty(x+1,y+1,z+1))/4.0f;
-//	return getAO(xmi,xpl,ymi,ypl,zmi,zpl);
+	//-1,0,-1
+	//-1,0,0
+	//0,0,-1
+	//0,0,0
+	return (isEmpty(x-1,y,z-1)+isEmpty(x-1,y,z)+isEmpty(x,y,z-1)+isEmpty(x,y,z)+
+			isEmpty(x-1,y-1,z-1)+isEmpty(x-1,y-1,z)+isEmpty(x,y-1,z-1)+isEmpty(x,y-1,z))/8.0f;
 }
 void Chunk::addAO(int x,int y,int z){
 	aoMeshData.push_back(getChunkAO(x,y,z));
@@ -258,53 +250,7 @@ bool Chunk::isEmptyReal(int x,int y,int z){
 }
 
 void Chunk::createChunkData(FastNoisePtr fn,WorldGenerator*wg){
-//	fn->SetFractalOctaves(1);
-//	fn->SetFractalLacunarity(100);
-//	fn->SetFractalGain(0.1);
-//	fn->SetFractalType(FractalTypeFBM);
-
 	wg->generateData(chunkPos.x*CHUNK_SIZE,chunkPos.y*CHUNK_SIZE,blockData);
-
-//#pragma omp parallel for
-//	for(int x=0;x<CHUNK_SIZE;x++){
-//#pragma omp parallel for
-//		for(int z=0;z<CHUNK_SIZE;z++){
-//#ifdef TERRAIN
-//			float zoom=2;
-//			fn->SetFractalOctaves(1);
-//			fn->SetFractalLacunarity(10);
-//			fn->SetFractalGain(0.1f);
-//			fn->SetFractalType(FractalTypeFBM);
-//			float rx=chunkPos.x*CHUNK_SIZE+x;
-//			float rz=chunkPos.y*CHUNK_SIZE+z;
-//			float fh=CHUNK_HEIGHT/2+20*fn->GetSimplexFractal( zoom*rx,zoom*rz);
-//			int h=(int)fh;
-//#endif
-//#pragma omp parallel for
-//			for(int y=0;y<CHUNK_HEIGHT;y++){
-//#ifdef PRISON
-//				blockData[x][y][z]=blockEmpty;
-//				if(y==0)blockData[x][y][z]=blockDirt;
-//				if(x==0||z==0||x==CHUNK_SIZE-1||z==CHUNK_SIZE-1)blockData[x][y][z]=blockGrass;
-//#endif
-//#ifdef TERRAIN
-//				if(y<h-10)blockData[x][y][z]=blockStone;
-//				else if(y<h)blockData[x][y][z]=blockDirt;
-//				else if(y==h){
-//					blockData[x][y][z]=blockGrass;
-//				}
-//				else blockData[x][y][z]=blockEmpty;
-//
-//#ifdef CAVES
-//				if(fn->GetSimplexFractal(rx*3,y*15,rz*3)<-0.75f){
-//					blockData[x][y][z]=blockEmpty;
-//				}
-//#endif
-//#endif
-//
-//			}
-//		}
-//	}
 }
 
 void Chunk::computeAO(){
