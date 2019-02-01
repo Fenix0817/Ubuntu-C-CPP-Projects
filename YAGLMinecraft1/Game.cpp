@@ -158,6 +158,10 @@ void Game::loop(gl::Window window) {
 		if(p.x==CHUNK_SIZE-1)chunkManager.remeshChunk(c.x+1,c.y);
 		if(p.y==CHUNK_SIZE-1)chunkManager.remeshChunk(c.x,c.y+1);
 	}
+	if(window.wasJustPressed('L')&&selectedIntersection.hit){
+		glm::ivec3 pos=selectedIntersection.prev;
+		chunkManager.addLight(pos);
+	}
 
 	if(window.isKeyDown('C')&&selectedIntersection.hit){
 //		if(true){

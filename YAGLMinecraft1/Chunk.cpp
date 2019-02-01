@@ -263,11 +263,19 @@ void Chunk::computeAO(){
 	}
 }
 
+void Chunk::addTorchlight(int x,int y,int z){
+	float f=(rand()%1000)/1000.0;
+	for(int i=0;i<4;i++){
+		torchlightMeshData.push_back(torchlightData[x][y][z]);
+	}
+}
+
 void Chunk::prepareMesh(Atlas*atlas){
 	posData.clear();
 	uvData.clear();
 	triData.clear();
 	aoMeshData.clear();
+	torchlightMeshData.clear();
 	computeAO();
 	for(int x=0;x<CHUNK_SIZE;x++){
 		for(int y=0;y<CHUNK_HEIGHT;y++){
@@ -299,6 +307,7 @@ void Chunk::prepareMesh(Atlas*atlas){
 					addAO(x,y+1,z);
 					addAO(x,y,z+1);
 					addAO(x,y+1,z+1);
+					addTorchlight(x-1,y,z);
 				}
 
 				if(isEmpty(x+1,y,z)){//xpl
@@ -316,6 +325,7 @@ void Chunk::prepareMesh(Atlas*atlas){
 					addAO(x+1,y,z+1);
 					addAO(x+1,y+1,z+1);
 					addUV(xplTP);
+					addTorchlight(x+1,y,z);
 				}
 
 				if(isEmpty(x,y-1,z)){//ymi
@@ -333,6 +343,7 @@ void Chunk::prepareMesh(Atlas*atlas){
 					addAO(x,y,z+1);
 					addAO(x+1,y,z+1);
 					addUV(ymiTP);
+					addTorchlight(x,y-1,z);
 				}
 
 				if(isEmpty(x,y+1,z)){//ypl
@@ -350,6 +361,7 @@ void Chunk::prepareMesh(Atlas*atlas){
 					addAO(x,y+1,z+1);
 					addAO(x+1,y+1,z+1);
 					addUV(yplTP);
+					addTorchlight(x,y+1,z);
 				}
 
 				if(isEmpty(x,y,z-1)){//zmi
@@ -367,6 +379,7 @@ void Chunk::prepareMesh(Atlas*atlas){
 					addAO(x+1,y,z);
 					addAO(x+1,y+1,z);
 					addUV(zmiTP);
+					addTorchlight(x,y,z-1);
 				}
 
 				if(isEmpty(x,y,z+1)){//zpl
@@ -384,6 +397,7 @@ void Chunk::prepareMesh(Atlas*atlas){
 					addAO(x+1,y,z+1);
 					addAO(x+1,y+1,z+1);
 					addUV(zplTP);
+					addTorchlight(x,y,z+1);
 				}
 
 			}
@@ -406,6 +420,10 @@ void Chunk::prepareGL(){
 		vboAO.bind();
 		vboAO.setData(sizeof(float)*aoMeshData.size(),aoMeshData.data());
 		vboAO.unbind();
+
+		vboTorchlight.bind();
+		vboTorchlight.setData(sizeof(float)*torchlightMeshData.size(),torchlightMeshData.data());
+		vboTorchlight.unbind();
 
 		ebo.bind();
 		ebo.setData(sizeof(unsigned int)*triData.size(),triData.data());
@@ -439,6 +457,12 @@ void Chunk::prepareGL(){
 	vboAO.addVertexAttrib(3,1,false,1,0);
 	vboAO.unbind();
 
+	vboTorchlight=gl::VertexBuffer(gl::VertexBufferTarget::Array,gl::VertexBufferUsage::StaticDraw,gl::Type::Float);
+	vboTorchlight.create();
+	vboTorchlight.bind();
+	vboTorchlight.setData(sizeof(float)*torchlightMeshData.size(),torchlightMeshData.data());
+	vboTorchlight.addVertexAttrib(4,1,false,1,0);
+
 	ebo=gl::VertexBuffer(gl::VertexBufferTarget::ElementArray,gl::VertexBufferUsage::StaticDraw,gl::Type::UnsignedInt);
 	ebo.create();
 	ebo.bind();
@@ -447,6 +471,9 @@ void Chunk::prepareGL(){
 
 	vao.unbind();
 
+}
+void Chunk::setTorchlight(int x,int y,int z,float l){
+	torchlightData[x][y][z]=l;
 }
 
 glm::mat4 Chunk::getModelMatrix(){

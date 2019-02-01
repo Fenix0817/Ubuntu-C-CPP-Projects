@@ -2,6 +2,7 @@
 
 in vec2 uv;
 in float ao;
+in float torchlight;
 
 out vec4 fragColor;
 
@@ -14,6 +15,7 @@ void main(){
 	float fogFactor=clamp(0.01*gl_FragCoord.z/gl_FragCoord.w,0.0,1.0);
 	fragColor*=clamp(ao,0.25,1.0);
 //	fragColor*=ao;
+	fragColor*=torchlight;
 	fragColor=mix(fragColor,fogColor,fogFactor);
 	
 }

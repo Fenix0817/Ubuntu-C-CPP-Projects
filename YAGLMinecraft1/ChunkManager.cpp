@@ -103,6 +103,25 @@ void ChunkManager::remeshChunk(int x,int z){
 	chunk->prepareGL();
 }
 
+void ChunkManager::setLight(int x,int y,int z,float l){
+	glm::ivec2 pos=getChunkCoord(glm::ivec2(x,z));
+	if(!contains_ivec2(remeshChunks,pos))remeshChunks.push_back(pos);
+	glm::ivec2 p=getPosInChunk(glm::ivec2(x,z));
+	getChunk(pos.x,pos.y,false)->setTorchlight(p.x,y,p.y,l);
+}
+
+void ChunkManager::addLight(glm::ivec3 pos){
+	std::queue<LightNode*>bfs;
+	remeshChunks.clear();
+	setLight(pos.x,pos.y,pos.z,1);
+	remeshChunkList();
+}
+
+void ChunkManager::remeshChunkList(){
+	for(int i=0;i<remeshChunks.size();i++){
+		remeshChunk(remeshChunks[i].x,remeshChunks[i].y);
+	}
+}
 
 void ChunkManager::render(gl::Shader shader,glm::mat4 vp){
 	for(unsigned int i=0;i<chunks.size();i++){

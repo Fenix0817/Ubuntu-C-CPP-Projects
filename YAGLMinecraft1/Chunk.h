@@ -26,7 +26,9 @@
 #include "FastNoise.h"
 
 #include <vector>
+#include <queue>
 
+#include "LightNode.h"
 
 class Chunk;
 
@@ -61,6 +63,7 @@ private:
 	void addUV(TexturePos tp,bool flip=false);
 	void addAO(int x,int y,int z);
 	void addTriangleFace(bool flip);
+	void addTorchlight(int x,int y,int z);
 
 	Block getLocalBlock(int x,int y,int z);
 	float getChunkAO(int x,int y,int z);
@@ -96,12 +99,11 @@ public:
 	bool instantiated=false;
 	bool meshCreated=false;
 
+	void setTorchlight(int x,int y,int z,float l);
 	void createChunkData(FastNoise*fn,WorldGenerator*wg);
 	void prepareMesh(Atlas*atlas);
 	void computeAO();
 	void prepareGL();
-
-//	void computeTorchlightData();
 
 	bool isEmptyReal(int x,int y,int z);
 
