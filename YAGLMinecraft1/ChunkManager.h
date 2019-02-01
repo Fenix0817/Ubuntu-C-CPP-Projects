@@ -16,7 +16,6 @@
 #include <algorithm>
 #include "WorldGenerator.h"
 #include <queue>
-#include "LightNode.h"
 
 bool contains_ivec2(std::vector<glm::ivec2>list,glm::ivec2 v);
 bool contains_ivec3(std::vector<glm::ivec3>list,glm::ivec3 v);
@@ -59,7 +58,12 @@ template<typename T>inline int sign(T x){
 //	glm::ivec2 c;
 //};
 
+class LightNode;
+
 class ChunkManager {
+private:
+	void setLight(int x,int y,int z,float l);
+	float getLight(int x,int y,int z);
 public:
 	ChunkManager();
 	virtual ~ChunkManager();
@@ -87,7 +91,6 @@ public:
 
 	std::vector<glm::ivec3> lights;
 	std::vector<glm::ivec2> remeshChunks;
-	void setLight(int x,int y,int z,float l);
 	void addLight(glm::ivec3 pos);
 
 	void remeshChunkList();
@@ -99,9 +102,9 @@ public:
 	//In world coordinates, not pos in chunk coordinates
 	Intersection intersectWorld(glm::vec3 start,glm::vec3 dir,float range);
 
+	ChunkPtr getChunk(int x,int z,bool instantiate);
 private:
 	void eraseChunk(int x,int z);
-	ChunkPtr getChunk(int x,int z,bool instantiate);
 
 };
 

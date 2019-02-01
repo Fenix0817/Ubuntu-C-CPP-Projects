@@ -99,6 +99,7 @@ public:
 	bool instantiated=false;
 	bool meshCreated=false;
 
+	float getTorchlight(int x,int y,int z);
 	void setTorchlight(int x,int y,int z,float l);
 	void createChunkData(FastNoise*fn,WorldGenerator*wg);
 	void prepareMesh(Atlas*atlas);

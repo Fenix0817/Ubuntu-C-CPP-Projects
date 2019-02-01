@@ -141,7 +141,7 @@ Chunk::Chunk(int x,int z){
 //	for(int x=0;x<CHUNK_SIZE;x++){
 //		for(int y=0;y<CHUNK_HEIGHT;y++){
 //			for(int z=0;z<CHUNK_SIZE;z++){
-//				lightData[x][y][z]=((float)rand())/((float)RAND_MAX);
+//				torchlightData[x][y][z]=0.3;
 //			}
 //		}
 //	}
@@ -221,6 +221,15 @@ bool Chunk::isEmpty(int x,int y,int z){
 	if(z>=CHUNK_SIZE)return cZPL->isEmptyReal(x,y,z-CHUNK_SIZE);
 //	if(y<0||y>=CHUNK_HEIGHT)return true;
 	return isEmptyReal(x,y,z);
+}
+
+float Chunk::getTorchlight(int x,int y,int z){
+	if(y<0||y>=CHUNK_HEIGHT)return true;
+	if(x<0)return cXMI->torchlightData[x+CHUNK_SIZE][y][z];
+	if(x>=CHUNK_SIZE)return cXPL->torchlightData[x-CHUNK_SIZE][y][z];
+	if(z<0)return cZMI->torchlightData[x][y][z+CHUNK_SIZE];
+	if(z>=CHUNK_SIZE)return cZPL->torchlightData[x][y][z-CHUNK_SIZE];
+	return torchlightData[x][y][z];
 }
 
 Block Chunk::getLocalBlock(int x,int y,int z){

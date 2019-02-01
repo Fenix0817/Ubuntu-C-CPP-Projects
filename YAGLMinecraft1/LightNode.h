@@ -10,11 +10,13 @@
 
 #include <glm/glm.hpp>
 
+class ChunkManager;
 class Chunk;
 
 struct LightNode{
 	glm::ivec3 pos;
 	Chunk*chunk;
+	LightNode(int x,int y,int z,ChunkManager*cm);
 };
 
 
