@@ -159,6 +159,19 @@ Chunk* emptyChunk(){
 	return c;
 }
 
+void Chunk::clearLight(){
+#pragma omp parallel for
+	for(int x=0;x<CHUNK_SIZE;x++){
+#pragma omp parallel for
+		for(int y=0;y<CHUNK_HEIGHT;y++){
+#pragma omp parallel for
+			for(int z=0;z<CHUNK_SIZE;z++){
+				torchlightData[x][y][z]=0;
+			}
+		}
+	}
+}
+
 void Chunk::addTriangle(unsigned int a,unsigned int b,unsigned int c){
 	unsigned int i=posData.size()/3;
 	triData.push_back(i+a);
@@ -482,7 +495,13 @@ void Chunk::prepareGL(){
 
 }
 void Chunk::setTorchlight(int x,int y,int z,float l){
-	torchlightData[x][y][z]=l;
+//	if(y<0||y>=CHUNK_HEIGHT)return;
+//	if(x<0&&cXMI!=nullptr)cXMI->setTorchlight(x+CHUNK_SIZE,y,z,l);
+//	if(z<0&&cZMI!=nullptr)cZMI->setTorchlight(x,y,z+CHUNK_SIZE,l);
+//	if(x>=CHUNK_SIZE&&cXPL!=nullptr)cXPL->setTorchlight(x-CHUNK_SIZE,y,z,l);
+//	if(x>=CHUNK_SIZE&&cZPL!=nullptr)cZPL->setTorchlight(x,y,z-CHUNK_SIZE,l);
+	if(x<0||y<0||z<0||x>=CHUNK_SIZE||y>=CHUNK_HEIGHT||z>=CHUNK_SIZE)printf("%i,%i,%i\n",x,y,z);
+	else torchlightData[x][y][z]=l;
 }
 
 glm::mat4 Chunk::getModelMatrix(){

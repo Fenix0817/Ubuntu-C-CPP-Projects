@@ -31,7 +31,8 @@ void Game::init() {
 
 	chunkManager.noise = noise;
 	chunkManager.atlas = atlas;
-	chunkManager.worldGen = new WorldGeneratorBasic();
+//	chunkManager.worldGen = new WorldGeneratorBasic();
+	chunkManager.worldGen = new WorldGeneratorFlat();
 	chunkManager.worldGen->init();
 
 	shader.create();
@@ -136,6 +137,7 @@ void Game::loop(gl::Window window) {
 	if(window.mouseLeftJustPressed&&selectedIntersection.hit){
 		glm::ivec3 pos=selectedIntersection.abs;
 		chunkManager.setBlock(pos.x,pos.y,pos.z,blockEmpty);
+		chunkManager.updateLights();
 
 		glm::ivec2 c=getChunkCoord(glm::ivec2(pos.x,pos.z));
 		chunkManager.remeshChunk(c.x,c.y);
@@ -149,6 +151,7 @@ void Game::loop(gl::Window window) {
 	if((window.mouseRightJustPressed||window.wasJustPressed('R'))&&selectedIntersection.hit){
 		glm::ivec3 pos=selectedIntersection.prev;
 		chunkManager.setBlock(pos.x,pos.y,pos.z,blockStone);
+		chunkManager.updateLights();
 
 		glm::ivec2 c=getChunkCoord(glm::ivec2(pos.x,pos.z));
 		chunkManager.remeshChunk(c.x,c.y);
@@ -189,6 +192,7 @@ void Game::loop(gl::Window window) {
 				}
 			}
 		}
+		chunkManager.updateLights();
 		for(int i=0;i<changes.size();i++){
 			chunkManager.remeshChunk(changes[i].x,changes[i].y);
 		}

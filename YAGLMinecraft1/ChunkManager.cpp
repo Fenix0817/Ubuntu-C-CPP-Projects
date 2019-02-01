@@ -117,12 +117,27 @@ float ChunkManager::getLight(int x,int y,int z){
 	return getChunk(c.x,c.y,false)->torchlightData[p.x][y][p.y];
 }
 
-void ChunkManager::addLight(glm::ivec3 pos){
-	lights.push_back(pos);
-	std::queue<LightNode>bfs;
+void ChunkManager::setTorchlight(int x,int y,int z,float l){
+	glm::ivec2 chunk=getChunkCoord(glm::ivec2(x,z));
+	glm::ivec2 pos=getPosInChunk(glm::ivec2(x,z));
+	getChunk(chunk.x,chunk.y,false)->torchlightData[pos.x][y][pos.y]=l;
+}
+
+void ChunkManager::updateLights(){
 	remeshChunks.clear();
+	for(int i=0;i<chunks.size();i++){
+		chunks[i]->clearLight();
+	}
+	for(int i=0;i<lights.size();i++){
+		propogateLight(lights[i]);
+	}
+	remeshChunkList();
+}
+
+void ChunkManager::propogateLight(glm::ivec3 pos){
 	setLight(pos.x,pos.y,pos.z,1);
 
+	std::queue<LightNode>bfs;
 	bfs.emplace(LightNode(pos.x,pos.y,pos.z,this));
 
 	float df=0.1;
@@ -136,54 +151,69 @@ void ChunkManager::addLight(glm::ivec3 pos){
 		int y=p.y;
 		int z=p.z;
 
-
+		dirtyChunk(getChunkCoord(glm::ivec2(x,z)));
 
 		glm::ivec2 ___posInChunk=getPosInChunk(glm::ivec2(x,z));
 		glm::ivec3 pc=glm::ivec3(___posInChunk.x,y,___posInChunk.y);
 		float f=chunk->getTorchlight(pc.x,pc.y,pc.z);
 		if(f<0)continue;
 
-		printf("iter\n");
-		printf("%i,%i,%i: %f->%f\n",x,y,z,f,f-df);
-		printf("size: %i\n",bfs.size());
 		if(chunk->isEmpty(pc.x-1,pc.y,pc.z)&&chunk->getTorchlight(pc.x-1,pc.y,pc.z)<f-df){
-			chunk->setTorchlight(pc.x-1,pc.y,pc.z,f-df);
-			printf("xmi ");
-			bfs.emplace(LightNode(p.x-1,p.y,p.z,this));
+			setTorchlight(x-1,y,z,f-df);
+			bfs.emplace(LightNode(x-1,y,z,this));
+			dirtyChunk(getChunkCoord(glm::ivec2(x-1,z)));
 		}
 		if(chunk->isEmpty(pc.x+1,pc.y,pc.z)&&chunk->getTorchlight(pc.x+1,pc.y,pc.z)<f-df){
-			chunk->setTorchlight(pc.x+1,pc.y,pc.z,f-df);
-			printf("xpl ");
-			bfs.emplace(LightNode(p.x+1,p.y,p.z,this));
+			setTorchlight(x+1,y,z,f-df);
+			bfs.emplace(LightNode(x+1,y,z,this));
+			dirtyChunk(getChunkCoord(glm::ivec2(x+1,z)));
 		}
 		if(chunk->isEmpty(pc.x,pc.y-1,pc.z)&&chunk->getTorchlight(pc.x,pc.y-1,pc.z)<f-df){
-			chunk->setTorchlight(pc.x,pc.y-1,pc.z,f-df);
-			printf("ymi ");
-			bfs.emplace(LightNode(p.x,p.y-1,p.z,this));
+			setTorchlight(x,y-1,z,f-df);
+			bfs.emplace(LightNode(x,y-1,z,this));
+			dirtyChunk(getChunkCoord(glm::ivec2(x,z)));
 		}
 		if(chunk->isEmpty(pc.x,pc.y+1,pc.z)&&chunk->getTorchlight(pc.x,pc.y+1,pc.z)<f-df){
-			chunk->setTorchlight(pc.x,pc.y+1,pc.z,f-df);
-			printf("ypl ");
-			bfs.emplace(LightNode(p.x,p.y+1,p.z,this));
+			setTorchlight(x,y+1,z,f-df);
+			bfs.emplace(LightNode(x,y+1,z,this));
+			dirtyChunk(getChunkCoord(glm::ivec2(x,z)));
 		}
 		if(chunk->isEmpty(pc.x,pc.y,pc.z-1)&&chunk->getTorchlight(pc.x,pc.y,pc.z-1)<f-df){
-			chunk->setTorchlight(pc.x,pc.y,pc.z-1,f-df);
-			printf("zmi ");
+			setTorchlight(x,y,z-1,f-df);
 			bfs.emplace(LightNode(p.x,p.y,p.z-1,this));
+			dirtyChunk(getChunkCoord(glm::ivec2(x,z-1)));
 		}
 		if(chunk->isEmpty(pc.x,pc.y,pc.z+1)&&chunk->getTorchlight(pc.x,pc.y,pc.z+1)<f-df){
-			chunk->setTorchlight(pc.x,pc.y,pc.z+1,f-df);
-			printf("zpl ");
-			bfs.emplace(LightNode(p.x,p.y,p.z+1,this));
+			setTorchlight(x,y,z+1,f-df);
+			bfs.emplace(LightNode(x,y,z+1,this));
+			dirtyChunk(getChunkCoord(glm::ivec2(x,z+1)));
 		}
-		printf("\n");
 
 	}
+}
+
+void ChunkManager::dirtyChunk(glm::ivec2 v){
+	if(!contains_ivec2(remeshChunks,v))remeshChunks.push_back(v);
+}
+
+void ChunkManager::dirtyChunk(int x,int z){
+	glm::ivec2 v(x,z);
+	if(!contains_ivec2(remeshChunks,v))remeshChunks.push_back(v);
+}
+
+void ChunkManager::addLight(glm::ivec3 pos){
+	//TODO: figure out how to change world AND lights together
+	lights.push_back(pos);
+	remeshChunks.clear();
+
+	propogateLight(pos);
+
 	remeshChunkList();
 }
 
 void ChunkManager::remeshChunkList(){
 	for(int i=0;i<remeshChunks.size();i++){
+		printf("%i,%i\n",remeshChunks[i].x,remeshChunks[i].y);
 		remeshChunk(remeshChunks[i].x,remeshChunks[i].y);
 	}
 }

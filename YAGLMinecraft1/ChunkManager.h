@@ -91,9 +91,14 @@ public:
 
 	std::vector<glm::ivec3> lights;
 	std::vector<glm::ivec2> remeshChunks;
+	void updateLights();
 	void addLight(glm::ivec3 pos);
-
+	void propogateLight(glm::ivec3 pos);
+	void setTorchlight(int x,int y,int z,float l);
 	void remeshChunkList();
+
+	void dirtyChunk(int x,int z);
+	void dirtyChunk(glm::ivec2 v);
 	//TODO
 	//void delLight(glm::ivec3 pos);
 	//or

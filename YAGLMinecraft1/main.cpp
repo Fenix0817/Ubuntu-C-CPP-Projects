@@ -146,11 +146,18 @@ int main(){
 
 	window.unbind();
 
+	float lastTime=gl::time();
+
 	while(window.isOpen()){
 
 		window.bind();
 
 		game.loop(window);
+
+		while(gl::time()<lastTime+1.0/50){
+
+		}
+		lastTime=gl::time();
 
 		window.clearInputs();
 		window.updateSize();

@@ -30,6 +30,7 @@
 #include "SelectedBlock.h"
 #include "WorldGenerator.h"
 #include "WorldGeneratorBasic.h"
+#include "WorldGeneratorFlat.h"
 //#include "TextAtlas.h"
 //#include "TextAtlasMonospaced.h"
 //#include "TextRenderer.h"
